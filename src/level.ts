@@ -20,13 +20,7 @@ export class Level extends ex.Scene {
         this.add(this.player);
     }
 
-    
-
-    onPreUpdate(engine: ex.Engine, elapsed: number): void {
-        super.onPreUpdate(engine, elapsed);
-    }
-
-    onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {
+    onPreDraw(ctx: ex.ExcaliburGraphicsContext): void {
         const gridBounds = this.gridSystem?.getBounds();
         if (gridBounds == null) {
             return;

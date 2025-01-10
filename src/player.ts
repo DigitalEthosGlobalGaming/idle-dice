@@ -43,7 +43,7 @@ export class Player extends ex.Actor {
         return this.scene;
     }
 
-    onInitialize(engine: ex.Engine): void {
+    onInitialize(): void {
         this.ghost = new Ghost();
         this.addChild(this.ghost);
         this.scoreComponent = new ScoreComponent();
@@ -56,17 +56,17 @@ export class Player extends ex.Actor {
         return this.getScene().engine;
     }
 
-    onMouseDown(state: MouseState) {
-        console.log('down');
-    }
+    // onMouseDown(state: MouseState) {
+    //     console.log('down');
+    // }
 
-    onPress(state: MouseState) {
+    // onPress(state: MouseState) {
 
-    }
+    // }
 
-    onLongPress(state: MouseState) {
+    // onLongPress(state: MouseState) {
 
-    }
+    // }
 
     onMouseUp(state: MouseState) {
         if (this.draggingBuilding != null) {
@@ -142,7 +142,7 @@ export class Player extends ex.Actor {
                 }
             } else {
                 if (didDownChange) {
-                    this.onMouseDown(state);
+                    // this.onMouseDown(state);
                 }
             }
 

@@ -1,7 +1,6 @@
 import * as ex from "excalibur";
 import { GridSystem } from "./grid-system";
 import { GridSpace } from "./grid-space";
-import { Dice } from "../dice";
 import { Grid } from "../graphics/grid";
 
 class GridSpaceGhost extends ex.Actor {
@@ -11,7 +10,7 @@ class GridSpaceGhost extends ex.Actor {
         this.spaceSize = size;
 
     }
-    onInitialize(engine: ex.Engine): void {
+    onInitialize(): void {
         this.graphics.add('hide',
             new ex.Rectangle({
                 width: 0,

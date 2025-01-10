@@ -3,7 +3,7 @@ import * as ex from 'excalibur';
 export class PlayerUi extends ex.Actor {
     isMoving = false;
 
-    onPreUpdate(engine: ex.Engine, elapsed: number): void {
+    onPreUpdate(engine: ex.Engine): void {
         const camera = engine.currentScene?.camera;
         if (camera) {
             const viewPort = camera.viewport;

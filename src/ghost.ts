@@ -1,7 +1,4 @@
 import * as ex from "excalibur";
-import { Resources } from "./resources";
-
-
 export class Ghost extends ex.Actor {
     target: ex.Actor | null = null;
     
