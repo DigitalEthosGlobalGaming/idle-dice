@@ -55,19 +55,7 @@ export class Player extends ex.Actor {
     getEngine(): ex.Engine {
         return this.getScene().engine;
     }
-
-    // onMouseDown(state: MouseState) {
-    //     console.log('down');
-    // }
-
-    // onPress(state: MouseState) {
-
-    // }
-
-    // onLongPress(state: MouseState) {
-
-    // }
-
+    
     onMouseUp(state: MouseState) {
         if (this.draggingBuilding != null) {
             const newSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(state.pos);

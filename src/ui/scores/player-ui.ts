@@ -1,5 +1,6 @@
 import * as ex from 'excalibur';
-import { PlayerActionsUi } from './player-actions-ui';
+import { PlayerActionsUi } from '../../player-systems/player-actions-ui';
+
 
 export class PlayerUi extends ex.Actor {
     isMoving = false;

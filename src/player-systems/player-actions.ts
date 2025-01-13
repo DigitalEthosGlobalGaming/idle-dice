@@ -11,9 +11,15 @@ export type PlayerAction = {
 
 export const playerActions: PlayerAction[] = [
     {
-        "code": "MOVE",
+        "code": "NEW_DICE",
         "image": Resources.DiceEmpty,
         "name": "Move",
+        "tooltip": "Move to another location"
+    },
+    {
+        "code": "ROLLER",
+        "image": Resources.DiceOut,
+        "name": "Roll",
         "tooltip": "Move to another location"
     }
 ]
