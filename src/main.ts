@@ -3,9 +3,9 @@ import { Level } from './level';
 import { GameLoader } from './game-loader';
 
 const game = new ex.Engine({
-  backgroundColor: ex.Color.fromHex("#222222"),
+  backgroundColor: ex.Color.fromHex("#000000"),
   pixelArt: false,
-  displayMode: ex.DisplayMode.Fixed,
+  displayMode: ex.DisplayMode.FillScreen,
   scenes: { Level }
 });
 

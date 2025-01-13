@@ -1,5 +1,5 @@
 import {Component} from "excalibur";
-import { Player } from "../player";
+import { Player } from "../player-systems/player";
 import { PlayerUi } from "../ui/scores/player-ui";
 
 export class BaseComponent extends Component {

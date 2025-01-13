@@ -14,6 +14,10 @@ export const Resources = {
     Dice4: new ex.ImageSource('./images/board-game-icons/dice_4.png'),
     Dice5: new ex.ImageSource('./images/board-game-icons/dice_5.png'),
     Dice6: new ex.ImageSource('./images/board-game-icons/dice_6.png'),
+    HandCube: new ex.ImageSource('./images/board-game-icons/hand_cube.png'),
+    DiceOut: new ex.ImageSource('./images/board-game-icons/dice_out.png'),
+    Pouch: new ex.ImageSource('./images/board-game-icons/pouch.png'),
+
     // Images
     BirdImage: new ex.ImageSource('./images/bird.png'),
     PipeImage: new ex.ImageSource('./images/pipe.png', {
@@ -29,6 +33,9 @@ export const Resources = {
     ScoreSound: new ex.Sound('./sounds/score.wav'),
 
     // Music
-    BackgroundMusic: new ex.Sound('./sounds/two_left_socks.ogg')
+    BackgroundMusic: new ex.Sound('./sounds/two_left_socks.ogg'),
+
+    // Fonts
+    FontNormal: new ex.ImageSource('./fonts/outline_24x32.png'),
 } as const;
 

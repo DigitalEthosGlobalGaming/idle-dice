@@ -1,8 +1,14 @@
 import * as ex from 'excalibur';
+import { PlayerActionsUi } from './player-actions-ui';
 
 export class PlayerUi extends ex.Actor {
     isMoving = false;
+    playerActionsUi!: PlayerActionsUi;
 
+    onInitialize(): void {
+        this.playerActionsUi = new PlayerActionsUi();
+        this.addChild(this.playerActionsUi);
+    }
     onPreUpdate(engine: ex.Engine): void {
         const camera = engine.currentScene?.camera;
         if (camera) {

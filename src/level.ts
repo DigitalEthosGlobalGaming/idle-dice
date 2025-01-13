@@ -1,6 +1,6 @@
 import * as ex from "excalibur";
 import { DiceGameGridSystem } from "./grid-system/grid-system-actor";
-import { Player } from "./player";
+import { Player } from "./player-systems/player";
 import { Resources } from "./resources";
 
 export class Level extends ex.Scene {
@@ -8,7 +8,8 @@ export class Level extends ex.Scene {
     best: number = 0;
     random = new ex.Random();
     player!: Player;
-    gridSystem: DiceGameGridSystem | null = null; 
+    gridSystem: DiceGameGridSystem | null = null;
+    gridColor = new ex.Color(255 * 0.25, 255 * 0.25, 255 * 0.25, 1);
 
     override onActivate(): void {
         Resources.BackgroundMusic.loop = true;
@@ -20,7 +21,7 @@ export class Level extends ex.Scene {
         this.add(this.player);
     }
 
-    onPreDraw(ctx: ex.ExcaliburGraphicsContext): void {
+    onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {
         const gridBounds = this.gridSystem?.getBounds();
         if (gridBounds == null) {
             return;
@@ -30,8 +31,9 @@ export class Level extends ex.Scene {
         const height = gridBounds?.height;
 
         const cameraTopLeft = this.camera.viewport.topLeft;
-        
-        ctx.drawRectangle(position.clone().sub(cameraTopLeft), width, height, ex.Color.Black);
+
+        ctx.drawRectangle(position.clone().sub(cameraTopLeft), width, height, this.gridColor);
+        super.onPreDraw(ctx, elapsed);
     }
 
 

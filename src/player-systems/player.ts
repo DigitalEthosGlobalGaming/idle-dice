@@ -1,10 +1,10 @@
 import * as ex from "excalibur";
-import { Level } from "./level";
-import { Dice } from "./dice";
-import { Building } from "./building";
-import { Ghost } from "./ghost";
-import { PlayerUi } from "./ui/scores/player-ui";
-import { ScoreComponent } from "./components/score-component";
+import { Level } from "../level";
+import { Dice } from "../dice";
+import { Building } from "../building";
+import { Ghost } from "../ghost";
+import { PlayerUi } from "../ui/scores/player-ui";
+import { ScoreComponent } from "../components/score-component";
 
 type MouseState = {
     button: number;
@@ -158,9 +158,12 @@ export class Player extends ex.Actor {
         if (primaryPointer == null) {
             return;
         }
+        
+        const camera = this.getCamera();
 
         const currentSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(primaryPointer.pos);
 
+        let targetPlayerPos = this.pos;
         if (primaryPointer.isDown) {
             const isLongDown = primaryPointer.downDuration > 300;
             const movingBuilding = this.draggingBuilding != null;
@@ -173,7 +176,7 @@ export class Player extends ex.Actor {
                 if (primaryPointer.dragging) {
                     this.cameraPos.x -= primaryPointer.downDelta.x;
                     this.cameraPos.y -= primaryPointer.downDelta.y;
-                    this.getCamera().pos = this.cameraPos;
+                    targetPlayerPos = this.cameraPos;
                 } else {
                     if (isLongDown) {
                         this.draggingBuilding = currentSpace?.children.find(c => c instanceof Building) as Building;
@@ -181,9 +184,27 @@ export class Player extends ex.Actor {
                 }
             }
         }
-        
-        this.pos = this.cameraPos;
+        const bounds = this.getScene().gridSystem?.getBounds();
+        if (bounds == null) {
+            return;
+        }
 
+        if (targetPlayerPos.x < bounds.left) {
+            targetPlayerPos.x = bounds.left;
+        }
+        if (targetPlayerPos.y < bounds.top) {
+            targetPlayerPos.y = bounds.top;
+        }
+        if (targetPlayerPos.x > bounds.right) {
+            targetPlayerPos.x = bounds.right;
+        }
+        if (targetPlayerPos.y > bounds.bottom) {
+            targetPlayerPos.y = bounds.bottom;
+        }
+        
+        
+        this.pos = targetPlayerPos;
+        camera.pos = targetPlayerPos;
     }
 
     placeDice(worldPosition: ex.Vector) {

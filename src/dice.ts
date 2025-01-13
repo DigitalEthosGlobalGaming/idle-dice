@@ -79,11 +79,10 @@ function getPossibleRollAnimations(faces: number, speed: number) {
         });
 
         const diceNumbers = getRandomRoll(faces);
-        const rolledNumber = {
-            number: Math.floor(i / rollAnimationsPerFace) + 1,
-            duration: 1
-        }
-        const frameData: (typeof rolledNumber)[] = [];
+        const frameData: {
+            number: number,
+            duration: number
+        }[] = [];
 
         const rollDuration = 100;
 
@@ -97,8 +96,6 @@ function getPossibleRollAnimations(faces: number, speed: number) {
                 duration: duration
             });
         }
-
-        frameData.push(rolledNumber);
 
         const animation = new ex.Animation({
             frames: frameData.map((item) => {
@@ -158,6 +155,7 @@ export class Dice extends Building {
         sprite.tint = ex.Color.Red;
         this.graphics.add('empty',sprite);
         this.graphics.use('empty');
+        this.color = new ex.Color(0.5,1,1,1);
     }
 
     setFaces(faces: number) {
@@ -192,6 +190,8 @@ export class Dice extends Building {
         const roll = getRandomRollAnimation(faces, speed);
         const animation = roll.animation;
         this.value = roll.numbers[roll.numbers.length - 1];
+        console.log(roll);
+        console.log(this.value);
         
         this.graphics.add('roll', animation, {});
         this.graphics.use('roll');

@@ -31,7 +31,6 @@ export class ScoreComponent extends BaseComponent {
             const ui = this.getUi();
             ui.addChild(this.scoreLabel)
         }
-        console.log(this.scoreLabel);
         this.scoreLabel.text = `Score: ${this.score}`;
     }
     
