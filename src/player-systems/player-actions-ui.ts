@@ -111,18 +111,4 @@ export class PlayerActionsUi extends Panel {
             this.buttons.push(button);
         }
     }
-
-    onUiUpdate() {
-        const uiBounds = this.scene?.camera?.viewport;
-        if (uiBounds == null) {
-            return;
-        }
-        const totalWidth = uiBounds.width;
-        const centerPosition = totalWidth / 2;
-        const elementSize = 64;
-
-        const totalPlayerActions = this.playerActions.length;
-        const totalElementSize = totalPlayerActions * elementSize;
-    }
-
 }
