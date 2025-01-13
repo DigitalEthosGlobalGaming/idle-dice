@@ -65,16 +65,10 @@ export class PlayerActionButton extends Button {
 }
 
 export class PlayerActionsUi extends Panel {
-    playerActions: PlayerAction[];
+    playerActions: PlayerAction[] = [];
     buttons: PlayerActionButton[] = [];
     currentAction: PlayerAction | null = null;
     hoveredAction: PlayerAction | null = null;
-
-    constructor(actions?: PlayerAction[]) {
-        super();
-        actions = actions ?? playerActions;
-        this.playerActions = actions;
-    }
 
     changeAction(action: PlayerAction) {
 

@@ -52,8 +52,14 @@ export class Player extends ex.Actor {
         this.getScene().add(this.playerUi);
     }
 
+
     getEngine(): ex.Engine {
         return this.getScene().engine;
+    }
+
+    getGridSystem() {
+        const scene = this.getScene();
+        return scene.gridSystem;   
     }
     
     onMouseUp(state: MouseState) {
@@ -84,6 +90,19 @@ export class Player extends ex.Actor {
         const pointerLength = pointers.count();
         for (let i = 0; i < pointerLength; i++) {
             const pointer = pointers.at(i);
+
+            const isInteractingWithUi = (ev: ex.Vector) => {
+                if (this.playerUi.doesCollide(ev)) {
+                    console.log("HERE");
+                    return true;
+                }
+                return false;
+            }
+
+            if (isInteractingWithUi(pointer.lastWorldPos)) {
+                return this.pointerStates[i];
+            }
+
             let state = this.pointerStates[i];
             if (state == null) {
                 state = {

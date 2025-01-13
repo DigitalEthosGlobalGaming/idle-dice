@@ -1,14 +1,15 @@
 import * as ex from 'excalibur';
 import { PlayerActionsUi } from '../../player-systems/player-actions-ui';
+import { Panel } from '../panel';
 
 
-export class PlayerUi extends ex.Actor {
+export class PlayerUi extends Panel {
     isMoving = false;
     playerActionsUi!: PlayerActionsUi;
 
-    onInitialize(): void {
-        this.playerActionsUi = new PlayerActionsUi();
-        this.addChild(this.playerActionsUi);
+    onRender(): void {      
+        super.onRender();  
+        this.playerActionsUi = this.addPanel(PlayerActionsUi);        
     }
     onPreUpdate(engine: ex.Engine): void {
         const camera = engine.currentScene?.camera;

@@ -35,10 +35,9 @@ export class Button extends Panel {
     }
 
     constructor(parent: Panel, options: ButtonOptions ) {
-        super();
-        this.options = options;        
-        parent.addChild(this);
-    }
+        super(parent);
+        this.options = options;
+        }
     
     onHoverChanged(): void {
         this.color ? ex.Color.Gray : ex.Color.White;
@@ -52,7 +51,7 @@ export class Button extends Panel {
     }
     
 
-    getBounds(): ex.BoundingBox | null {
+    override calculateBounds(): ex.BoundingBox  {
         const pos = this.pos;
         const width = this.width;
         const height = this.height;
