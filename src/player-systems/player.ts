@@ -1,235 +1,192 @@
 import * as ex from "excalibur";
-import { Level } from "../level";
-import { Dice } from "../dice";
 import { Building } from "../building";
-import { Ghost } from "../ghost";
-import { PlayerUi } from "../ui/scores/player-ui";
 import { ScoreComponent } from "../components/score-component";
+import { Dice } from "../dice";
+import { Ghost } from "../ghost";
+import { ExtendedPointerEvent } from "../input-manager";
+import { Level } from "../level";
+import { PlayerUi } from "../ui/scores/player-ui";
+import { PlayerActions } from "./player-actions";
 
 type MouseState = {
-    button: number;
-    pos: ex.Vector;
-    isDown: boolean;
-    downPos: ex.Vector;
-    downDelta: ex.Vector;
-    pointer: ex.PointerAbstraction;
-    dragging: boolean;
-    downStartTick: number;
-    downDuration: number;
-}
+  button: number;
+  pos: ex.Vector;
+  isDown: boolean;
+  downPos: ex.Vector;
+  downDelta: ex.Vector;
+  pointer: ex.PointerAbstraction;
+  dragging: boolean;
+  downStartTick: number;
+  downDuration: number;
+};
+
+type CameraMovementData = {
+  isMoving: boolean;
+  pos: ex.Vector;
+  lastPos: ex.Vector;
+};
 
 export class Player extends ex.Actor {
-    scoreComponent!: ScoreComponent
-    cameraPos = ex.vec(0, 0);
-    pointerStates: { [key: number]: MouseState } = [];
-    ghost!: Ghost;
-    draggingBuilding: Building | null = null;
-    playerUi!: PlayerUi;
+  scoreComponent!: ScoreComponent;
+  cameraPos = ex.vec(0, 0);
+  pointerStates: { [key: number]: MouseState } = [];
+  ghost!: Ghost;
+  draggingBuilding: Building | null = null;
+  playerUi!: PlayerUi;
+  currentAction: PlayerActions = PlayerActions.NONE;
+  cameraMovementData: CameraMovementData | null = null;
+  wishPosition = ex.vec(0, 0);
 
-    getCamera(): ex.Camera {
-        if (this.scene == null) {
-            throw new Error("Scene is null");
-        }
-        return this.scene?.camera;
+  getCamera(): ex.Camera {
+    if (this.scene == null) {
+      throw new Error("Scene is null");
+    }
+    return this.scene?.camera;
+  }
+
+  getScene(): Level {
+    if (this.scene == null) {
+      throw new Error("Scene is null");
+    }
+    if (!(this.scene instanceof Level)) {
+      throw new Error("Scene is not a Level");
+    }
+    return this.scene;
+  }
+
+  onAdd(): void {
+    this.ghost = new Ghost();
+    this.addChild(this.ghost);
+    this.scoreComponent = new ScoreComponent();
+    this.addComponent(this.scoreComponent);
+    this.playerUi = new PlayerUi();
+    this.addChild(this.playerUi);
+    this.scoreComponent.setScore(0);
+
+    this.scene?.on("im-pointer-down", (e) => {
+      this.onPointerDown(e as ExtendedPointerEvent);
+    });
+    this.scene?.on("im-pointer-move", (e) => {
+      this.onPointerMove(e as ExtendedPointerEvent);
+    });
+    this.scene?.on("im-pointer-up", (e) => {
+      this.onPointerUp(e as ExtendedPointerEvent);
+    });
+  }
+
+  onPointerMove(e: ExtendedPointerEvent) {
+    if (this.currentAction != PlayerActions.NONE) {
+      return;
+    }
+    if (e.isDown("MouseLeft")) {
+      if (this.cameraMovementData == null) {
+        this.cameraMovementData = {
+          isMoving: true,
+          pos: e.screenPos.clone(),
+          lastPos: e.screenPos.clone(),
+        };
+      } else {
+        this.cameraMovementData.pos = e.screenPos.clone();
+
+        let diff = this.cameraMovementData.pos.sub(
+          this.cameraMovementData.lastPos
+        );
+        this.wishPosition = this.wishPosition.sub(diff);
+
+        this.cameraMovementData.lastPos = e.screenPos.clone();
+      }
+    } else {
+      this.cameraMovementData = null;
+    }
+  }
+
+  onPointerDown(_e: ExtendedPointerEvent) {}
+
+  onPointerUp(e: ExtendedPointerEvent) {
+    if (this.cameraMovementData == null) {
+      this.placeDice(e.worldPos);
+    }
+    this.cameraMovementData = null;
+  }
+
+  getEngine(): ex.Engine {
+    return this.getScene().engine;
+  }
+
+  getGridSystem() {
+    const scene = this.getScene();
+    return scene.gridSystem;
+  }
+
+  onMouseUp(state: MouseState) {
+    if (this.draggingBuilding != null) {
+      const newSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(
+        state.pos
+      );
+      const building = newSpace?.children.find(
+        (c) => c instanceof Building
+      ) as Building;
+      if (building == null) {
+        const oldSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(
+          this.draggingBuilding.pos
+        );
+        this.draggingBuilding.unparent();
+        oldSpace?.removeChild(this.draggingBuilding);
+        newSpace?.addChild(this.draggingBuilding);
+      }
+      this.draggingBuilding = null;
+      this.ghost.clear();
+      return;
     }
 
-    getScene(): Level {
-        if (this.scene == null) {
-            throw new Error("Scene is null");
-        }
-        if (!(this.scene instanceof Level)) {
-            throw new Error("Scene is not a Level");
-        }
-        return this.scene;
+    if (!state.dragging) {
+      this.placeDice(state.pos);
+    }
+  }
+
+  onPreUpdate(engine: ex.Engine, elapsed: number): void {
+    super.onPreUpdate(engine, elapsed);
+    const camera = this.getCamera();
+
+    let targetPlayerPos = this.wishPosition;
+    const bounds = this.getScene().gridSystem?.getBounds();
+    if (bounds == null) {
+      return;
     }
 
-    onInitialize(): void {
-        this.ghost = new Ghost();
-        this.addChild(this.ghost);
-        this.scoreComponent = new ScoreComponent();
-        this.addComponent(this.scoreComponent);
-        this.playerUi = new PlayerUi();
-        this.getScene().add(this.playerUi);
+    if (targetPlayerPos.x < bounds.left) {
+      targetPlayerPos.x = bounds.left;
+    }
+    if (targetPlayerPos.y < bounds.top) {
+      targetPlayerPos.y = bounds.top;
+    }
+    if (targetPlayerPos.x > bounds.right) {
+      targetPlayerPos.x = bounds.right;
+    }
+    if (targetPlayerPos.y > bounds.bottom) {
+      targetPlayerPos.y = bounds.bottom;
     }
 
+    this.pos = targetPlayerPos;
+    camera.pos = targetPlayerPos;
+  }
 
-    getEngine(): ex.Engine {
-        return this.getScene().engine;
+  placeDice(worldPosition: ex.Vector) {
+    const space =
+      this.getScene().gridSystem?.getSpaceFromWorldPosition(worldPosition);
+    if (space == null) {
+      return;
     }
-
-    getGridSystem() {
-        const scene = this.getScene();
-        return scene.gridSystem;   
+    let dice = space.children.find((c) => c instanceof Building);
+    if (dice == null) {
+      const faces = 6;
+      dice = new Dice(faces, 1);
+      space.addChild(dice);
+      dice.onBuild();
+    } else {
+      if (dice instanceof Dice) {
+        dice.rollDice();
+      }
     }
-    
-    onMouseUp(state: MouseState) {
-        if (this.draggingBuilding != null) {
-            const newSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(state.pos);
-            const building = newSpace?.children.find(c => c instanceof Building) as Building;
-            if (building == null) {
-                const oldSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(this.draggingBuilding.pos);
-                this.draggingBuilding.unparent();
-                oldSpace?.removeChild(this.draggingBuilding);
-                newSpace?.addChild(this.draggingBuilding);
-
-            }
-            this.draggingBuilding = null;
-            this.ghost.clear();
-            return;
-        }
-
-        if (!state.dragging) {
-            this.placeDice(state.pos);
-        }
-    }
-
-    handlePointers() {
-        const engine = this.getEngine();
-        const now = Date.now();
-        const pointers = engine.input.pointers;
-        const pointerLength = pointers.count();
-        for (let i = 0; i < pointerLength; i++) {
-            const pointer = pointers.at(i);
-
-            const isInteractingWithUi = (ev: ex.Vector) => {
-                if (this.playerUi.doesCollide(ev)) {
-                    console.log("HERE");
-                    return true;
-                }
-                return false;
-            }
-
-            if (isInteractingWithUi(pointer.lastWorldPos)) {
-                return this.pointerStates[i];
-            }
-
-            let state = this.pointerStates[i];
-            if (state == null) {
-                state = {
-                    button: 0,
-                    pos: ex.vec(pointer.lastWorldPos.x, pointer.lastWorldPos.y),
-                    isDown: false,
-                    downPos: ex.vec(pointer.lastWorldPos.x, pointer.lastWorldPos.y),
-                    pointer: pointer,
-                    downDelta: ex.vec(0, 0),
-                    dragging: false,
-                    downStartTick: now,
-                    downDuration: 0
-                };
-            }
-
-            const isDown = pointers.isDown(i);
-            state.pos = ex.vec(pointer.lastWorldPos.x, pointer.lastWorldPos.y);
-            let didDownChange = state.isDown != isDown;
-
-            if (didDownChange) {
-                state.isDown = isDown;
-                if (isDown) {
-                    state.downStartTick = now;
-                }
-            }
-
-            if (isDown) {
-                state.downDuration = now - state.downStartTick;
-                if (didDownChange) {
-                    state.downPos = ex.vec(pointer.lastWorldPos.x, pointer.lastWorldPos.y);
-                }
-                state.downDelta = state.pos.sub(state.downPos);
-
-                if (state.downDelta.magnitude > 2) {
-                    state.dragging = true;
-                }
-            }
-
-            if (!isDown) {
-                if (didDownChange) {
-                    this.onMouseUp(state);
-                    state.dragging = false;
-                    state.downStartTick = now;
-                }
-            } else {
-                if (didDownChange) {
-                    // this.onMouseDown(state);
-                }
-            }
-
-            this.pointerStates[i] = state;
-        }
-        return this.pointerStates;
-    }
-
-    onPreUpdate(engine: ex.Engine, elapsed: number): void {
-        super.onPreUpdate(engine, elapsed);
-        this.handlePointers();
-        const primaryPointer = this.pointerStates[0];
-        if (primaryPointer == null) {
-            return;
-        }
-        
-        const camera = this.getCamera();
-
-        const currentSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(primaryPointer.pos);
-
-        let targetPlayerPos = this.pos;
-        if (primaryPointer.isDown) {
-            const isLongDown = primaryPointer.downDuration > 300;
-            const movingBuilding = this.draggingBuilding != null;
-            this.ghost.setFrom(this.draggingBuilding);
-            if (this.draggingBuilding != null) {
-                this.ghost.pos = primaryPointer.pos;
-            }
-
-            if (!movingBuilding) {
-                if (primaryPointer.dragging) {
-                    this.cameraPos.x -= primaryPointer.downDelta.x;
-                    this.cameraPos.y -= primaryPointer.downDelta.y;
-                    targetPlayerPos = this.cameraPos;
-                } else {
-                    if (isLongDown) {
-                        this.draggingBuilding = currentSpace?.children.find(c => c instanceof Building) as Building;
-                    }
-                }
-            }
-        }
-        const bounds = this.getScene().gridSystem?.getBounds();
-        if (bounds == null) {
-            return;
-        }
-
-        if (targetPlayerPos.x < bounds.left) {
-            targetPlayerPos.x = bounds.left;
-        }
-        if (targetPlayerPos.y < bounds.top) {
-            targetPlayerPos.y = bounds.top;
-        }
-        if (targetPlayerPos.x > bounds.right) {
-            targetPlayerPos.x = bounds.right;
-        }
-        if (targetPlayerPos.y > bounds.bottom) {
-            targetPlayerPos.y = bounds.bottom;
-        }
-        
-        
-        this.pos = targetPlayerPos;
-        camera.pos = targetPlayerPos;
-    }
-
-    placeDice(worldPosition: ex.Vector) {
-        const space = this.getScene().gridSystem?.getSpaceFromWorldPosition(worldPosition);
-        if (space == null) {
-            return;
-        }
-        let dice = space.children.find(c => c instanceof Building);
-        if (dice == null) {
-            const faces = 6;
-            dice = new Dice(faces, 1);
-            space.addChild(dice);
-            dice.onBuild();
-        } else {
-            if (dice instanceof Dice) {
-                dice.rollDice();
-            }
-        }
-    }
-
+  }
 }
