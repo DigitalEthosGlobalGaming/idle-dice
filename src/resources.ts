@@ -19,13 +19,8 @@ export const Resources = {
   Pouch: new ex.ImageSource("./images/board-game-icons/pouch.png"),
   ChessQueen: new ex.ImageSource("./images/board-game-icons/chess_queen.png"),
 
-  // Images
-
   // Sounds
   FlapSound: new ex.Sound("./sounds/flap.wav"),
   FailSound: new ex.Sound("./sounds/fail.wav"),
   ScoreSound: new ex.Sound("./sounds/score.wav"),
-
-  // Fonts
-  FontNormal: new ex.ImageSource("./fonts/outline_24x32.png"),
 } as const;
