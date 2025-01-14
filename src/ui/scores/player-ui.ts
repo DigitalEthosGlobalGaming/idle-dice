@@ -5,28 +5,18 @@ import { Panel } from "../panel";
 export class PlayerUi extends Panel {
   isMoving = false;
   playerActionsUi!: PlayerActionsUi;
+  acceptingInputs = false;
 
-  onAdd(): void {
-    super.onAdd();
+  onRender(): void {
     const bounds = this.scene?.camera?.viewport;
     if (bounds == null) {
       throw new Error("Bounds are null");
     }
     this.pos = ex.vec(-bounds.width / 2, -bounds.height / 2);
-  }
+    this.size = ex.vec(bounds.width, bounds.height);
+    this.z = 1000;
 
-  onRender(): void {
     super.onRender();
-
     this.playerActionsUi = this.addPanel(PlayerActionsUi);
-  }
-
-  override calculateBounds(): ex.BoundingBox | null {
-    const camera = this.scene?.camera;
-    const viewPort = camera?.viewport;
-    if (viewPort == null) {
-      return null;
-    }
-    return viewPort.clone();
   }
 }

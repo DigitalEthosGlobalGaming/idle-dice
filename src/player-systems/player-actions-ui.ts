@@ -1,26 +1,28 @@
 import * as ex from "excalibur";
 import { Button } from "../ui/elements/button";
 import { Panel } from "../ui/panel";
-import { PlayerAction, PlayerActions, playerActions } from "./player-actions";
+import { PlayerAction, playerActions } from "./player-actions";
+import { Player } from "./player";
+import { Level } from "../level";
 
 export class PlayerActionButton extends Button {
-  action: PlayerAction;
-  isFocused: boolean = false;
-  constructor(parent: Panel, actionCode: PlayerActions) {
-    const action = playerActions.find((a) => a.code == actionCode);
-    if (action == null) {
-      throw new Error(`Action not found: ${actionCode}`);
-    }
-    super(parent, {
-      icon: {
-        imageSource: action.image,
-        width: 32,
-        height: 32,
-      },
-    });
-    this.z = 100;
-    this.action = action;
+  _action: PlayerAction | null = null;
+  set action(value: PlayerAction) {
+    this._action = value;
+    this.icon = {
+      imageSource: value.image,
+      width: 64,
+      height: 64,
+    };
   }
+  get action(): PlayerAction {
+    if (this._action == null) {
+      throw new Error("Action is null");
+    }
+    return this._action;
+  }
+  isFocused: boolean = false;
+
   getParent<T = PlayerActionsUi>(): T {
     if (this.parent instanceof PlayerActionsUi) {
       return this.parent as T;
@@ -63,52 +65,75 @@ export class PlayerActionButton extends Button {
   }
 
   setFocused(value: boolean) {
-    this.isFocused = value;
-    this.updateColor();
+    if (value != this.isFocused) {
+      this.isFocused = value;
+      this.updateColor();
+    }
+  }
+
+  override collides(vec: ex.Vector): boolean {
+    if (this.acceptingInputs === false) {
+      return false;
+    }
+
+    const bounds = this.globalBounds;
+    if (bounds == null) {
+      return false;
+    }
+    return bounds.contains(vec);
   }
 }
 
 export class PlayerActionsUi extends Panel {
-  playerActions: PlayerAction[] = [];
+  get level(): Level {
+    if (this.scene instanceof Level) {
+      return this.scene;
+    }
+    throw new Error("Scene is not a Level");
+  }
+  get player(): Player {
+    return this.level.player;
+  }
+  playerActions: PlayerAction[] = playerActions;
   buttons: PlayerActionButton[] = [];
   currentAction: PlayerAction | null = null;
   hoveredAction: PlayerAction | null = null;
+  acceptingInputs = false;
 
   changeAction(action: PlayerAction) {
-    if (this.currentAction != null) {
-      const currentActionButton = this.buttons.find(
-        (b) => b.action == this.currentAction
-      );
-      if (currentActionButton != null) {
-        currentActionButton.setFocused(false);
+    for (let button of this.buttons) {
+      if (button.action?.code == action.code) {
+        button.setFocused(true);
+      } else {
+        button.setFocused(false);
       }
     }
 
-    const actionButton = this.buttons.find((b) => b.action == action);
-    if (actionButton != null) {
-      actionButton.setFocused(true);
-    }
-
     this.currentAction = action;
+    this.player.currentAction = action.code;
+  }
+
+  onAdd(engine: ex.Engine): void {
+    super.onAdd(engine);
+    this.changeAction(playerActions[0]);
   }
 
   onRender(): void {
     const bounds = this.getParentBounds();
     const width = bounds?.width ?? 0;
     const height = bounds?.height ?? 0;
-    const buttonWidth = 32;
-    const spacing = 10;
+    const buttonWidth = 64;
+    const spacing = 32;
     const totalWidth =
       this.playerActions.length * (buttonWidth + spacing) - spacing;
     const startX = (width - totalWidth) / 2;
 
     for (let i = 0; i < this.playerActions.length; i++) {
       const action = this.playerActions[i];
-      const button = new PlayerActionButton(this, action.code);
-      button.pos = new ex.Vector(
-        startX + i * (buttonWidth + spacing),
-        height - buttonWidth - 2
-      );
+      const button = this.addPanel(PlayerActionButton);
+      button.action = action;
+      const x = startX + i * (buttonWidth + spacing);
+      button.pos = new ex.Vector(x, height - buttonWidth - 10);
       this.buttons.push(button);
     }
   }

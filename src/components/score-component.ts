@@ -3,14 +3,14 @@ import { FloatingScore } from "../ui/scores/floating-score";
 import { BaseComponent } from "./base-component";
 
 export class ScoreComponent extends BaseComponent {
-  private score: number;
+  private _score: number;
   private scoreLabel: ex.Label;
 
   constructor() {
     super();
-    this.score = 0;
+    this._score = 0;
     this.scoreLabel = new ex.Label({
-      text: `Score: ${this.score}`,
+      text: `Score: ${this._score}`,
       pos: new ex.Vector(10, 10),
       font: new ex.Font({
         family: "Arial",
@@ -20,17 +20,21 @@ export class ScoreComponent extends BaseComponent {
     });
   }
 
-  public updateScore(points: number) {
-    this.setScore(this.score + points);
+  public get score(): number {
+    return this._score;
   }
 
-  public setScore(points: number) {
-    this.score = points;
+  public set score(value: number) {
+    this._score = value;
     if (this.scoreLabel.parent == null) {
       const ui = this.getUi();
       ui.addChild(this.scoreLabel);
     }
-    this.scoreLabel.text = `Score: ${this.score}`;
+    this.scoreLabel.text = `Score: ${this._score}`;
+  }
+
+  public updateScore(points: number) {
+    this.score += points;
   }
 
   public createScore(creator: ex.Actor, value: number) {

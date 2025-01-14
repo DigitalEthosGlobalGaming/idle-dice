@@ -1,21 +1,42 @@
 import * as ex from "excalibur";
-import { InputHandler, InputManager } from "../input-manager";
+import {
+  ButtonStates,
+  ExtendedPointerEvent,
+  InputHandler,
+  InputManager,
+} from "../input-manager";
 
 export class Panel extends ex.Actor implements InputHandler {
   lastRenderTick = -1;
   isHovered = false;
   isMouseDown = false;
-  bounds: ex.BoundingBox | null = null;
+  size: ex.Vector | null = null;
+  _globalBounds: ex.BoundingBox | null = null;
+  acceptingInputs?: boolean | ButtonStates[];
+
+  get bounds(): ex.BoundingBox {
+    const width = this.size?.x ?? 0;
+    const height = this.size?.y ?? 0;
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
+    return new ex.BoundingBox(
+      this.pos.x - halfWidth,
+      this.pos.y - halfHeight,
+      this.pos.x + halfWidth,
+      this.pos.y + halfHeight
+    );
+  }
 
   get globalBounds(): ex.BoundingBox | null {
-    if (this.bounds == null) {
-      return null;
-    }
+    const width = this.size?.x ?? 0;
+    const height = this.size?.y ?? 0;
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
     return new ex.BoundingBox(
-      this.globalPos.x,
-      this.globalPos.y,
-      this.bounds.width,
-      this.bounds.height
+      this.globalPos.x - halfWidth,
+      this.globalPos.y - halfHeight,
+      this.globalPos.x + halfWidth,
+      this.globalPos.y + halfHeight
     );
   }
 
@@ -27,6 +48,10 @@ export class Panel extends ex.Actor implements InputHandler {
   }
 
   collides(vec: ex.Vector): boolean {
+    if (this.acceptingInputs === false) {
+      return false;
+    }
+
     const bounds = this.globalBounds;
     if (bounds == null) {
       return false;
@@ -43,34 +68,34 @@ export class Panel extends ex.Actor implements InputHandler {
     if (element.parent == null) {
       this.addChild(element);
     }
+    this.render();
     return element;
   }
 
   onInitialize(): void {
     this.render();
-    this.attachEvents();
   }
 
-  attachEvents() {
-    this.on("pointerup", (e) => {
-      this.onPointerUp(e);
-    });
-    this.on("pointerdown", (e) => {
-      this.onPointerDown(e);
-    });
-    this.on("pointerenter", (e) => {
-      this.onPointerEnter(e);
-    });
-    this.on("pointerleave", (e) => {
-      this.onPointerLeave(e);
-    });
-  }
+  // attachEvents() {
+  //   this.on("pointerup", (e) => {
+  //     this.onPointerUp(e);
+  //   });
+  //   this.on("pointerdown", (e) => {
+  //     this.onPointerDown(e);
+  //   });
+  //   this.on("pointerenter", (e) => {
+  //     this.onPointerEnter(e);
+  //   });
+  //   this.on("pointerleave", (e) => {
+  //     this.onPointerLeave(e);
+  //   });
+  // }
 
   getPanelChildren(): Panel[] {
     return this.children.filter((c) => c instanceof Panel) as Panel[];
   }
 
-  onPointerLeave(_e: ex.PointerEvent): void {
+  onPointerLeave(_e: ExtendedPointerEvent): void {
     if (!this.isHovered) {
       return;
     }
@@ -105,7 +130,6 @@ export class Panel extends ex.Actor implements InputHandler {
     }
     this.lastRenderTick = tick;
 
-    this.bounds = this.calculateBounds();
     this.onRender();
     for (let i = 0; i < this.children.length; i++) {
       const child = this.children[i];
@@ -115,7 +139,8 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onAdd(): void {
+  onAdd(engine: ex.Engine): void {
+    super.onAdd(engine);
     InputManager.register(this);
     this.render();
   }
@@ -127,10 +152,6 @@ export class Panel extends ex.Actor implements InputHandler {
     if (parent instanceof Panel) {
       return parent as T;
     }
-    return null;
-  }
-
-  calculateBounds(): ex.BoundingBox | null {
     return null;
   }
 
@@ -149,19 +170,5 @@ export class Panel extends ex.Actor implements InputHandler {
       return false;
     }
     return bounds.contains(position);
-  }
-
-  doesCollide(position: ex.Vector) {
-    if (this.isInBounds(position)) {
-      return true;
-    }
-    const panelChildren = this.getPanelChildren();
-    for (let i = 0; i < panelChildren.length; i++) {
-      const child = panelChildren[i];
-      if (child.doesCollide(position)) {
-        return true;
-      }
-    }
-    return false;
   }
 }

@@ -7,6 +7,8 @@ import {
   InputHandler,
   InputManager,
 } from "../input-manager";
+import { Player } from "../player-systems/player";
+import { Level } from "../level";
 
 class GridSpaceGhost extends ex.Actor {
   spaceSize: ex.Vector = new ex.Vector(32, 32);
@@ -66,6 +68,17 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
   }
   ghost!: GridSpaceGhost;
 
+  get level(): Level {
+    if (this.scene instanceof Level) {
+      return this.scene;
+    }
+
+    throw new Error("Scene is not a Level");
+  }
+  get player(): Player {
+    return this.level.player;
+  }
+
   constructor(size: ex.Vector, spaceSize: ex.Vector) {
     super(size, spaceSize);
   }
@@ -74,12 +87,13 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
     this.highlightedSpace = null;
   }
 
-  onPointerDown(evt: ExtendedPointerEvent): void {
+  onPointerUp(evt: ExtendedPointerEvent): void {
     let space = this.getSpaceFromWorldPosition(evt.worldPos);
     if (space != null) {
-      space.handleClick();
+      this.player.onSpaceClicked(space);
     }
   }
+
   onPointerMove?(evt: ExtendedPointerEvent): void {
     let space = this.getSpaceFromWorldPosition(evt.worldPos);
     this.highlightedSpace = space;

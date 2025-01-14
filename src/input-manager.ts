@@ -20,13 +20,22 @@ type RegisterForInput = {
   onPointerEnter?(evt: ExtendedPointerEvent): void;
   onPointerLeave?(evt: ExtendedPointerEvent): void;
   collides(vec: ex.Vector): boolean;
+  acceptingInputs?: boolean | ButtonStates[];
   globalZ: number;
 };
 
 export type InputHandler = ex.Entity & RegisterForInput;
 export class ExtendedPointerEvent extends ex.PointerEvent {
   inputManager!: InputManager;
-  entities: InputHandler[] | null = null;
+  _entities: InputHandler[] | null = null;
+  get entities(): InputHandler[] {
+    if (this._entities != null) {
+      return this._entities;
+    }
+    let entities = this.getEntities();
+    this._entities = entities;
+    return entities;
+  }
 
   static extendPointerEvent(
     evt: ex.PointerEvent,
@@ -42,14 +51,11 @@ export class ExtendedPointerEvent extends ex.PointerEvent {
     return extended;
   }
 
-  getEntities() {
-    if (this.entities != null) {
-      return this.entities;
-    }
+  private getEntities() {
     const eventPosition = this.worldPos;
-
     let entitiesGroupedByZIndex: { [key: number]: InputHandler[] } = {};
     let entities = Object.values(this.inputManager.entities ?? {});
+
     for (let entity of entities) {
       if (entitiesGroupedByZIndex[entity.globalZ] == null) {
         entitiesGroupedByZIndex[entity.globalZ] = [];
@@ -58,17 +64,19 @@ export class ExtendedPointerEvent extends ex.PointerEvent {
     }
     let zIndices = Object.keys(entitiesGroupedByZIndex)
       .map((key) => parseInt(key))
-      .sort((a, b) => a - b);
+      .sort((a, b) => b - a);
+
     for (let zIndex of zIndices) {
       let entities = entitiesGroupedByZIndex[zIndex];
       let collidedEntities = [];
       for (let entity of entities) {
-        if (entity.collides(eventPosition)) {
-          collidedEntities.push(entity);
+        if (entity.acceptingInputs !== false) {
+          if (entity.collides(eventPosition)) {
+            collidedEntities.push(entity);
+          }
         }
       }
       if (collidedEntities.length > 0) {
-        this.entities = collidedEntities;
         return collidedEntities;
       }
     }
@@ -80,7 +88,7 @@ export class ExtendedPointerEvent extends ex.PointerEvent {
   }
 }
 
-type ButtonStates = "MouseLeft" | "MouseRight";
+export type ButtonStates = "MouseLeft" | "MouseRight";
 
 export class InputManager extends ex.Entity {
   static InputManagers: InputManager[] = [];
@@ -130,7 +138,7 @@ export class InputManager extends ex.Entity {
     }
 
     let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
-    let entities = extendedEvent.getEntities();
+    let entities = extendedEvent.entities;
     for (let entity of entities) {
       if (entity.onPointerDown != null) {
         entity.onPointerDown(extendedEvent);
@@ -146,7 +154,7 @@ export class InputManager extends ex.Entity {
       this.buttonStates[mouseButton] = false;
     }
     let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
-    let entities = extendedEvent.getEntities();
+    let entities = extendedEvent.entities;
     for (let entity of entities) {
       if (entity.onPointerUp != null) {
         entity.onPointerUp(extendedEvent);
@@ -160,7 +168,7 @@ export class InputManager extends ex.Entity {
     let previousHoveredEntities = this.currentHoveredEntities ?? {};
     this.currentHoveredEntities = {};
 
-    let entities = extendedEvent.getEntities();
+    let entities = extendedEvent.entities;
 
     for (let entity of entities) {
       this.currentHoveredEntities[entity.id] = entity;
@@ -200,6 +208,9 @@ export class InputManager extends ex.Entity {
 
     if (inputManager == null) {
       throw new Error("InputManager not found");
+    }
+    if (entity.acceptingInputs === false) {
+      return;
     }
 
     inputManager.entities[entity.id] = entity;

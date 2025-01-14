@@ -1,10 +1,10 @@
 import * as ex from "excalibur";
-import { Config } from "./config";
-import { Resources } from "./resources";
-import { ease } from "./easing";
-import { random } from "./utility/random";
-import { Building } from "./building";
-import { Level } from "./level";
+import { Config } from "../config";
+import { Resources } from "../resources";
+import { ease } from "../easing";
+import { random } from "../utility/random";
+import { Building } from "../building";
+import { Level } from "../level";
 
 const possibleRolls: { [key: number]: number[][] } = {};
 const totalPossibleRolls = 100;
@@ -141,22 +141,11 @@ export class Dice extends Building {
   faces: number = 6;
   speed: number = 1;
   value: number = 0;
-  constructor(faces: number = 0, speed: number = 0) {
-    const width = 16;
-    const height = 16;
-    super({
-      width: width,
-      height: height,
-    });
-    this.faces = faces;
+  constructor(faces: number = 6, speed: number = 1) {
+    super();
+    this.setFaces(faces);
     this.speed = speed;
-    const sprite = ex.Sprite.from(Resources.DiceEmpty);
-    sprite.width = width;
-    sprite.height = height;
-    sprite.tint = ex.Color.Red;
-    this.graphics.add("empty", sprite);
-    this.graphics.use("empty");
-    this.color = new ex.Color(0.5, 1, 1, 1);
+    this.spriteImage = Resources.DiceEmpty;
   }
 
   setFaces(faces: number) {

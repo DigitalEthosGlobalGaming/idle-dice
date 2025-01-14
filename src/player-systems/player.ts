@@ -1,8 +1,10 @@
 import * as ex from "excalibur";
 import { Building } from "../building";
+import { Dice } from "../buildings/dice";
+import { Roller } from "../buildings/roller";
 import { ScoreComponent } from "../components/score-component";
-import { Dice } from "../dice";
 import { Ghost } from "../ghost";
+import { GridSpace } from "../grid-system/grid-space";
 import { ExtendedPointerEvent } from "../input-manager";
 import { Level } from "../level";
 import { PlayerUi } from "../ui/scores/player-ui";
@@ -24,6 +26,12 @@ type CameraMovementData = {
   isMoving: boolean;
   pos: ex.Vector;
   lastPos: ex.Vector;
+};
+
+const costs: { [key in PlayerActions]: number } = {
+  NONE: 0,
+  NEW_DICE: 10,
+  NEWROLLER: 100,
 };
 
 export class Player extends ex.Actor {
@@ -61,7 +69,7 @@ export class Player extends ex.Actor {
     this.addComponent(this.scoreComponent);
     this.playerUi = new PlayerUi();
     this.addChild(this.playerUi);
-    this.scoreComponent.setScore(0);
+    this.scoreComponent.score = 10;
 
     this.scene?.on("im-pointer-down", (e) => {
       this.onPointerDown(e as ExtendedPointerEvent);
@@ -75,9 +83,6 @@ export class Player extends ex.Actor {
   }
 
   onPointerMove(e: ExtendedPointerEvent) {
-    if (this.currentAction != PlayerActions.NONE) {
-      return;
-    }
     if (e.isDown("MouseLeft")) {
       if (this.cameraMovementData == null) {
         this.cameraMovementData = {
@@ -102,11 +107,14 @@ export class Player extends ex.Actor {
 
   onPointerDown(_e: ExtendedPointerEvent) {}
 
-  onPointerUp(e: ExtendedPointerEvent) {
-    if (this.cameraMovementData == null) {
-      this.placeDice(e.worldPos);
-    }
+  onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
+  }
+
+  onSpaceClicked(space: GridSpace) {
+    if (this.cameraMovementData == null) {
+      this.placeBuildable(space.globalPos);
+    }
   }
 
   getEngine(): ex.Engine {
@@ -116,32 +124,6 @@ export class Player extends ex.Actor {
   getGridSystem() {
     const scene = this.getScene();
     return scene.gridSystem;
-  }
-
-  onMouseUp(state: MouseState) {
-    if (this.draggingBuilding != null) {
-      const newSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(
-        state.pos
-      );
-      const building = newSpace?.children.find(
-        (c) => c instanceof Building
-      ) as Building;
-      if (building == null) {
-        const oldSpace = this.getScene().gridSystem?.getSpaceFromWorldPosition(
-          this.draggingBuilding.pos
-        );
-        this.draggingBuilding.unparent();
-        oldSpace?.removeChild(this.draggingBuilding);
-        newSpace?.addChild(this.draggingBuilding);
-      }
-      this.draggingBuilding = null;
-      this.ghost.clear();
-      return;
-    }
-
-    if (!state.dragging) {
-      this.placeDice(state.pos);
-    }
   }
 
   onPreUpdate(engine: ex.Engine, elapsed: number): void {
@@ -171,21 +153,32 @@ export class Player extends ex.Actor {
     camera.pos = targetPlayerPos;
   }
 
-  placeDice(worldPosition: ex.Vector) {
+  placeBuildable(worldPosition: ex.Vector) {
     const space =
       this.getScene().gridSystem?.getSpaceFromWorldPosition(worldPosition);
     if (space == null) {
       return;
     }
-    let dice = space.children.find((c) => c instanceof Building);
-    if (dice == null) {
-      const faces = 6;
-      dice = new Dice(faces, 1);
-      space.addChild(dice);
-      dice.onBuild();
+    let existingBuilding = space.children.find((c) => c instanceof Building);
+    if (existingBuilding == null) {
+      let cost = costs[this.currentAction];
+      if (this.scoreComponent.score < cost) {
+        return;
+      }
+      this.scoreComponent.updateScore(-cost);
+      if (this.currentAction == PlayerActions.NEWDICE) {
+        const faces = 6;
+        existingBuilding = new Dice(faces, 1);
+        space.addChild(existingBuilding);
+        existingBuilding.onBuild();
+      }
+      if (this.currentAction == PlayerActions.NEWROLLER) {
+        const entity = new Roller();
+        space.addChild(entity);
+      }
     } else {
-      if (dice instanceof Dice) {
-        dice.rollDice();
+      if (existingBuilding instanceof Dice) {
+        existingBuilding.rollDice();
       }
     }
   }

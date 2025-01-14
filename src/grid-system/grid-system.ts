@@ -26,6 +26,29 @@ export class GridSystem extends ex.Actor {
     return index >= 0 && index < this.spaces.length;
   }
 
+  getNeighbors(space: GridSpace): {
+    left: GridSpace | null;
+    right: GridSpace | null;
+    top: GridSpace | null;
+    bottom: GridSpace | null;
+  } {
+    const pos = space.gridPos;
+    if (pos == null) {
+      return {
+        left: null,
+        right: null,
+        top: null,
+        bottom: null,
+      };
+    }
+    return {
+      left: this.getSpace(new ex.Vector(pos.x - 1, pos.y)),
+      right: this.getSpace(new ex.Vector(pos.x + 1, pos.y)),
+      top: this.getSpace(new ex.Vector(pos.x, pos.y - 1)),
+      bottom: this.getSpace(new ex.Vector(pos.x, pos.y + 1)),
+    };
+  }
+
   getSpaceIndex(position: ex.Vector) {
     return position.y * this.size.x + position.x;
   }
@@ -42,15 +65,19 @@ export class GridSystem extends ex.Actor {
     return new ex.BoundingBox(left, top, right, bottom);
   }
 
-  getSpaceFromWorldPosition(position: ex.Vector) {
+  getSpacePositionFromWorldPosition(position: ex.Vector) {
     const bounds = this.getBounds();
     if (bounds.contains(position)) {
       const x = Math.floor((position.x - this.pos.x) / this.spaceSize.x);
       const y = Math.floor((position.y - this.pos.y) / this.spaceSize.y);
-      const space = this.getSpace(new ex.Vector(x, y));
-      return space;
+      return new ex.Vector(x, y);
     }
     return null;
+  }
+  getSpaceFromWorldPosition(position: ex.Vector) {
+    return this.getSpace(
+      this.getSpacePositionFromWorldPosition(position) ?? new ex.Vector(-1, -1)
+    );
   }
 
   getSpace<T = GridSpace>(position: ex.Vector): T | null {

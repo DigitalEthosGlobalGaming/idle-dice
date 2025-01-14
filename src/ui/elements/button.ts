@@ -14,7 +14,7 @@ type ButtonOptions = {
 export class Button extends Panel {
   label?: ex.Label;
   iconSprite?: ex.Sprite;
-  options!: ButtonOptions;
+  options: ButtonOptions = {};
 
   private _color: ex.Color = ex.Color.White;
 
@@ -32,9 +32,23 @@ export class Button extends Panel {
     }
   }
 
-  constructor(parent: Panel, options: ButtonOptions) {
+  set text(value: string) {
+    this.options.text = value;
+    if (this.label != null) {
+      this.label.text = value;
+    }
+    this.render();
+  }
+
+  set icon(value: ButtonIcon) {
+    this.iconSprite = undefined;
+    this.options.icon = value;
+
+    this.onRender();
+  }
+
+  constructor(parent: Panel) {
     super(parent);
-    this.options = options;
   }
 
   onHoverChanged(): void {
@@ -48,23 +62,23 @@ export class Button extends Panel {
     }
   }
 
-  override calculateBounds(): ex.BoundingBox {
-    const pos = this.pos;
+  calculateSize(): ex.Vector {
     const width = this.width;
     const height = this.height;
-    if (this.label == null && this.options.icon != null) {
-      return new ex.BoundingBox(
-        pos.x,
-        pos.y,
-        this.options.icon.width,
-        this.options.icon.height
-      );
+    const size = new ex.Vector(width, height);
+
+    if (this.options.icon != null) {
+      size.x = this.options.icon.width;
+      size.y = this.options.icon.height;
     }
-    return new ex.BoundingBox(pos.x, pos.y, width, height);
+    return size;
   }
 
   override onRender(): void {
-    const { text, icon } = this.options;
+    super.onRender();
+    const { text, icon } = this.options ?? {
+      text: "Hello world",
+    };
     if (text != "") {
       if (this.label == null) {
         this.label = new ex.Label({
@@ -85,5 +99,6 @@ export class Button extends Panel {
         this.graphics.use("default");
       }
     }
+    this.size = this.calculateSize();
   }
 }

@@ -3,7 +3,7 @@ import { Resources } from "../resources";
 export enum PlayerActions {
   NONE = "NONE",
   NEWDICE = "NEW_DICE",
-  ROLLER = "ROLLER",
+  NEWROLLER = "NEWROLLER",
 }
 
 export type PlayerAction = {
@@ -15,20 +15,14 @@ export type PlayerAction = {
 
 export const playerActions: PlayerAction[] = [
   {
-    code: PlayerActions.NONE,
-    image: Resources.DiceEmpty,
-    name: "None",
-    tooltip: "No action selected",
-  },
-  {
     code: PlayerActions.NEWDICE,
-    image: Resources.DiceEmpty,
+    image: Resources.DiceOut,
     name: "Move",
     tooltip: "Move to another location",
   },
   {
-    code: PlayerActions.ROLLER,
-    image: Resources.DiceOut,
+    code: PlayerActions.NEWROLLER,
+    image: Resources.HandCube,
     name: "Roll",
     tooltip: "Move to another location",
   },
