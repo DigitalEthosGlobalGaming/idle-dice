@@ -1,8 +1,7 @@
 import * as ex from "excalibur";
 import { DiceGameGridSystem } from "./grid-system/grid-system-actor";
-import { Player } from "./player-systems/player";
-import { Resources } from "./resources";
 import { InputManager } from "./input-manager";
+import { Player } from "./player-systems/player";
 
 export class Level extends ex.Scene {
   score: number = 0;
