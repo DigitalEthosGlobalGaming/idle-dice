@@ -14,9 +14,6 @@ export class Level extends ex.Scene {
   inputSystem!: InputManager;
 
   override onActivate(): void {
-    Resources.BackgroundMusic.loop = true;
-    Resources.BackgroundMusic.play();
-
     this.add(new InputManager());
     this.gridSystem = new DiceGameGridSystem(
       new ex.Vector(32, 32),

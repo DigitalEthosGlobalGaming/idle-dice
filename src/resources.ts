@@ -20,21 +20,11 @@ export const Resources = {
   ChessQueen: new ex.ImageSource("./images/board-game-icons/chess_queen.png"),
 
   // Images
-  BirdImage: new ex.ImageSource("./images/bird.png"),
-  PipeImage: new ex.ImageSource("./images/pipe.png", {
-    wrapping: ex.ImageWrapping.Clamp, // Clamp is the default
-  }),
-  GroundImage: new ex.ImageSource("./images/ground.png", {
-    wrapping: ex.ImageWrapping.Repeat,
-  }),
 
   // Sounds
   FlapSound: new ex.Sound("./sounds/flap.wav"),
   FailSound: new ex.Sound("./sounds/fail.wav"),
   ScoreSound: new ex.Sound("./sounds/score.wav"),
-
-  // Music
-  BackgroundMusic: new ex.Sound("./sounds/two_left_socks.ogg"),
 
   // Fonts
   FontNormal: new ex.ImageSource("./fonts/outline_24x32.png"),
