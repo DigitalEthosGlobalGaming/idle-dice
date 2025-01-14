@@ -30,6 +30,8 @@ export class Button extends Panel {
     if (this.label != null) {
       this.label.color = value;
     }
+    this.backgroundColor = value;
+    this.dirty = true;
   }
 
   set text(value: string) {
@@ -37,18 +39,21 @@ export class Button extends Panel {
     if (this.label != null) {
       this.label.text = value;
     }
-    this.render();
+    this.size = this.calculateSize();
+    this.dirty = true;
   }
 
   set icon(value: ButtonIcon) {
     this.iconSprite = undefined;
     this.options.icon = value;
-
-    this.onRender();
+    this.size = this.calculateSize();
+    this.dirty = true;
+    console.log(this.size);
   }
 
   constructor(parent: Panel) {
     super(parent);
+    this.hasBackground = true;
   }
 
   onHoverChanged(): void {
@@ -100,5 +105,6 @@ export class Button extends Panel {
       }
     }
     this.size = this.calculateSize();
+    console.log(this.size);
   }
 }

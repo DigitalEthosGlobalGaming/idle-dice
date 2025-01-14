@@ -4,7 +4,7 @@ import { Panel } from "../panel";
 
 export class PlayerUi extends Panel {
   isMoving = false;
-  playerActionsUi!: PlayerActionsUi;
+  playerActionsUi?: PlayerActionsUi;
   acceptingInputs = false;
 
   onRender(): void {
@@ -17,6 +17,11 @@ export class PlayerUi extends Panel {
     this.z = 1000;
 
     super.onRender();
-    this.playerActionsUi = this.addPanel(PlayerActionsUi);
+    if (this.playerActionsUi == null) {
+      this.playerActionsUi = this.addPanel(
+        "player-actions-ui",
+        PlayerActionsUi
+      );
+    }
   }
 }

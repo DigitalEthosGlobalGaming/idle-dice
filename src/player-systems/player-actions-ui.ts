@@ -130,7 +130,10 @@ export class PlayerActionsUi extends Panel {
 
     for (let i = 0; i < this.playerActions.length; i++) {
       const action = this.playerActions[i];
-      const button = this.addPanel(PlayerActionButton);
+      const button = this.addPanel(
+        `player-action-ui-${action.code}`,
+        PlayerActionButton
+      );
       button.action = action;
       const x = startX + i * (buttonWidth + spacing);
       button.pos = new ex.Vector(x, height - buttonWidth - 10);

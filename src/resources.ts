@@ -23,4 +23,7 @@ export const Resources = {
   FlapSound: new ex.Sound("./sounds/flap.wav"),
   FailSound: new ex.Sound("./sounds/fail.wav"),
   ScoreSound: new ex.Sound("./sounds/score.wav"),
+
+  // UI Images
+  UiButtonSquareFlat: new ex.ImageSource("./images/ui/button_square_flat.png"),
 } as const;
