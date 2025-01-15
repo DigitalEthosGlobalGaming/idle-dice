@@ -20,7 +20,7 @@ export class FloatingScore extends ex.Actor {
             this.kill();
             return new Promise<number>((resolve) => { resolve(0); });
         }
-        const sprite = ex.Sprite.from(Resources.Dollar);
+        const sprite = ex.Sprite.from(Resources.SuitDiamonds);
         sprite.width = 10;
         sprite.height = 10;
 

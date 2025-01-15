@@ -18,6 +18,10 @@ export const Resources = {
     DiceOut: new ex.ImageSource("./images/board-game-icons/dice_out.png"),
     Pouch: new ex.ImageSource("./images/board-game-icons/pouch.png"),
     ChessQueen: new ex.ImageSource("./images/board-game-icons/chess_queen.png"),
+    SuitDiamonds: new ex.ImageSource("./images/board-game-icons/suit_diamonds.png"),
+    SuitHearts: new ex.ImageSource("./images/board-game-icons/suit_hearts.png"),
+    SuitSpades: new ex.ImageSource("./images/board-game-icons/suit_spades.png"),
+    SuitClubs: new ex.ImageSource("./images/board-game-icons/suit_clubs.png"),
 
     // Sounds
     FlapSound: new ex.Sound("./sounds/flap.wav"),
