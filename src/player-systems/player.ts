@@ -33,6 +33,7 @@ const costs: { [key in PlayerActions]: number } = {
   NONE: 0,
   NEW_DICE: 10,
   NEWROLLER: 100,
+  REMOVE: 0
 };
 
 export class Player extends ex.Actor {
@@ -70,7 +71,7 @@ export class Player extends ex.Actor {
     this.addComponent(this.scoreComponent);
     this.playerUi = new PlayerUi();
     this.addChild(this.playerUi);
-    this.scoreComponent.score = 10;
+    this.scoreComponent.score = 1000;
 
     this.scene?.on("im-pointer-down", (e) => {
       this.onPointerDown(e as ExtendedPointerEvent);
@@ -81,6 +82,15 @@ export class Player extends ex.Actor {
     this.scene?.on("im-pointer-up", (e) => {
       this.onPointerUp(e as ExtendedPointerEvent);
     });
+    const timer = this.scene?.addTimer(new ex.Timer({
+      fcn: () => {
+        this.scoreComponent.updateScore(1);
+      },
+      interval: 10000,
+      repeats: true
+    }));
+    timer?.start();
+    
   }
 
   onPointerMove(e: ExtendedPointerEvent) {
@@ -107,7 +117,7 @@ export class Player extends ex.Actor {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) {}
+  onPointerDown(_e: ExtendedPointerEvent) { }
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -115,7 +125,12 @@ export class Player extends ex.Actor {
 
   onSpaceClicked(space: GridSpace) {
     if (this.cameraMovementData == null) {
-      this.placeBuildable(space.globalPos);
+      if (this.currentAction == PlayerActions.REMOVE) {
+        this.removeBuildable(space.globalPos);
+      } else {
+
+        this.placeBuildable(space.globalPos);
+      }
     }
   }
 
@@ -155,6 +170,17 @@ export class Player extends ex.Actor {
     camera.pos = targetPlayerPos;
   }
 
+  removeBuildable(worldPosition: ex.Vector) {
+    const space =
+      this.getScene().gridSystem?.getSpaceFromWorldPosition(worldPosition);
+    if (space == null) {
+      return;
+    }
+    let existingBuilding = space.children.find((c) => c instanceof Building);
+    if (existingBuilding != null) {
+      existingBuilding.kill();
+    }
+  }
   placeBuildable(worldPosition: ex.Vector) {
     const space =
       this.getScene().gridSystem?.getSpaceFromWorldPosition(worldPosition);
@@ -184,24 +210,24 @@ export class Player extends ex.Actor {
       }
     }
   }
-  
+
   tooltips: Tooltip[] = [];
 
   updateTooltip() {
     let ui = this.playerUi;
     let tooltip = this.tooltips?.[0] ?? null;
     if (tooltip != null) {
-        ui.tooltip = tooltip;
-        return;
-    } 
+      ui.tooltip = tooltip;
+      return;
+    }
 
     let relatedAction = playerActions.find((a) => a.code == this.currentAction);
     if (relatedAction != null) {
-        ui.tooltip = {
-            code: relatedAction.code,
-            title: relatedAction.name,
-            description: relatedAction.tooltip,
-        }
+      ui.tooltip = {
+        code: relatedAction.code,
+        title: relatedAction.name,
+        description: relatedAction.tooltip,
+      }
     }
 
   }

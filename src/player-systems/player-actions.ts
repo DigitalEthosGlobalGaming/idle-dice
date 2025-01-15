@@ -4,6 +4,7 @@ export enum PlayerActions {
   NONE = "NONE",
   NEWDICE = "NEW_DICE",
   NEWROLLER = "NEWROLLER",
+  REMOVE = "REMOVE",
 }
 
 export type PlayerAction = {
@@ -25,5 +26,10 @@ export const playerActions: PlayerAction[] = [
     image: Resources.HandCube,
     name: "Buy Roller",
     tooltip: "100⚡︎ - Every 10 seconds will roll all touching dice.",
+  },{
+    code: PlayerActions.REMOVE,
+    image: Resources.DiceSkull,
+    name: "Remove",
+    tooltip: "Removes a dice from the board.",
   },
 ];

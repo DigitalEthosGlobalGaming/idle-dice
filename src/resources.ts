@@ -22,6 +22,7 @@ export const Resources = {
     SuitHearts: new ex.ImageSource("./images/board-game-icons/suit_hearts.png"),
     SuitSpades: new ex.ImageSource("./images/board-game-icons/suit_spades.png"),
     SuitClubs: new ex.ImageSource("./images/board-game-icons/suit_clubs.png"),
+    DiceSkull: new ex.ImageSource("./images/board-game-icons/dice_skull.png"),
 
     // Sounds
     FlapSound: new ex.Sound("./sounds/flap.wav"),

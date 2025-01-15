@@ -2,6 +2,7 @@ import * as ex from 'excalibur';
 import { Resources } from '../../resources';
 
 export class FloatingScore extends ex.Actor {
+    static numberOfInstances = 0;
     screenPos: ex.Vector = ex.Vector.Zero;
     value: number = 0;
     

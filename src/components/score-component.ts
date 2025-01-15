@@ -41,11 +41,20 @@ export class ScoreComponent extends BaseComponent {
     if (this.owner == null) {
       throw new Error("Owner is null");
     }
+
+    if (FloatingScore.numberOfInstances >= 20) {
+      this.updateScore(value);
+      return;
+    }
+
     const pos = creator.globalPos;
     const floatingScore = new FloatingScore(pos, this.scoreLabel.globalPos);
     this.owner.scene?.engine.add(floatingScore);
+
+    FloatingScore.numberOfInstances += 1;
     floatingScore.addScore(value).then((value) => {
       this.updateScore(value);
+      FloatingScore.numberOfInstances -= 1;
     });
   }
 }
