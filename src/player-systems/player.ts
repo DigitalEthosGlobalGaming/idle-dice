@@ -71,7 +71,7 @@ export class Player extends ex.Actor {
     this.addComponent(this.scoreComponent);
     this.playerUi = new PlayerUi();
     this.addChild(this.playerUi);
-    this.scoreComponent.score = 1000;
+    this.scoreComponent.score = 10;
 
     this.scene?.on("im-pointer-down", (e) => {
       this.onPointerDown(e as ExtendedPointerEvent);
