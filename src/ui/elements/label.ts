@@ -54,10 +54,15 @@ export class Label extends Panel {
         }
 
         if (this.label == null) {
-            this.label = new ex.Label();
+            this.label = new ex.Label({
+                font: new ex.Font({
+                    family: "ds-digi",
+                })
+            });
             this.addChild(this.label);
         }
         this.label.text = this.text;
+        this.label.font.family = "ds-digi";
         this.label.color = this.color;
         this.label.anchor = this.labelAnchor;
         this.label.font.size = this.fontSize;

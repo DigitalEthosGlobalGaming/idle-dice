@@ -18,7 +18,7 @@ export const playerActions: PlayerAction[] = [
     code: PlayerActions.NEWDICE,
     image: Resources.DiceOut,
     name: "Buy Dice",
-    tooltip: "$10 - Will roll to generate income.",
+    tooltip: "$10 - Will roll to generate income.\n         Click to roll once placed."
   },
   {
     code: PlayerActions.NEWROLLER,

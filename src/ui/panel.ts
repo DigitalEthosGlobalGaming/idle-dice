@@ -5,9 +5,9 @@ import {
     InputHandler,
     InputManager,
 } from "../input-manager";
-import { getNineslice } from "../resources";
 import { Level } from "../level";
 import { Player } from "../player-systems/player";
+import { getNineslice } from "../resources";
 
 export enum PanelBackgrounds {
     "ButtonSquareFlat" = "ButtonSquareFlat"
@@ -29,7 +29,7 @@ export class Panel extends ex.Actor implements InputHandler {
         throw new Error("Scene is not a Level");
     }
 
-    get player(): Player {
+    get player(): Player | undefined {
         return this.level.player;
     }
 

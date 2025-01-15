@@ -26,14 +26,15 @@ export const Resources = {
 
     // UI Images
     UiButtonSquareFlat: new ex.ImageSource("./images/ui/button_square_flat.png"),
+    UiFrame: new ex.ImageSource("./images/ui/button_square_flat.png"),
 } as const;
 
 const UiNineSlices = {
     ButtonSquareFlat: {
         source: Resources.UiButtonSquareFlat,
         sourceConfig: {
-            width: 64,
-            height: 64,
+            width: 105,
+            height: 21,
             topMargin: 8,
             leftMargin: 8,
             bottomMargin: 8,
@@ -60,8 +61,8 @@ export function getNineslice(config: NinesliceResourceOptions) {
         height: config.height,
         destinationConfig: {
             drawCenter: config.drawCenter ?? true,
-            horizontalStretch: config.horizontalStretch ?? ex.NineSliceStretch.TileFit,
-            verticalStretch: config.verticalStretch ?? ex.NineSliceStretch.TileFit,
+            horizontalStretch: config.horizontalStretch ?? ex.NineSliceStretch.Stretch,
+            verticalStretch: config.verticalStretch ?? ex.NineSliceStretch.Stretch,
         }
     };
 

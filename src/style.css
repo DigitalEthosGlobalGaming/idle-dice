@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'DS-DIGI';
+  src: url('../fonts/DS-DIGI.TTF');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 html, body {
   background-color: black;
   margin: 0;
@@ -5,7 +13,10 @@ html, body {
   height: 100%;
 }
 
+
+
 body {
+  font-family: "ds-digi";
   display: flex;
   justify-content: center;
   align-items: center;

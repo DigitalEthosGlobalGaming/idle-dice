@@ -6,7 +6,7 @@ import { ScoreComponent } from "../components/score-component";
 import { Ghost } from "../ghost";
 import { GridSpace } from "../grid-system/grid-space";
 import { ExtendedPointerEvent } from "../input-manager";
-import { Level } from "../level";
+import { GameScene } from "../scenes/game.scene";
 import { PlayerUi } from "../ui/scores/player-ui";
 import { playerActions, PlayerActions } from "./player-actions";
 import { Tooltip } from "./player-tooltip";
@@ -53,12 +53,12 @@ export class Player extends ex.Actor {
     return this.scene?.camera;
   }
 
-  getScene(): Level {
+  getScene(): GameScene {
     if (this.scene == null) {
       throw new Error("Scene is null");
     }
-    if (!(this.scene instanceof Level)) {
-      throw new Error("Scene is not a Level");
+    if (!(this.scene instanceof GameScene)) {
+      throw new Error("Scene is not a GameScene");
     }
     return this.scene;
   }

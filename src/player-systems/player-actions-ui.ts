@@ -1,10 +1,10 @@
 import * as ex from "excalibur";
+import { ExtendedPointerEvent } from "../input-manager";
+import { GameScene } from "../scenes/game.scene";
 import { Button } from "../ui/elements/button";
 import { Panel } from "../ui/panel";
-import { PlayerAction, playerActions } from "./player-actions";
 import { Player } from "./player";
-import { Level } from "../level";
-import { ExtendedPointerEvent } from "../input-manager";
+import { PlayerAction, playerActions } from "./player-actions";
 
 export class PlayerActionButton extends Button {
     _action: PlayerAction | null = null;
@@ -46,7 +46,7 @@ export class PlayerActionButton extends Button {
 
     updateColor() {
         const defaultColor = ex.Color.White;
-        const focusedColor = new ex.Color(0, 180, 0, 1);
+        const focusedColor = new ex.Color(0, 180, 150, 1);
         let colors = {
             hovered: defaultColor.clone().darken(0.5),
             focused: focusedColor,
@@ -85,13 +85,16 @@ export class PlayerActionButton extends Button {
 }
 
 export class PlayerActionsUi extends Panel {
-    get level(): Level {
-        if (this.scene instanceof Level) {
+    get level(): GameScene {
+        if (this.scene instanceof GameScene) {
             return this.scene;
         }
-        throw new Error("Scene is not a Level");
+        throw new Error("Scene is not a GameScene");
     }
     get player(): Player {
+        if (this.level.player == null) {
+            throw new Error("Player is null");
+        }
         return this.level.player;
     }
     playerActions: PlayerAction[] = playerActions;

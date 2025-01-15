@@ -10,10 +10,10 @@ export class ScoreComponent extends BaseComponent {
     super();
     this._score = 0;
     this.scoreLabel = new ex.Label({
-      text: `Score: ${this._score}`,
+      text: `Energy: ${this._score}`,
       pos: new ex.Vector(10, 10),
       font: new ex.Font({
-        family: "Arial",
+        family: "ds-digi",
         size: 24,
         color: ex.Color.White,
       }),
@@ -30,7 +30,7 @@ export class ScoreComponent extends BaseComponent {
       const ui = this.getUi();
       ui.addChild(this.scoreLabel);
     }
-    this.scoreLabel.text = `Score: ${this._score}`;
+    this.scoreLabel.text = `Energy: ${this._score}`;
   }
 
   public updateScore(points: number) {

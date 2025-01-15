@@ -1,6 +1,7 @@
 import * as ex from "excalibur";
 import { GridSpace } from "./grid-system/grid-space";
-import { Level } from "./level";
+import { GameScene } from "./scenes/game.scene";
+import { Player } from "./player-systems/player";
 
 export class Building extends ex.Actor {
   tickRate = -1;
@@ -12,10 +13,10 @@ export class Building extends ex.Actor {
     throw new Error("parent is not a grid space");
   }
   get level() {
-    if (this.scene instanceof Level) {
+    if (this.scene instanceof GameScene) {
       return this.scene;
     }
-    throw new Error("Scene is not a level");
+    throw new Error("Scene is not a game scene");
   }
   private _color: ex.Color = ex.Color.White;
 
@@ -49,6 +50,13 @@ export class Building extends ex.Actor {
 
   get spriteImage() {
     return this._spriteImage;
+  }
+
+  get player(): Player {
+    if (this.level.player == null) {
+      throw new Error("Player is null");
+    }
+    return this.level.player;
   }
 
   constructor() {

@@ -43,13 +43,13 @@ export class Button extends Panel {
     onHoverChanged(e: ex.PointerEvent): void {
         super.onHoverChanged(e);
         if (e.pointerType != "Mouse") {
-            this.player.clearTooltips();
+            this.player?.clearTooltips();
         }
         if (this.tooltip != null) {
             if (this.isHovered) {
-                this.player.showTooltip(this.tooltip);
+                this.player?.showTooltip(this.tooltip);
             } else {
-                this.player.hideTooltip(this.tooltip);
+                this.player?.hideTooltip(this.tooltip);
             }
         }
     }

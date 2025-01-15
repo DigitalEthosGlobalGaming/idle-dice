@@ -1,10 +1,9 @@
 import * as ex from "excalibur";
-import { Config } from "../config";
-import { Resources } from "../resources";
-import { ease } from "../easing";
-import { random } from "../utility/random";
 import { Building } from "../building";
-import { Level } from "../level";
+import { Config } from "../config";
+import { ease } from "../easing";
+import { Resources } from "../resources";
+import { random } from "../utility/random";
 
 const possibleRolls: { [key: number]: number[][] } = {};
 const totalPossibleRolls = 100;
@@ -127,16 +126,6 @@ function getRandomRollAnimation(
 }
 
 export class Dice extends Building {
-  getLevel(): Level {
-    if (this.scene == null) {
-      throw new Error("Scene is null");
-    }
-    if (!(this.scene instanceof Level)) {
-      throw new Error("Scene is not a Level");
-    }
-    return this.scene;
-  }
-
   rolling: boolean = false;
   faces: number = 6;
   speed: number = 1;
@@ -189,8 +178,7 @@ export class Dice extends Building {
 
   onRollFinish() {
     this.rolling = false;
-    const level = this.getLevel();
-    level.player.scoreComponent.createScore(this, this.value);
+    this.player.scoreComponent.createScore(this, this.value);
   }
 
   start() {

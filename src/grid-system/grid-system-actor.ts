@@ -8,7 +8,7 @@ import {
   InputManager,
 } from "../input-manager";
 import { Player } from "../player-systems/player";
-import { Level } from "../level";
+import { GameScene } from "../scenes/game.scene";
 
 class GridSpaceGhost extends ex.Actor {
   spaceSize: ex.Vector = new ex.Vector(32, 32);
@@ -73,14 +73,17 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
   }
   ghost!: GridSpaceGhost;
 
-  get level(): Level {
-    if (this.scene instanceof Level) {
+  get level(): GameScene {
+    if (this.scene instanceof GameScene) {
       return this.scene;
     }
 
     throw new Error("Scene is not a Level");
   }
   get player(): Player {
+    if (this.level.player == null) {
+      throw new Error("Player is null");
+    }
     return this.level.player;
   }
 
