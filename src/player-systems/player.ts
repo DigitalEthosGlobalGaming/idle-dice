@@ -8,7 +8,8 @@ import { GridSpace } from "../grid-system/grid-space";
 import { ExtendedPointerEvent } from "../input-manager";
 import { Level } from "../level";
 import { PlayerUi } from "../ui/scores/player-ui";
-import { PlayerActions } from "./player-actions";
+import { playerActions, PlayerActions } from "./player-actions";
+import { Tooltip } from "./player-tooltip";
 
 type MouseState = {
   button: number;
@@ -83,7 +84,8 @@ export class Player extends ex.Actor {
   }
 
   onPointerMove(e: ExtendedPointerEvent) {
-    if (e.isDown("MouseLeft")) {
+    const isPrimary = e.isDown("MouseLeft") || e.pointerType == "Touch";
+    if (isPrimary) {
       if (this.cameraMovementData == null) {
         this.cameraMovementData = {
           isMoving: true,
@@ -181,5 +183,44 @@ export class Player extends ex.Actor {
         existingBuilding.rollDice();
       }
     }
+  }
+  
+  tooltips: Tooltip[] = [];
+
+  updateTooltip() {
+    let ui = this.playerUi;
+    let tooltip = this.tooltips?.[0] ?? null;
+    if (tooltip != null) {
+        ui.tooltip = tooltip;
+        return;
+    } 
+
+    let relatedAction = playerActions.find((a) => a.code == this.currentAction);
+    if (relatedAction != null) {
+        ui.tooltip = {
+            code: relatedAction.code,
+            title: relatedAction.name,
+            description: relatedAction.tooltip,
+        }
+    }
+
+  }
+
+  clearTooltips() {
+    this.tooltips = [];
+    this.updateTooltip();
+  }
+
+  showTooltip(value: Tooltip) {
+    if (this.tooltips.find((t) => t.code == value.code) != null) {
+      return;
+    }
+    this.tooltips.push(value);
+    this.updateTooltip();
+  }
+
+  hideTooltip(value: Tooltip) {
+    this.tooltips = this.tooltips.filter((t) => t.code != value.code);
+    this.updateTooltip();
   }
 }

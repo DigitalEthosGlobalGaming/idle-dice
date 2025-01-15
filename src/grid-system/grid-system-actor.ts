@@ -36,7 +36,7 @@ class GridSpaceGhost extends ex.Actor {
       })
     );
 
-    this.graphics.use("hover");
+    this.graphics.use("hide");
   }
 
   show() {
@@ -50,6 +50,7 @@ class GridSpaceGhost extends ex.Actor {
 export class DiceGameGridSystem extends GridSystem implements InputHandler {
   spaceSize: ex.Vector = new ex.Vector(32, 32);
   private _highlightedSpace: GridSpace | null = null;
+  showGhost = false;
 
   get highlightedSpace(): GridSpace | null {
     return this._highlightedSpace;
@@ -58,6 +59,10 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
   set highlightedSpace(space: GridSpace | null) {
     if (this._highlightedSpace != space) {
       this._highlightedSpace = space;
+      if (!this.showGhost) {
+        this.ghost.hide();
+        return;
+      }
       if (space != null) {
         this.ghost.show();
         this.ghost.pos = space.pos;
@@ -96,6 +101,11 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
 
   onPointerMove?(evt: ExtendedPointerEvent): void {
     let space = this.getSpaceFromWorldPosition(evt.worldPos);
+    if (evt.pointerType == "Mouse") {
+      this.showGhost = true;
+    } else {
+      this.showGhost = false;
+    }
     this.highlightedSpace = space;
   }
 
@@ -111,6 +121,7 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
   onInitialize(): void {
     this.ghost = new GridSpaceGhost(this.spaceSize);
     this.addChild(this.ghost);
+    this.ghost.hide();
     this.graphics.use(
       new Grid({
         rows: this.size.x,
