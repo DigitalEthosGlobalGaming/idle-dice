@@ -116,23 +116,17 @@ export class InputManager extends ex.Entity {
 
     this.subscriptions.push(
       engine.input.pointers.primary.on("down", (e) => {
-        if (this.scene?.isCurrentScene()) {
-          this.onPointerDown(e);
-        }
+        this.onPointerDown(e);
       })
     );
     this.subscriptions.push(
       engine.input.pointers.primary.on("up", (e) => {
-        if (this.scene?.isCurrentScene()) {
-          this.onPointerUp(e);
-        }
+        this.onPointerUp(e);
       })
     );
     this.subscriptions.push(
       engine.input.pointers.primary.on("move", (e) => {
-        if (this.scene?.isCurrentScene()) {
-          this.onPointerMove(e);
-        }
+        this.onPointerMove(e);
       })
     );
   }
@@ -208,7 +202,7 @@ export class InputManager extends ex.Entity {
     }
     if (entity.scene != null) {
       if (entity.scene instanceof Level) {
-        inputManager = entity.scene.inputSystem;
+        inputManager = entity.scene.inputSystem ?? null;
       }
     }
 

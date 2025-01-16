@@ -7,11 +7,11 @@ import { Button } from "../ui/elements/button";
 
 const elements: any[] = [
   "HELP",
+  " ",
   "-----Objective-----",
-  " ",
   "Roll dice and try to get as much energy as possible",
-  "-----How to play-----",
   " ",
+  "-----How to play-----",
   "1) Click and drag your mouse to move the camera",
   "2) Choose what to place using the buttons on the bottom of the screen",
   "3) Place a dice, then click on it to roll it, this generates energy",
@@ -43,10 +43,14 @@ export class HowToPlayScene extends Level {
   mainPanel!: HowToPlayUi;
   onActivate(context: ex.SceneActivationContext): void {
     super.onActivate(context);
-    if (this.mainPanel == null) {
-      this.mainPanel = new HowToPlayUi();
-      this.add(this.mainPanel);
-      this.mainPanel.pos = ex.vec(this.camera.viewport.width / 2, 0);
-    }
+    this.mainPanel = new HowToPlayUi();
+    this.add(this.mainPanel);
+    this.mainPanel.pos = ex.vec(this.camera.viewport.width / 2, 0);
+  }
+
+  onDeactivate(context: ex.SceneActivationContext): void {
+    super.onDeactivate(context);
+    this.mainPanel?.kill();
+    this.remove(this.mainPanel);
   }
 }

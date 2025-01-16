@@ -37,7 +37,7 @@ class CreditUi extends Panel {
 }
 
 export class CreditScene extends Level {
-  mainPanel!: CreditUi;
+  mainPanel?: CreditUi;
   onActivate(context: ex.SceneActivationContext): void {
     super.onActivate(context);
     if (this.mainPanel == null) {
@@ -45,5 +45,11 @@ export class CreditScene extends Level {
       this.add(this.mainPanel);
       this.mainPanel.pos = ex.vec(this.camera.viewport.width / 2, 0);
     }
+  }
+
+  onDeactivate(context: ex.SceneActivationContext): void {
+    super.onDeactivate(context);
+    this.mainPanel?.kill();
+    this.mainPanel = undefined;
   }
 }

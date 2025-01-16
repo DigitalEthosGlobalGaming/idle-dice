@@ -43,10 +43,14 @@ export class WelcomeScene extends Level {
   mainPanel!: WelcomeUi;
   onActivate(context: ex.SceneActivationContext): void {
     super.onActivate(context);
-    if (this.mainPanel == null) {
-      this.mainPanel = new WelcomeUi();
-      this.add(this.mainPanel);
-      this.mainPanel.pos = ex.vec(this.camera.viewport.width / 2, 0);
-    }
+    this.mainPanel = new WelcomeUi();
+    this.add(this.mainPanel);
+    this.mainPanel.pos = ex.vec(this.camera.viewport.width / 2, 0);
+  }
+
+  onDeactivate(context: ex.SceneActivationContext): void {
+    super.onDeactivate(context);
+    this.mainPanel?.kill();
+    this.remove(this.mainPanel);
   }
 }

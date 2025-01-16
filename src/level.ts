@@ -10,4 +10,10 @@ export class Level extends ex.Scene {
     super.onActivate(context);
     this.add(new InputManager());
   }
+
+  override onDeactivate(context: ex.SceneActivationContext): void {
+    super.onDeactivate(context);
+    this.inputSystem?.kill();
+    this.remove(this.inputSystem);
+  }
 }
