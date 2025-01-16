@@ -13,7 +13,7 @@ class WelcomeUi extends Panel {
 
     const label = list.addPanel("game-title", Label);
     label.fontSize = 60;
-    label.text = "RollMaster";
+    label.text = "Roll Masters";
     label.labelAnchor = ex.vec(0.5, 0.5);
 
     const playButton = list.addPanel("play", Button);
