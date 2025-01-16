@@ -6,8 +6,10 @@ export class Level extends ex.Scene {
   inputSystem!: InputManager;
   player?: Player;
 
-  override onActivate(context: ex.SceneActivationContext ): void {
+  override onActivate(context: ex.SceneActivationContext): void {
     super.onActivate(context);
-    this.add(new InputManager());
+    if (this.inputSystem == null) {
+      this.add(new InputManager());
+    }
   }
 }

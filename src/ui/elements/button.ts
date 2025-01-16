@@ -1,106 +1,136 @@
 import * as ex from "excalibur";
 import { Panel, PanelBackgrounds } from "../panel";
 import { Tooltip } from "../../player-systems/player-tooltip";
+import { Label } from "./label";
 
 export type ButtonIcon = {
-    imageSource: ex.ImageSource;
-    width: number;
-    height: number;
+  imageSource: ex.ImageSource;
+  width: number;
+  height: number;
 };
 type ButtonOptions = {
-    text?: string;
-    icon?: ButtonIcon;
-    onClick?: (e: ex.PointerEvent) => void;
+  text?: string;
+  icon?: ButtonIcon;
+  onClick?: (e: ex.PointerEvent) => void;
 };
 export class Button extends Panel {
-    label?: ex.Label;
-    iconSprite?: ex.Sprite;
-    options: ButtonOptions = {};
-    tooltip?: Tooltip
+  label?: Label;
+  iconSprite?: ex.Sprite;
+  options: ButtonOptions = {};
+  tooltip?: Tooltip;
 
-    set text(value: string) {
-        this.options.text = value;
-        if (this.label != null) {
-            this.label.text = value;
-        }
-        this.size = this.calculateSize();
-        this.dirty = true;
+  set text(value: string) {
+    this.options.text = value;
+    if (this.label != null) {
+      this.label.text = value;
     }
+    this.dirty = true;
+  }
 
-    set icon(value: ButtonIcon) {
-        this.iconSprite = undefined;
-        this.options.icon = value;
-        this.size = this.calculateSize();
-        this.dirty = true;
+  set icon(value: ButtonIcon) {
+    let oldIcon = this.options.icon;
+    let newKey = `${value.imageSource.path}-${value.width}-${value.height}`;
+    let oldKey = `${oldIcon?.imageSource.path}-${oldIcon?.width}-${oldIcon?.height}`;
+    if (newKey == oldKey) {
+      return;
     }
+    this.iconSprite = undefined;
+    this.options.icon = value;
+    this.dirty = true;
+  }
 
-    constructor(parent: Panel) {
-        super(parent);
-        this.background = PanelBackgrounds.ButtonSquareFlat;
-        this.padding = 10;
+  set fontSize(value: number) {
+    if (this.fontSize == value) {
+      return;
     }
-
-    onHoverChanged(e: ex.PointerEvent): void {
-        super.onHoverChanged(e);
-        if (e.pointerType != "Mouse") {
-            this.player?.clearTooltips();
-        }
-        if (this.tooltip != null) {
-            if (this.isHovered) {
-                this.player?.showTooltip(this.tooltip);
-            } else {
-                this.player?.hideTooltip(this.tooltip);
-            }
-        }
+    if (this.label != null) {
+      this.label.fontSize = value;
     }
+    this.dirty = true;
+  }
+  get fontSize(): number {
+    return this.label?.fontSize ?? 0;
+  }
 
-    onPointerDown(_e: ex.PointerEvent): void {
-        super.onPointerDown(_e);
-        if (this.options.onClick != null) {
-            this.options.onClick(_e);
-        }
+  set onClick(value: (e: ex.PointerEvent) => void) {
+    this.options.onClick = value;
+  }
+
+  constructor(parent: Panel) {
+    super(parent);
+    this.background = PanelBackgrounds.ButtonSquareFlat;
+    this.padding = 10;
+  }
+
+  onHoverChanged(e: ex.PointerEvent): void {
+    super.onHoverChanged(e);
+    if (e.pointerType != "Mouse") {
+      this.player?.clearTooltips();
     }
-
-    calculateSize(): ex.Vector {
-        const width = this.width;
-        const height = this.height;
-        const size = new ex.Vector(width, height);
-
-        if (this.options.icon != null) {
-            size.x = this.options.icon.width;
-            size.y = this.options.icon.height;
-        }
-        if (this.options.text != null) {
-            
-        }
-        return size;
+    if (this.tooltip != null) {
+      if (this.isHovered) {
+        this.player?.showTooltip(this.tooltip);
+      } else {
+        this.player?.hideTooltip(this.tooltip);
+      }
     }
+  }
 
-    override onRender(): void {
-        super.onRender();
-        const { text, icon } = this.options ?? {
-            text: "Hello world",
+  onPointerDown(_e: ex.PointerEvent): void {
+    super.onPointerDown(_e);
+    this.emit("button-clicked", _e);
+    if (this.options.onClick != null) {
+      this.options.onClick(_e);
+    }
+  }
+
+  calculateSize(): ex.Vector {
+    const width = this.width;
+    const height = this.height;
+    const size = new ex.Vector(width, height);
+
+    if (this.options.icon != null) {
+      size.x = this.options.icon.width;
+      size.y = this.options.icon.height;
+    }
+    size.x = size.x + (this.label?.size.x ?? 0);
+    size.y = size.y + (this.label?.size.y ?? 0);
+    return size;
+  }
+
+  render(): void {
+    let wasDirty = this.dirty;
+
+    super.render();
+    if (wasDirty) {
+      const newSize = this.calculateSize();
+      if (this._size.x != newSize.x || this._size.y != newSize.y) {
+        this.size = newSize;
+      }
+    }
+  }
+
+  override onRender(): void {
+    super.onRender();
+    const { text, icon } = this.options ?? {
+      text: "Hello world",
+    };
+    if ((text ?? "") != "") {
+      if (this.label == null) {
+        this.label = this.addPanel("label", Label);
+        this.label.labelAnchor = ex.vec(0.5, 0.5);
+      }
+      this.label.text = text ?? "";
+    }
+    if (icon != null) {
+      if (this.iconSprite == null) {
+        this.iconSprite = ex.Sprite.from(icon.imageSource);
+        this.iconSprite.destSize = {
+          width: icon.width,
+          height: icon.height,
         };
-        if (text != "") {
-            if (this.label == null) {
-                this.label = new ex.Label({
-                    text: text,
-                    color: ex.Color.White,
-                });
-                this.addChild(this.label);
-            }
-        }
-        if (icon != null) {
-            if (this.iconSprite == null) {
-                this.iconSprite = ex.Sprite.from(icon.imageSource);
-                this.iconSprite.destSize = {
-                    width: icon.width,
-                    height: icon.height,
-                };
-
-                this.addGraphic(this.iconSprite);
-            }
-        }
-        this.size = this.calculateSize();
+        this.addGraphic(this.iconSprite, new ex.Vector(-32, -32));
+      }
     }
+  }
 }

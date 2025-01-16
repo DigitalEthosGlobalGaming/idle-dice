@@ -11,15 +11,18 @@ export class GameScene extends Level {
   gridColor = new ex.Color(255 * 0, 255 * 0.1, 255 * 0.1, 1);
 
   override onActivate(ctx: ex.SceneActivationContext): void {
-    super.onActivate(ctx)
-    this.gridSystem = new DiceGameGridSystem(
-      new ex.Vector(32, 32),
-      new ex.Vector(32, 32)
-    );
-    this.add(this.gridSystem);
-
-    this.player = new Player();
-    this.add(this.player);
+    super.onActivate(ctx);
+    if (this.gridSystem == null) {
+      this.gridSystem = new DiceGameGridSystem(
+        new ex.Vector(32, 32),
+        new ex.Vector(32, 32)
+      );
+      this.add(this.gridSystem);
+    }
+    if (this.player == null) {
+      this.player = new Player();
+      this.add(this.player);
+    }
   }
 
   onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {

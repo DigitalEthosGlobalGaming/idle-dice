@@ -97,9 +97,17 @@ function getPossibleRollAnimations(faces: number, speed: number) {
     }
 
     const animation = new ex.Animation({
-      frames: frameData.map((item) => {
+      frames: frameData.map((item, index) => {
+        const graphic = sprites[item.number];
+        const angle = (Math.PI * index) / frameData.length; // 5 degrees
+
+        graphic.rotation = angle * 6;
+        if (index === frameData.length - 1) {
+          graphic.rotation = 0;
+        }
+
         return {
-          graphic: sprites[item.number],
+          graphic: graphic,
           duration: item.duration,
         };
       }),

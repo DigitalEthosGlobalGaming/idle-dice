@@ -1,0 +1,21 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "eslint.validate": [
+      "javascript",
+      "typescript",
+      "javascript",
+      "javascriptreact",
+      "html",
+      "typescriptreact"
+    ],
+    "editor.formatOnSave": true,
+    "editor.codeLens": true,
+    "eslint.alwaysShowStatus": true,
+    "github.copilot.advanced": {}
+  }
+}

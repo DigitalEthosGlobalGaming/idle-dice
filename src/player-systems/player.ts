@@ -33,7 +33,7 @@ const costs: { [key in PlayerActions]: number } = {
   NONE: 0,
   NEW_DICE: 10,
   NEWROLLER: 100,
-  REMOVE: 0
+  REMOVE: 0,
 };
 
 export class Player extends ex.Actor {
@@ -46,6 +46,7 @@ export class Player extends ex.Actor {
   currentAction: PlayerActions = PlayerActions.NONE;
   cameraMovementData: CameraMovementData | null = null;
   wishPosition = ex.vec(0, 0);
+  isSetup = false;
 
   getCamera(): ex.Camera {
     if (this.scene == null) {
@@ -65,6 +66,10 @@ export class Player extends ex.Actor {
   }
 
   onAdd(): void {
+    if (this.isSetup) {
+      return;
+    }
+    this.isSetup = true;
     this.ghost = new Ghost();
     this.addChild(this.ghost);
     this.scoreComponent = new ScoreComponent();
@@ -82,15 +87,16 @@ export class Player extends ex.Actor {
     this.scene?.on("im-pointer-up", (e) => {
       this.onPointerUp(e as ExtendedPointerEvent);
     });
-    const timer = this.scene?.addTimer(new ex.Timer({
-      fcn: () => {
-        this.scoreComponent.updateScore(1);
-      },
-      interval: 10000,
-      repeats: true
-    }));
+    const timer = this.scene?.addTimer(
+      new ex.Timer({
+        fcn: () => {
+          this.scoreComponent.updateScore(1);
+        },
+        interval: 10000,
+        repeats: true,
+      })
+    );
     timer?.start();
-    
   }
 
   onPointerMove(e: ExtendedPointerEvent) {
@@ -117,7 +123,7 @@ export class Player extends ex.Actor {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) { }
+  onPointerDown(_e: ExtendedPointerEvent) {}
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -128,7 +134,6 @@ export class Player extends ex.Actor {
       if (this.currentAction == PlayerActions.REMOVE) {
         this.removeBuildable(space.globalPos);
       } else {
-
         this.placeBuildable(space.globalPos);
       }
     }
@@ -227,9 +232,8 @@ export class Player extends ex.Actor {
         code: relatedAction.code,
         title: relatedAction.name,
         description: relatedAction.tooltip,
-      }
+      };
     }
-
   }
 
   clearTooltips() {

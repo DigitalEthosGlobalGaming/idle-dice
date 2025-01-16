@@ -116,17 +116,23 @@ export class InputManager extends ex.Entity {
 
     this.subscriptions.push(
       engine.input.pointers.primary.on("down", (e) => {
-        this.onPointerDown(e);
+        if (this.scene?.isCurrentScene()) {
+          this.onPointerDown(e);
+        }
       })
     );
     this.subscriptions.push(
       engine.input.pointers.primary.on("up", (e) => {
-        this.onPointerUp(e);
+        if (this.scene?.isCurrentScene()) {
+          this.onPointerUp(e);
+        }
       })
     );
     this.subscriptions.push(
       engine.input.pointers.primary.on("move", (e) => {
-        this.onPointerMove(e);
+        if (this.scene?.isCurrentScene()) {
+          this.onPointerMove(e);
+        }
       })
     );
   }
