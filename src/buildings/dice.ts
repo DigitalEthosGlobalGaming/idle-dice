@@ -97,15 +97,8 @@ function getPossibleRollAnimations(faces: number, speed: number) {
     }
 
     const animation = new ex.Animation({
-      frames: frameData.map((item, index) => {
+      frames: frameData.map((item) => {
         const graphic = sprites[item.number];
-        const angle = (Math.PI * index) / frameData.length; // 5 degrees
-
-        graphic.rotation = angle * 6;
-        if (index === frameData.length - 1) {
-          graphic.rotation = 0;
-        }
-
         return {
           graphic: graphic,
           duration: item.duration,
@@ -179,7 +172,20 @@ export class Dice extends Building {
 
     this.graphics.add("roll", animation, {});
     this.graphics.use("roll");
+    let originalPosition = this.pos.clone();
+    animation.events.on("frame", (frame) => {
+      if (frame.frameIndex < roll.numbers.length) {
+        const offset = random.integer(2, 4);
+        this.pos = ex.vec(
+          random.number(-offset, offset),
+          random.number(-offset, offset)
+        );
+      } else {
+        this.pos = ex.vec(0, 0);
+      }
+    });
     animation.events.on("end", () => {
+      this.pos = originalPosition;
       this.onRollFinish();
     });
   }
