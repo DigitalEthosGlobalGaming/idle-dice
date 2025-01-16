@@ -8,7 +8,11 @@ import { GridSpace } from "../grid-system/grid-space";
 import { ExtendedPointerEvent } from "../input-manager";
 import { GameScene } from "../scenes/game.scene";
 import { PlayerUi } from "../ui/scores/player-ui";
-import { playerActions, PlayerActions } from "./player-actions";
+import {
+  playerActions,
+  PlayerActions,
+  PlayerActionTypes,
+} from "./player-actions";
 import { Tooltip } from "./player-tooltip";
 
 type MouseState = {
@@ -34,6 +38,7 @@ const costs: { [key in PlayerActions]: number } = {
   NEW_DICE: 10,
   NEWROLLER: 100,
   REMOVE: 0,
+  UPGRADES: 0,
 };
 
 export class Player extends ex.Actor {
@@ -43,10 +48,28 @@ export class Player extends ex.Actor {
   ghost!: Ghost;
   draggingBuilding: Building | null = null;
   playerUi!: PlayerUi;
-  currentAction: PlayerActions = PlayerActions.NONE;
+
   cameraMovementData: CameraMovementData | null = null;
   wishPosition = ex.vec(0, 0);
   isSetup = false;
+
+  _currentAction: PlayerActions = PlayerActions.NONE;
+  get currentAction() {
+    return this._currentAction;
+  }
+  set currentAction(value: PlayerActions) {
+    this._currentAction = value;
+    this.clearTooltips();
+    this.playerUi.dirty = true;
+    let relatedAction = playerActions.find((a) => a.code == value);
+    if (relatedAction != null) {
+      this.showTooltip({
+        code: relatedAction.code,
+        title: relatedAction.name,
+        description: relatedAction.tooltip,
+      });
+    }
+  }
 
   getCamera(): ex.Camera {
     if (this.scene == null) {
@@ -131,10 +154,15 @@ export class Player extends ex.Actor {
 
   onSpaceClicked(space: GridSpace) {
     if (this.cameraMovementData == null) {
-      if (this.currentAction == PlayerActions.REMOVE) {
-        this.removeBuildable(space.globalPos);
-      } else {
-        this.placeBuildable(space.globalPos);
+      let currentAction = playerActions.find(
+        (a) => a.code == this.currentAction
+      );
+      if (currentAction?.type == PlayerActionTypes.BUILDABLE) {
+        if (this.currentAction == PlayerActions.REMOVE) {
+          this.removeBuildable(space.globalPos);
+        } else {
+          this.placeBuildable(space.globalPos);
+        }
       }
     }
   }

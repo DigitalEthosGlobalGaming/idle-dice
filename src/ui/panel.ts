@@ -20,6 +20,13 @@ export class Panel extends ex.Actor implements InputHandler {
   needsRender = true;
   dirty = true;
 
+  set allDirty(value: boolean) {
+    this.dirty = value;
+    for (let child of this.getChildrenPanels()) {
+      child.allDirty = value;
+    }
+  }
+
   get level(): Level {
     if (this.scene instanceof Level) {
       return this.scene;
@@ -35,14 +42,21 @@ export class Panel extends ex.Actor implements InputHandler {
 
   _visible = true;
   get visible(): boolean {
-    return this._visible;
+    if (this._visible == false) {
+      return false;
+    }
+
+    if (this.parent instanceof Panel) {
+      return this.parent.visible;
+    }
+    return true;
   }
   set visible(value: boolean) {
     if (value == this._visible) {
       return;
     }
     this._visible = value;
-    this.dirty = true;
+    this.allDirty = true;
   }
 
   _padding = 0;
@@ -55,18 +69,32 @@ export class Panel extends ex.Actor implements InputHandler {
   }
 
   _size: ex.Vector = new ex.Vector(0, 0);
+  _customSize: boolean = false;
   get size(): ex.Vector {
     if (this.visible == false) {
       return ex.vec(0, 0);
     }
-    let size = this._size ?? new ex.Vector(this.width, this.height);
-    if (this.padding) {
-      size = size.add(ex.vec(this.padding * 2, this.padding * 2));
+    if (this._customSize) {
+      let size = this._size ?? new ex.Vector(this.width, this.height);
+      if (this.padding) {
+        size = size.add(ex.vec(this.padding * 2, this.padding * 2));
+      }
+      return size;
     }
-    return size;
+    if (this._size.x == 0 && this._size.y == 0) {
+      let children = this.getChildrenPanels();
+      let size = ex.vec(0, 0);
+      for (let child of children) {
+        size = size.add(child.size);
+      }
+      this._size = size;
+      return size;
+    }
+    return this._size;
   }
 
   set size(value: ex.Vector) {
+    this._customSize = true;
     if (this._size.x == value.x && this._size.y == value.y) {
       return;
     }
@@ -76,6 +104,10 @@ export class Panel extends ex.Actor implements InputHandler {
       this.onResize(oldSize, this.size);
     }
     this.dirty = true;
+  }
+
+  getChild(name: string): Panel | null {
+    return this.children.find((c) => c.name == name) as Panel;
   }
 
   _backgroundColor: ex.Color | null = null;
@@ -92,7 +124,7 @@ export class Panel extends ex.Actor implements InputHandler {
 
   _color: ex.Color = ex.Color.White;
   get color(): ex.Color {
-    return this.backgroundColor ?? ex.Color.White;
+    return this._color ?? ex.Color.White;
   }
   set color(value: ex.Color) {
     if (value == this._color) {
@@ -345,13 +377,13 @@ export class Panel extends ex.Actor implements InputHandler {
     return null;
   }
 
-  getParentBounds(): ex.BoundingBox | null {
+  getParentBounds(): ex.BoundingBox {
     let parent = this.getParent();
     if (parent != null) {
       return parent.bounds;
     }
 
-    return this.scene?.camera?.viewport ?? null;
+    return this.scene?.camera?.viewport ?? new ex.BoundingBox(0, 0, 0, 0);
   }
 
   isInBounds(position: ex.Vector) {

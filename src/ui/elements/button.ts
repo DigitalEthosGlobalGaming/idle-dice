@@ -18,6 +18,8 @@ export class Button extends Panel {
   iconSprite?: ex.Sprite;
   options: ButtonOptions = {};
   tooltip?: Tooltip;
+  hoverColor?: ex.Color;
+  originalColor?: ex.Color;
 
   set text(value: string) {
     this.options.text = value;
@@ -64,6 +66,14 @@ export class Button extends Panel {
 
   onHoverChanged(e: ex.PointerEvent): void {
     super.onHoverChanged(e);
+    if (this.hoverColor != null) {
+      if (this.isHovered) {
+        this.originalColor = this.color.clone();
+        this.color = this.hoverColor;
+      } else {
+        this.color = this.originalColor ?? this.color;
+      }
+    }
     if (e.pointerType != "Mouse") {
       this.player?.clearTooltips();
     }
@@ -120,6 +130,7 @@ export class Button extends Panel {
         this.label = this.addPanel("label", Label);
         this.label.labelAnchor = ex.vec(0.5, 0.5);
       }
+      this.label.color = this.color;
       this.label.text = text ?? "";
     }
     if (icon != null) {

@@ -22,6 +22,8 @@ export class GameScene extends Level {
     if (this.player == null) {
       this.player = new Player();
       this.add(this.player);
+      const gridSize = this.gridSystem.getBounds().center;
+      this.player.wishPosition = gridSize.clone();
     }
   }
 

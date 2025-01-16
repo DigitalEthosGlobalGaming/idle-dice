@@ -21,6 +21,8 @@ export class List extends Panel {
   }
 
   updatePositions(): void {
+    let totalHeight = 0;
+    let largestWidth = 0;
     const childPanels = this.getChildrenPanels();
     let currentY = 0;
     for (let i = 0; i < childPanels.length; i++) {
@@ -31,7 +33,12 @@ export class List extends Panel {
       if (child.pos.x != newPos.x || child.pos.y != newPos.y) {
         child.pos = newPos;
       }
+      totalHeight += child.size.y + this._spacing;
+      if (child.size.x > largestWidth) {
+        largestWidth = child.size.x;
+      }
     }
+    this.size = ex.vec(largestWidth, totalHeight);
   }
 
   override render(): void {

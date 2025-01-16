@@ -9,6 +9,7 @@ import {
 } from "../input-manager";
 import { Player } from "../player-systems/player";
 import { GameScene } from "../scenes/game.scene";
+import { Resources } from "../resources";
 
 class GridSpaceGhost extends ex.Actor {
   spaceSize: ex.Vector = new ex.Vector(32, 32);
@@ -25,17 +26,13 @@ class GridSpaceGhost extends ex.Actor {
         color: ex.Color.Green,
       })
     );
-    const hoveredColor = ex.Color.Red.clone();
-    hoveredColor.a = 0.5;
-    this.graphics.add(
-      "hover",
-      new ex.Rectangle({
-        width: this.spaceSize.x,
-        height: this.spaceSize.y,
-        color: hoveredColor,
-      })
-    );
-
+    const sprite = ex.Sprite.from(Resources.ResizeDCrossDiagonal);
+    sprite.destSize = {
+      width: this.spaceSize.x * 1.2,
+      height: this.spaceSize.y * 1.2,
+    };
+    sprite.opacity = 0.5;
+    this.graphics.add("hover", sprite);
     this.graphics.use("hide");
   }
 

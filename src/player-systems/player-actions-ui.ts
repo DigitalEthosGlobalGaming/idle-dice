@@ -99,9 +99,20 @@ export class PlayerActionsUi extends Panel {
   }
   playerActions: PlayerAction[] = playerActions;
   buttons: PlayerActionButton[] = [];
-  currentAction: PlayerAction | null = null;
+
   hoveredAction: PlayerAction | null = null;
   acceptingInputs = false;
+
+  get currentAction(): PlayerAction {
+    let item = playerActions.find((a) => a.code == this.player.currentAction);
+    if (item == null) {
+      throw new Error("Current action not found");
+    }
+    return item;
+  }
+  set currentAction(value: PlayerAction) {
+    this.player.currentAction = value.code;
+  }
 
   changeAction(action: PlayerAction) {
     for (let button of this.buttons) {
@@ -113,8 +124,6 @@ export class PlayerActionsUi extends Panel {
     }
 
     this.currentAction = action;
-    this.player.currentAction = action.code;
-    this.player.clearTooltips();
   }
 
   onAdd(engine: ex.Engine): void {
