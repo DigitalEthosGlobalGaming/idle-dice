@@ -302,7 +302,6 @@ export class Player extends ex.Actor {
   }
 
   spendEnergy(amount: number): boolean {
-    return true;
     if (this.scoreComponent.score < amount) {
       return false;
     }
