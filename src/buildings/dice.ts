@@ -4,6 +4,7 @@ import { Config } from "../config";
 import { ease } from "../easing";
 import { Resources } from "../resources";
 import { random } from "../utility/random";
+import { BetterDiceUpgrade } from "../components/upgrades/better-dice.upgrade";
 
 const possibleRolls: { [key: number]: number[][] } = {};
 const totalPossibleRolls = 100;
@@ -192,7 +193,8 @@ export class Dice extends Building {
 
   onRollFinish() {
     this.rolling = false;
-    this.player.scoreComponent.createScore(this, this.value);
+    const score = this.player.getUpgrade(BetterDiceUpgrade)?.value ?? 0;
+    this.player.scoreComponent.createScore(this, this.value + score);
   }
 
   start() {

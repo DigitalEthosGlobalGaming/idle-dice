@@ -17,7 +17,30 @@ export class Button extends Panel {
   label?: Label;
   iconSprite?: ex.Sprite;
   options: ButtonOptions = {};
-  tooltip?: Tooltip;
+  _tooltip?: Tooltip;
+  get tooltip(): Tooltip | undefined {
+    return this._tooltip;
+  }
+  set tooltip(value: Tooltip | undefined) {
+    let oldTooltip = this._tooltip;
+    if (value?.code == this.tooltip?.code) {
+      return;
+    }
+
+    this._tooltip = value;
+
+    if (this.isHovered) {
+      if (oldTooltip != null) {
+        this.player?.hideTooltip(oldTooltip);
+      }
+
+      if (value != null) {
+        this.player?.hideTooltip(value);
+        this.player?.showTooltip(value);
+      }
+    }
+
+  }
   hoverColor?: ex.Color;
   originalColor?: ex.Color;
 

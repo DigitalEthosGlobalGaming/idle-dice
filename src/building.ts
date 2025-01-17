@@ -72,6 +72,11 @@ export class Building extends ex.Actor {
     return this.gridSpace.getNeighbors();
   }
 
+  resetTicker() {
+    const now = new Date().getTime();
+    this.lastTick = now;
+  }
+
   onPreUpdate(_engine: ex.Engine, _elapsed: number): void {
     if (this.tickRate > 0) {
       const now = new Date().getTime();
@@ -87,8 +92,12 @@ export class Building extends ex.Actor {
     }
   }
 
-  onTick(_delta: number) {}
+  onTick(_delta: number) { }
 
-  onBuild() {}
-  onTrigger() {}
+  onBuild() { }
+
+  trigger() {
+    this.onTrigger();
+  }
+  onTrigger() { }
 }

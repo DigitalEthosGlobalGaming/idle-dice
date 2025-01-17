@@ -2,7 +2,9 @@ import * as ex from "excalibur";
 import { Building } from "../building";
 import { Dice } from "../buildings/dice";
 import { Roller } from "../buildings/roller";
+import { PlayerUpgradesComponent } from "../components/player-upgrades-component";
 import { ScoreComponent } from "../components/score-component";
+import { Upgrade } from "../components/upgrade-component";
 import { Ghost } from "../ghost";
 import { GridSpace } from "../grid-system/grid-space";
 import { ExtendedPointerEvent } from "../input-manager";
@@ -14,6 +16,7 @@ import {
   PlayerActionTypes,
 } from "./player-actions";
 import { Tooltip } from "./player-tooltip";
+import { PassiveEnergyComponent } from "../components/upgrades/passive-energy.upgrade";
 
 type MouseState = {
   button: number;
@@ -43,6 +46,7 @@ const costs: { [key in PlayerActions]: number } = {
 
 export class Player extends ex.Actor {
   scoreComponent!: ScoreComponent;
+  playerUpgradesComponent!: PlayerUpgradesComponent;
   cameraPos = ex.vec(0, 0);
   pointerStates: { [key: number]: MouseState } = [];
   ghost!: Ghost;
@@ -93,13 +97,24 @@ export class Player extends ex.Actor {
       return;
     }
     this.isSetup = true;
-    this.ghost = new Ghost();
-    this.addChild(this.ghost);
-    this.scoreComponent = new ScoreComponent();
-    this.addComponent(this.scoreComponent);
-    this.playerUi = new PlayerUi();
-    this.addChild(this.playerUi);
-    this.scoreComponent.score = 10;
+    if (this.ghost == null) {
+      this.ghost = new Ghost();
+      this.addChild(this.ghost);
+    }
+
+    if (this.playerUi == null) {
+      this.playerUi = new PlayerUi();
+      this.addChild(this.playerUi);
+    }
+    if (this.scoreComponent == null) {
+      this.scoreComponent = new ScoreComponent();
+      this.addComponent(this.scoreComponent);
+      this.scoreComponent.score = 10;
+    }
+    if (this.playerUpgradesComponent == null) {
+      this.playerUpgradesComponent = new PlayerUpgradesComponent();
+      this.addComponent(this.playerUpgradesComponent);
+    }
 
     this.scene?.on("im-pointer-down", (e) => {
       this.onPointerDown(e as ExtendedPointerEvent);
@@ -113,9 +128,11 @@ export class Player extends ex.Actor {
     const timer = this.scene?.addTimer(
       new ex.Timer({
         fcn: () => {
-          this.scoreComponent.updateScore(1);
+          const upgrade = this.getUpgrade(PassiveEnergyComponent);
+          let upgradeAmount = upgrade?.value ?? 1;
+          this.scoreComponent.updateScore(upgradeAmount);
         },
-        interval: 10000,
+        interval: 1000,
         repeats: true,
       })
     );
@@ -146,7 +163,7 @@ export class Player extends ex.Actor {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) {}
+  onPointerDown(_e: ExtendedPointerEvent) { }
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -223,24 +240,20 @@ export class Player extends ex.Actor {
     let existingBuilding = space.children.find((c) => c instanceof Building);
     if (existingBuilding == null) {
       let cost = costs[this.currentAction];
-      if (this.scoreComponent.score < cost) {
-        return;
-      }
-      this.scoreComponent.updateScore(-cost);
-      if (this.currentAction == PlayerActions.NEWDICE) {
-        const faces = 6;
-        existingBuilding = new Dice(faces, 1);
-        space.addChild(existingBuilding);
-        existingBuilding.onBuild();
-      }
-      if (this.currentAction == PlayerActions.NEWROLLER) {
-        const entity = new Roller();
-        space.addChild(entity);
+      if (this.spendEnergy(cost)) {
+        if (this.currentAction == PlayerActions.NEWDICE) {
+          const faces = 6;
+          existingBuilding = new Dice(faces, 1);
+          space.addChild(existingBuilding);
+          existingBuilding.onBuild();
+        }
+        if (this.currentAction == PlayerActions.NEWROLLER) {
+          const entity = new Roller();
+          space.addChild(entity);
+        }
       }
     } else {
-      if (existingBuilding instanceof Dice) {
-        existingBuilding.rollDice();
-      }
+      existingBuilding.trigger();
     }
   }
 
@@ -281,4 +294,20 @@ export class Player extends ex.Actor {
     this.tooltips = this.tooltips.filter((t) => t.code != value.code);
     this.updateTooltip();
   }
+  get upgrades(): Upgrade[] {
+    return Object.values(this.playerUpgradesComponent.upgrades);
+  }
+  getUpgrade<T extends Upgrade>(t: new (...args: any[]) => T): T | null {
+    return this.playerUpgradesComponent.getUpgrade(t);
+  }
+
+  spendEnergy(amount: number): boolean {
+    return true;
+    if (this.scoreComponent.score < amount) {
+      return false;
+    }
+    this.scoreComponent.updateScore(-amount);
+    return true;
+  }
+
 }

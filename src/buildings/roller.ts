@@ -1,4 +1,3 @@
-import { Engine } from "excalibur";
 import { Building } from "../building";
 import { Resources } from "../resources";
 import { Dice } from "./dice";
@@ -12,12 +11,8 @@ export class Roller extends Building {
   onTick(_delta: number): void {
     this.rollDice();
   }
-  onAdd(engine: Engine): void {
-    super.onAdd(engine);
-    this.onBuild();
-  }
 
-  onBuild(): void {
+  onTrigger(): void {
     super.onBuild();
     this.rollDice();
   }
