@@ -85,10 +85,16 @@ export class Upgrade {
 
     protected _nextCost: number = 0;
     get nextCost() {
+        if (this.level == 0) {
+            return this.baseCost;
+        }
         return this._nextCost;
     }
     protected _nextValue: number = 0;
     get nextValue() {
+        if (this.level == 0) {
+            return this.baseValue;
+        }
         return this._nextValue;
     }
 
