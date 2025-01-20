@@ -4,6 +4,7 @@ import { GameScene } from "./scenes/game.scene";
 import { WelcomeScene } from "./scenes/welcome.scene";
 import { CreditScene } from "./scenes/credits.scene";
 import { HowToPlayScene } from "./scenes/how-to-play.scene";
+import { UpdatesScene } from "./scenes/updates.scene";
 
 async function waitForFontLoad(font: string, timeout = 2000, interval = 100) {
   return new Promise((resolve, reject) => {
@@ -28,12 +29,18 @@ waitForFontLoad("24px DS-DIGI").then(() => {
     backgroundColor: ex.Color.fromHex("#000000"),
     pixelArt: false,
     displayMode: ex.DisplayMode.FillScreen,
-    scenes: { WelcomeScene, GameScene, CreditScene, HowToPlayScene },
+    scenes: {
+      WelcomeScene,
+      GameScene,
+      CreditScene,
+      HowToPlayScene,
+      UpdatesScene,
+    },
   });
 
   const loader = new GameLoader();
 
   game.start(loader).then(() => {
-    game.goToScene("WelcomeScene");
+    game.goToScene("UpdatesScene");
   });
 });

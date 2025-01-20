@@ -44,6 +44,7 @@ export class InputManager extends ex.Entity {
   };
 
   onAdd(engine: ex.Engine): void {
+    super.onAdd(engine);
     if (this.scene?.entities.indexOf(this) === -1) {
       const inputManagers = this.scene?.entities.filter(
         (entity) => entity instanceof InputManager

@@ -5,6 +5,12 @@ import { Label } from "../ui/elements/label";
 import { Button } from "../ui/elements/button";
 import { List } from "../ui/elements/list";
 
+export const Scenes: Record<string, string> = {
+  Play: "GameScene",
+  Updates: "UpdatesScene",
+  Help: "HowToPlayScene",
+  Credits: "CreditScene",
+};
 class WelcomeUi extends Panel {
   onRender(): void {
     super.onRender();
@@ -16,26 +22,14 @@ class WelcomeUi extends Panel {
     label.text = "Roll Masters";
     label.labelAnchor = ex.vec(0.5, 0.5);
 
-    const playButton = list.addPanel("play", Button);
-    playButton.text = "Play";
-    playButton.fontSize = 20;
-    playButton.onClick = () => {
-      this.scene?.engine.goToScene("GameScene");
-    };
-
-    const helpButton = list.addPanel("help", Button);
-    helpButton.text = "Help";
-    helpButton.fontSize = 20;
-    helpButton.onClick = () => {
-      this.scene?.engine.goToScene("HowToPlayScene");
-    };
-
-    const creditsButton = list.addPanel("credits", Button);
-    creditsButton.text = "Credits";
-    creditsButton.fontSize = 20;
-    creditsButton.onClick = () => {
-      this.scene?.engine.goToScene("CreditScene");
-    };
+    for (const title in Scenes) {
+      const sceneButton = list.addPanel(title, Button);
+      sceneButton.text = title;
+      sceneButton.fontSize = 20;
+      sceneButton.onClick = () => {
+        this.scene?.engine.goToScene(Scenes[title]);
+      };
+    }
   }
 }
 

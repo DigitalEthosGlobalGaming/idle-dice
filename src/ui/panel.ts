@@ -13,12 +13,19 @@ export enum PanelBackgrounds {
   "ButtonSquareFlat" = "ButtonSquareFlat",
 }
 
+type DirtyPanels = {
+  element: Panel;
+  children: DirtyPanels[];
+};
+
 export class Panel extends ex.Actor implements InputHandler {
   lastRenderTick = -1;
   isHovered = false;
   isMouseDown = false;
   needsRender = true;
   dirty = true;
+
+  subscriptions: ex.Subscription[] = [];
 
   set allDirty(value: boolean) {
     this.dirty = value;
@@ -68,7 +75,7 @@ export class Panel extends ex.Actor implements InputHandler {
     this.dirty = true;
   }
 
-  _size: ex.Vector = new ex.Vector(0, 0);
+  _size: ex.Vector | undefined = undefined;
   _customSize: boolean = false;
   get size(): ex.Vector {
     if (this.visible == false) {
@@ -81,21 +88,15 @@ export class Panel extends ex.Actor implements InputHandler {
       }
       return size;
     }
-    if (this._size.x == 0 && this._size.y == 0) {
-      let children = this.getChildrenPanels();
-      let size = ex.vec(0, 0);
-      for (let child of children) {
-        size = size.add(child.size);
-      }
-      this._size = size;
-      return size;
+    if (this._size == undefined) {
+      this.calculateSize();
     }
-    return this._size;
+    return this._size ?? ex.vec(0, 0);
   }
 
   set size(value: ex.Vector) {
     this._customSize = true;
-    if (this._size.x == value.x && this._size.y == value.y) {
+    if (this._size?.x == value.x && this._size?.y == value.y) {
       return;
     }
     let oldSize = this.size.clone();
@@ -134,6 +135,16 @@ export class Panel extends ex.Actor implements InputHandler {
     this.dirty = true;
   }
 
+  get dirtyPanels(): DirtyPanels[] {
+    let elements: DirtyPanels[] = [];
+    for (let child of this.getChildrenPanels()) {
+      if (child.dirty) {
+        elements.push({ element: child, children: child.dirtyPanels });
+      }
+    }
+    return elements;
+  }
+
   get isChildDirty(): boolean {
     let children = this.getChildrenPanels();
     for (let child of children) {
@@ -147,7 +158,6 @@ export class Panel extends ex.Actor implements InputHandler {
     return false;
   }
 
-  _globalBounds: ex.BoundingBox | null = null;
   acceptingInputs?: boolean | ButtonStates[];
 
   get bounds(): ex.BoundingBox {
@@ -163,7 +173,7 @@ export class Panel extends ex.Actor implements InputHandler {
     );
   }
 
-  get globalBounds(): ex.BoundingBox | null {
+  get globalBounds(): ex.BoundingBox {
     const width = this.size?.x ?? 0;
     const height = this.size?.y ?? 0;
     const halfWidth = width / 2;
@@ -195,6 +205,28 @@ export class Panel extends ex.Actor implements InputHandler {
     }
 
     this.initializeGraphicsGroup();
+  }
+
+  calculateSize() {
+    let oldSize = this._size?.clone() ?? ex.vec(0, 0);
+    let children = this.getChildrenPanels();
+    let bottomRight = ex.vec(0, 0);
+    for (let child of children) {
+      let childBottomRight = child.bounds.bottomRight;
+      if (childBottomRight.x > bottomRight.x) {
+        bottomRight.x = childBottomRight.x;
+      }
+      if (childBottomRight.y > bottomRight.y) {
+        bottomRight.y = childBottomRight.y;
+      }
+    }
+    if (this._size == undefined) {
+      this._size = ex.vec(0, 0);
+    }
+    if (oldSize.distance(bottomRight) != 0) {
+      this._size = bottomRight;
+      this.dirty = true;
+    }
   }
 
   getChildrenPanels(): Panel[] {
@@ -236,6 +268,14 @@ export class Panel extends ex.Actor implements InputHandler {
     return bounds.contains(vec);
   }
 
+  getPanel<T = Panel>(name: string): T | null {
+    return this.children.find((c) => c.name == name) as T | null;
+  }
+
+  hasPanel(name: string): boolean {
+    return this.children.some((c) => c.name == name);
+  }
+
   addPanel<T extends Panel>(
     name: string,
     PanelClass: new (...args: any[]) => T,
@@ -254,7 +294,7 @@ export class Panel extends ex.Actor implements InputHandler {
       this.addChild(element);
       this.emit("childadded", element);
     }
-    this.dirty = true;
+    this.calculateSize();
     return element;
   }
 
@@ -277,10 +317,10 @@ export class Panel extends ex.Actor implements InputHandler {
     this.isHovered = true;
     this.onHoverChanged(e);
   }
-  onPointerUp(_e: ex.PointerEvent): void { }
-  onPointerDown(_e: ex.PointerEvent): void { }
+  onPointerUp(_e: ex.PointerEvent): void {}
+  onPointerDown(_e: ex.PointerEvent): void {}
 
-  onHoverChanged(_e: ex.PointerEvent) { }
+  onHoverChanged(_e: ex.PointerEvent) {}
 
   getCurrentTick() {
     const engine = this.scene?.engine;
@@ -365,9 +405,25 @@ export class Panel extends ex.Actor implements InputHandler {
   onAdd(engine: ex.Engine): void {
     super.onAdd(engine);
     InputManager.register(this);
+    const isParentPanel = this.parent instanceof Panel;
+    if (!isParentPanel) {
+      const subscription = this.scene?.engine.screen.events.on("resize", () => {
+        this.allDirty = true;
+      });
+      if (subscription != null) {
+        this.subscriptions.push(subscription);
+      }
+    }
   }
 
-  onRender() { }
+  kill(): void {
+    super.kill();
+    for (let subscription of this.subscriptions) {
+      subscription.close();
+    }
+  }
+
+  onRender() {}
 
   getParent<T = Panel>(): T | null {
     let parent = this.parent;
@@ -401,5 +457,5 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) { }
+  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) {}
 }

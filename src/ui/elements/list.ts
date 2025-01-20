@@ -13,39 +13,47 @@ export class List extends Panel {
     }
     this.dirty = true;
   }
+
   onInitialize(engine: ex.Engine): void {
     super.onInitialize(engine);
     this.on("childadded", () => {
-      this.dirty = true;
+      // this.updatePositions();
+      // this.dirty = true;
     });
   }
 
   updatePositions(): void {
-    let totalHeight = 0;
-    let largestWidth = 0;
     const childPanels = this.getChildrenPanels();
     let currentY = 0;
+    let hasChanged = false;
     for (let i = 0; i < childPanels.length; i++) {
       const child = childPanels[i];
 
       currentY += child.size.y + this._spacing;
-      let newPos = ex.vec(0, currentY);
-      if (child.pos.x != newPos.x || child.pos.y != newPos.y) {
-        child.pos = newPos;
-      }
-      totalHeight += child.size.y + this._spacing;
-      if (child.size.x > largestWidth) {
-        largestWidth = child.size.x;
+      if (child.pos.y != currentY) {
+        child.pos.y = currentY;
+        child.dirty = true;
+        hasChanged = true;
       }
     }
-    this.size = ex.vec(largestWidth, totalHeight);
+
+    if (hasChanged) {
+      this.calculateSize();
+    }
+    this.level.drawDebug(this.globalBounds, this.id);
   }
 
   override render(): void {
     const wasDirty = this.isChildDirty;
+
     super.render();
     if (wasDirty) {
-      this.updatePositions();
+      const dirtyPanels = this.dirtyPanels;
+      for (const panel of dirtyPanels) {
+        console.log(panel.element);
+      }
+      // console.log(dirtyPanels);
+      // this.updatePositions();
     }
   }
 }

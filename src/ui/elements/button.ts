@@ -39,7 +39,6 @@ export class Button extends Panel {
         this.player?.showTooltip(value);
       }
     }
-
   }
   hoverColor?: ex.Color;
   originalColor?: ex.Color;
@@ -137,7 +136,7 @@ export class Button extends Panel {
     super.render();
     if (wasDirty) {
       const newSize = this.calculateSize();
-      if (this._size.x != newSize.x || this._size.y != newSize.y) {
+      if (this._size?.x != newSize.x || this._size?.y != newSize.y) {
         this.size = newSize;
       }
     }
