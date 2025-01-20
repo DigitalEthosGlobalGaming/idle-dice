@@ -3,13 +3,13 @@ import { Grid } from "../graphics/grid";
 import { GridSpace } from "./grid-space";
 import { GridSystem } from "./grid-system";
 import {
-  ExtendedPointerEvent,
   InputHandler,
   InputManager,
-} from "../input-manager";
+} from "../input/input-manager";
 import { Player } from "../player-systems/player";
 import { GameScene } from "../scenes/game.scene";
 import { Resources } from "../resources";
+import { ExtendedPointerEvent } from "../input/extended-pointer-event";
 
 class GridSpaceGhost extends ex.Actor {
   spaceSize: ex.Vector = new ex.Vector(32, 32);
@@ -45,7 +45,6 @@ class GridSpaceGhost extends ex.Actor {
 }
 
 export class DiceGameGridSystem extends GridSystem implements InputHandler {
-  spaceSize: ex.Vector = new ex.Vector(32, 32);
   private _highlightedSpace: GridSpace | null = null;
   showGhost = false;
 
@@ -82,10 +81,6 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
       throw new Error("Player is null");
     }
     return this.level.player;
-  }
-
-  constructor(size: ex.Vector, spaceSize: ex.Vector) {
-    super(size, spaceSize);
   }
 
   onPointerLeave(_evt: ExtendedPointerEvent): void {

@@ -5,6 +5,7 @@ import { ease } from "../easing";
 import { Resources } from "../resources";
 import { random } from "../utility/random";
 import { BetterDiceUpgrade } from "../components/upgrades/better-dice.upgrade";
+import { Serializable } from "../systems/save-system";
 
 const possibleRolls: { [key: number]: number[][] } = {};
 const totalPossibleRolls = 100;
@@ -127,24 +128,60 @@ function getRandomRollAnimation(
   return random.array(diceFaces);
 }
 
-export class Dice extends Building {
+export class Dice extends Building implements Serializable {
   rolling: boolean = false;
-  faces: number = 6;
-  speed: number = 1;
-  value: number = 0;
-  constructor(faces: number = 6, speed: number = 1) {
-    super();
-    this.setFaces(faces);
-    this.speed = speed;
-    this.spriteImage = Resources.DiceEmpty;
+  private _faces: number = 6;
+  private _speed: number = 1;
+  private _value: number = 0;
+
+  get faces(): number {
+    return this._faces;
   }
 
-  setFaces(faces: number) {
-    if (faces <= 1) {
+  set faces(value: number) {
+    if (value <= 1) {
       throw new Error("Faces must be greater than 1");
     }
-    this.faces = Math.floor(faces);
+    value = Math.floor(value);
+    if (value == this._faces) {
+      return;
+    }
+    this._faces = value;
   }
+
+  get speed(): number {
+    return this._speed;
+  }
+
+  set speed(value: number) {
+    if (value <= 0) {
+      throw new Error("Speed must be greater than 0");
+    }
+    this._speed = value;
+  }
+
+  get value(): number {
+    return this._value;
+  }
+
+  set value(value: number) {
+    this._value = value;
+  }
+  serialize() {
+    return {
+      faces: this.faces,
+      speed: this.speed,
+      value: this.value,
+      pos: this.pos,
+    };
+  }
+  deserialize(data: any): void {
+    this.speed = data.speed;
+    this.faces = data.faces;
+    this.value = data.value;
+    this.pos = ex.vec(data.pos._x, data.pos._y);
+  }
+
 
   onTrigger() {
     this.rollDice();

@@ -1,24 +1,37 @@
 import * as ex from "excalibur";
+import { DiceSaveSystem } from "../dice-save-system";
 import { DiceGameGridSystem } from "../grid-system/grid-system-actor";
 import { Level } from "../level";
 import { Player } from "../player-systems/player";
+import { Serializable } from "../systems/save-system";
 
-export class GameScene extends Level {
+
+export class GameScene extends Level implements Serializable {
+  serialize() {
+    return null;
+    // throw new Error("Method not implemented.");
+  }
+
   score: number = 0;
   best: number = 0;
   random = new ex.Random();
   gridSystem: DiceGameGridSystem | null = null;
   gridColor = new ex.Color(255 * 0, 255 * 0.1, 255 * 0.1, 1);
+  saveSystem!: DiceSaveSystem;
 
   override onActivate(ctx: ex.SceneActivationContext): void {
     super.onActivate(ctx);
+    if (this.saveSystem == null) {
+      this.saveSystem = new DiceSaveSystem();
+      this.saveSystem.addClassMapping(GameScene);
+    }
     let timer = new ex.Timer({
       fcn: () => {
         if (this.gridSystem == null) {
-          this.gridSystem = new DiceGameGridSystem(
-            new ex.Vector(32, 32),
-            new ex.Vector(32, 32)
-          );
+          this.gridSystem = new DiceGameGridSystem();
+          this.gridSystem.serializeId = "gridSystem";
+          this.gridSystem.size = new ex.Vector(32, 32);
+          this.gridSystem.spaceSize = new ex.Vector(32, 32);
           this.add(this.gridSystem);
         }
         if (this.player == null) {
@@ -32,6 +45,10 @@ export class GameScene extends Level {
     });
     timer = this.addTimer(timer);
     timer.start();
+  }
+
+  deserialize(data: any): void {
+
   }
 
   onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {

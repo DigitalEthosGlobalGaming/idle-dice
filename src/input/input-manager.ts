@@ -1,5 +1,7 @@
 import * as ex from "excalibur";
-import { Level } from "./level";
+import { Level } from "../level";
+import { ExtendedPointerEvent } from "./extended-pointer-event";
+import { ExtendedKeyEvent } from "./extended-key-event";
 
 /**
  * Represents an entity that implements various input handling functions.
@@ -19,74 +21,15 @@ type RegisterForInput = {
   onPointerMove?(evt: ExtendedPointerEvent): void;
   onPointerEnter?(evt: ExtendedPointerEvent): void;
   onPointerLeave?(evt: ExtendedPointerEvent): void;
+  onKeyUp?(evt: ExtendedKeyEvent): void;
+  onKeyDown?(evt: ExtendedKeyEvent): void;
+  onKeyPress?(evt: ExtendedKeyEvent): void;
   collides(vec: ex.Vector): boolean;
   acceptingInputs?: boolean | ButtonStates[];
   globalZ: number;
 };
 
 export type InputHandler = ex.Entity & RegisterForInput;
-export class ExtendedPointerEvent extends ex.PointerEvent {
-  inputManager!: InputManager;
-  _entities: InputHandler[] | null = null;
-  get entities(): InputHandler[] {
-    if (this._entities != null) {
-      return this._entities;
-    }
-    let entities = this.getEntities();
-    this._entities = entities;
-    return entities;
-  }
-
-  static extendPointerEvent(
-    evt: ex.PointerEvent,
-    manager: InputManager
-  ): ExtendedPointerEvent {
-    if (evt instanceof ExtendedPointerEvent) {
-      return evt;
-    }
-    Object.setPrototypeOf(evt, ExtendedPointerEvent.prototype);
-
-    let extended = evt as ExtendedPointerEvent;
-    extended.inputManager = manager;
-    return extended;
-  }
-
-  private getEntities() {
-    const eventPosition = this.worldPos;
-    let entitiesGroupedByZIndex: { [key: number]: InputHandler[] } = {};
-    let entities = Object.values(this.inputManager.entities ?? {});
-
-    for (let entity of entities) {
-      if (entitiesGroupedByZIndex[entity.globalZ] == null) {
-        entitiesGroupedByZIndex[entity.globalZ] = [];
-      }
-      entitiesGroupedByZIndex[entity.globalZ].push(entity);
-    }
-    let zIndices = Object.keys(entitiesGroupedByZIndex)
-      .map((key) => parseInt(key))
-      .sort((a, b) => b - a);
-
-    for (let zIndex of zIndices) {
-      let entities = entitiesGroupedByZIndex[zIndex];
-      let collidedEntities = [];
-      for (let entity of entities) {
-        if (entity.acceptingInputs !== false) {
-          if (entity.collides(eventPosition)) {
-            collidedEntities.push(entity);
-          }
-        }
-      }
-      if (collidedEntities.length > 0) {
-        return collidedEntities;
-      }
-    }
-    return [];
-  }
-
-  isDown(button: ButtonStates): boolean {
-    return this.inputManager.buttonStates[button] ?? false;
-  }
-}
 
 export type ButtonStates = "MouseLeft" | "MouseRight";
 
@@ -127,6 +70,21 @@ export class InputManager extends ex.Entity {
     this.subscriptions.push(
       engine.input.pointers.primary.on("move", (e) => {
         this.onPointerMove(e);
+      })
+    );
+    this.subscriptions.push(
+      engine.input.keyboard.on("up", (e: any) => {
+        this.onKeyUp(e);
+      })
+    );
+    this.subscriptions.push(
+      engine.input.keyboard.on("down", (e: any) => {
+        this.onKeyDown(e);
+      })
+    );
+    this.subscriptions.push(
+      engine.input.keyboard.on("press", (e: any) => {
+        this.onKeyPress(e);
       })
     );
   }
@@ -190,6 +148,36 @@ export class InputManager extends ex.Entity {
     }
 
     this.scene?.emit("im-pointer-move", extendedEvent);
+  }
+
+  onKeyUp(evt: ex.KeyEvent) {
+    let extendedEvent = ExtendedKeyEvent.extendPointerEvent(evt, this);
+    let entities = Object.values(this.entities);
+    for (let entity of entities) {
+      if (entity.onKeyUp != null) {
+        entity.onKeyUp(extendedEvent);
+      }
+    }
+  }
+
+  onKeyDown(evt: ex.KeyEvent) {
+    let extendedEvent = ExtendedKeyEvent.extendPointerEvent(evt, this);
+    let entities = Object.values(this.entities);
+    for (let entity of entities) {
+      if (entity.onKeyDown != null) {
+        entity.onKeyDown(extendedEvent);
+      }
+    }
+  }
+
+  onKeyPress(evt: ex.KeyEvent) {
+    let extendedEvent = ExtendedKeyEvent.extendPointerEvent(evt, this);
+    let entities = Object.values(this.entities);
+    for (let entity of entities) {
+      if (entity.onKeyPress != null) {
+        entity.onKeyPress(extendedEvent);
+      }
+    }
   }
 
   static register(entity: InputHandler): void {

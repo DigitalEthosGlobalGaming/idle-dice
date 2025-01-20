@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { InputHandler } from "../input-manager";
+import { InputHandler } from "../input/input-manager";
 import { Panel } from "./panel";
 
 export enum PanelBackgrounds {

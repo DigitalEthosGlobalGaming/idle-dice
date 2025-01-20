@@ -1,13 +1,13 @@
 import * as ex from "excalibur";
 import {
   ButtonStates,
-  ExtendedPointerEvent,
   InputHandler,
   InputManager,
-} from "../input-manager";
+} from "../input/input-manager";
 import { Level } from "../level";
 import { Player } from "../player-systems/player";
 import { getNineslice } from "../resources";
+import { ExtendedPointerEvent } from "../input/extended-pointer-event";
 
 export enum PanelBackgrounds {
   "ButtonSquareFlat" = "ButtonSquareFlat",
@@ -277,10 +277,10 @@ export class Panel extends ex.Actor implements InputHandler {
     this.isHovered = true;
     this.onHoverChanged(e);
   }
-  onPointerUp(_e: ex.PointerEvent): void {}
-  onPointerDown(_e: ex.PointerEvent): void {}
+  onPointerUp(_e: ex.PointerEvent): void { }
+  onPointerDown(_e: ex.PointerEvent): void { }
 
-  onHoverChanged(_e: ex.PointerEvent) {}
+  onHoverChanged(_e: ex.PointerEvent) { }
 
   getCurrentTick() {
     const engine = this.scene?.engine;
@@ -367,7 +367,7 @@ export class Panel extends ex.Actor implements InputHandler {
     InputManager.register(this);
   }
 
-  onRender() {}
+  onRender() { }
 
   getParent<T = Panel>(): T | null {
     let parent = this.parent;
@@ -401,5 +401,5 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) {}
+  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) { }
 }

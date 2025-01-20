@@ -1,6 +1,9 @@
 import * as ex from "excalibur";
-import { InputManager } from "./input-manager";
+import { InputManager } from "./input/input-manager";
 import { Player } from "./player-systems/player";
+
+
+
 
 export class Level extends ex.Scene {
   inputSystem!: InputManager;

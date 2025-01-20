@@ -1,26 +1,117 @@
 import * as ex from "excalibur";
 import { GridSpace } from "./grid-space";
+import { Serializable } from "../systems/save-system";
 
-export class GridSystem extends ex.Actor {
-  spaces: (GridSpace | null)[] = [];
-  size: ex.Vector = ex.vec(0, 0);
-  spaceSize: ex.Vector = ex.vec(32, 32);
+export class GridSystem extends ex.Actor implements Serializable {
+  private _spaces: (GridSpace | null)[] = [];
 
-  constructor(size: ex.Vector, spaceSize: ex.Vector) {
+  constructor() {
     super({
-      pos: new ex.Vector(0, 0),
-      width: size.x * spaceSize.x,
-      height: size.y * spaceSize.y,
-    });
-    this.setSize(size);
-    this.color = ex.Color.Green;
-    this.spaceSize = spaceSize;
+      width: 50,
+      height: 50,
+    })
   }
 
-  setSize(size: ex.Vector) {
-    this.size = size;
-    this.spaces = new Array(size.x * size.y).fill(null);
+  getChildObjects(): any[] {
+    let children = [];
+    for (let child of this.children) {
+      if (child instanceof GridSpace) {
+        if (child.children.length == 0) {
+          continue;
+        }
+      }
+      children.push(child);
+    }
+    return children;
   }
+
+  addChildObject(child: any, data: any) {
+    if (child instanceof GridSpace) {
+      let index = data.gridIndex;
+      if (index == null) {
+        return;
+      }
+      this._spaces[index] = child;
+      if (child.parent == null) {
+        this.addChild(child);
+      }
+    }
+  }
+
+  private _spaceSize: ex.Vector = ex.vec(0, 0);
+  private _size: ex.Vector = ex.vec(0, 0);
+
+
+  get spaceSize(): ex.Vector {
+    return this._spaceSize;
+  }
+
+  set spaceSize(size: ex.Vector) {
+    this._spaceSize = size;
+  }
+
+  get size(): ex.Vector {
+    return this._size;
+  }
+
+  set size(size: ex.Vector) {
+    if (size.x == this._size.x && size.y == this._size.y) {
+      return;
+    }
+    size.x = Math.floor(size.x);
+    size.y = Math.floor(size.y);
+    let oldSize = this._size;
+    this._size = size.clone();
+
+    let oldSpaces = this._spaces;
+    let newSpaces: (GridSpace | null)[] = new Array(size.x * size.y).fill(null);
+
+    for (let i in oldSpaces) {
+      let iIndex: number = parseInt(i);
+      let newPosition = new ex.Vector(iIndex % oldSize.x, Math.floor(iIndex / oldSize.x));
+      if (newPosition.x >= size.x || newPosition.y >= size.y) {
+        oldSpaces[iIndex]?.kill();
+        continue;
+      }
+      let newIndex = newPosition.y * size.x + newPosition.x;
+      if (newIndex < newSpaces.length) {
+        newSpaces[newIndex] = oldSpaces[iIndex];
+      }
+    }
+
+    this._spaces = newSpaces;
+
+    // Update the bounds.
+    const worldSize = this.worldSize;
+    const halfWorldSize = worldSize.scale(0.5);
+    const newCollider = new ex.PolygonCollider({
+      points: [
+        ex.vec(-halfWorldSize.x, -halfWorldSize.y),
+        ex.vec(halfWorldSize.x, -halfWorldSize.y),
+        ex.vec(halfWorldSize.x, halfWorldSize.y),
+        ex.vec(-halfWorldSize.x, halfWorldSize.y),
+      ]
+    });
+
+    this.collider.set(newCollider);
+  }
+
+  set spaces(spaces: (GridSpace | null)[]) {
+    if (this.spaces.length == spaces.length) {
+      return;
+    }
+    this._spaces = spaces;
+  }
+  get spaces() {
+    return this._spaces;
+  }
+
+  get worldSize() {
+    return this.size.clone().scale(this.spaceSize);
+  }
+
+
+
   isInBounds(position: ex.Vector) {
     const index = this.getSpaceIndex(position);
     return index >= 0 && index < this.spaces.length;
@@ -54,25 +145,33 @@ export class GridSystem extends ex.Actor {
   }
 
   createSpace() {
-    return new GridSpace(this.spaceSize);
+    let gridSpace = new GridSpace();
+    gridSpace.size = this.spaceSize;
+    return gridSpace;
   }
 
   public getBounds(): ex.BoundingBox {
+    const worldSize = this.worldSize;
     const left = this.globalPos.x;
     const top = this.globalPos.y;
-    const right = left + this.width;
-    const bottom = top + this.height;
+    const right = left + worldSize.x;
+    const bottom = top + worldSize.y;
     return new ex.BoundingBox(left, top, right, bottom);
   }
 
   getSpacePositionFromWorldPosition(position: ex.Vector) {
-    const bounds = this.getBounds();
-    if (bounds.contains(position)) {
-      const x = Math.floor((position.x - this.pos.x) / this.spaceSize.x);
-      const y = Math.floor((position.y - this.pos.y) / this.spaceSize.y);
+    const x = Math.floor((position.x - this.pos.x) / this.spaceSize.x);
+    const y = Math.floor((position.y - this.pos.y) / this.spaceSize.y);
+    if (x >= 0 && x < this.size.x && y >= 0 && y < this.size.y) {
       return new ex.Vector(x, y);
     }
     return null;
+  }
+  getSpacePositionFromIndex(index: number) {
+    const xPos = index % this.size.x;
+    const yPos = Math.floor(index / this.size.x);
+    return this.getSpacePositionFromWorldPosition(new ex.Vector(xPos, yPos));
+
   }
   getSpaceFromWorldPosition(position: ex.Vector) {
     return this.getSpace(
@@ -81,28 +180,33 @@ export class GridSystem extends ex.Actor {
   }
 
   getSpace<T = GridSpace>(position: ex.Vector): T | null {
-    if (!this.isInBounds(position)) {
+    const index = this.getSpaceIndex(position);
+    if (index < 0 && index >= this.spaces.length) {
       return null;
     }
-    const index = this.getSpaceIndex(position);
 
     let foundSpace = this.spaces[index];
     if (foundSpace == null) {
       foundSpace = this.createSpace();
-      const centerSpace = new ex.Vector(
-        this.spaceSize.x / 2,
-        this.spaceSize.y / 2
-      );
-      const pos = new ex.Vector(
-        position.x * this.spaceSize.x,
-        position.y * this.spaceSize.y
-      );
-      foundSpace.pos = pos.add(centerSpace);
-
       this.addChild(foundSpace);
       this.spaces[index] = foundSpace;
     }
 
+    foundSpace.gridIndex = index;
+    foundSpace.serializeId = `grid-space-${index}`;
+    const xPos = (position.x * this.spaceSize.x) + this.spaceSize.x / 2;
+    const yPos = (position.y * this.spaceSize.y) + this.spaceSize.y / 2;
+    if (foundSpace.pos.x != xPos || foundSpace.pos.y != yPos) {
+      foundSpace.pos.setTo(xPos, yPos);
+    }
+
     return foundSpace as T;
   }
+
+  serialize() {
+
+  }
+  deserialize(): void {
+  }
+  serializeId?: string | undefined;
 }
