@@ -101,7 +101,6 @@ export class UpgradeUi extends Panel {
     );
 
     const upgrades = this.player.upgrades;
-    // console.log(upgrades);
     for (const i in upgrades) {
       const upgrade = upgrades[i];
       const upgradePanel = list.addPanel(upgrade.code, UpgradeListItem);

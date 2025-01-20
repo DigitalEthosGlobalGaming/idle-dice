@@ -8,7 +8,12 @@ export interface Serializable {
     serializeId?: string;
     getChildObjects?(): any[];
     addChildObject?(obj: any, data: any): void;
+    preSerialize?(): void;
+    postSerialize?(data: SerialisedObject): void;
+    preDeserialize?(): void;
+    postDeserialize?(data: SerialisedObject): void;
 }
+
 
 function isSerializable(obj: any): obj is Serializable {
     if (obj == null) {
@@ -17,17 +22,27 @@ function isSerializable(obj: any): obj is Serializable {
     return obj.serialize !== undefined && obj.deserialize !== undefined;
 }
 
-export type SerializableObject = Scene | Scene[] | Entity | Entity[] | Component | Component[] | Serializable | Serializable[];
+export type SerializableObject = (Entity | Scene | Component) & Serializable;
 
 export type LoadOptions = {
-    obj: SerializableObject;
+    obj: Scene;
     data: string | object;
 }
 
 export type SerialisedObject = {
     className: string;
-    id?: string;
+    id: string;
+    parentId: string;
     data: any;
+    ref?: SerializableObject;
+    isInScene: boolean;
+    children: string[];
+}
+
+type SerializeState = {
+    itemIndexes: Record<string, number>;
+    rootItems: number[]
+    items: SerialisedObject[];
 }
 
 type SerializedData = {
@@ -35,7 +50,7 @@ type SerializedData = {
     children: SerializedData[];
 }
 
-function getChildren(obj: SerializableObject) {
+function getChildren(obj: SerializableObject | Scene) {
     if (isSerializable(obj)) {
         if (obj.getChildObjects != null) {
             return obj.getChildObjects();
@@ -54,7 +69,7 @@ function getChildren(obj: SerializableObject) {
     return [];
 }
 
-function addChild(parent: SerializableObject, child: SerializableObject, data?: any) {
+function addChild(parent: SerializableObject | Scene, child: SerializableObject, data?: any) {
     if (isSerializable(parent)) {
         if (parent.addChildObject != null) {
             parent.addChildObject(child, data);
@@ -71,7 +86,14 @@ function addChild(parent: SerializableObject, child: SerializableObject, data?: 
 
     if (parent instanceof Entity) {
         if (child instanceof Entity) {
-            parent.addChild(child);
+            if (parent == child) {
+                return;
+            }
+            try {
+                parent.addChild(child);
+            } catch (e) {
+                throw e;
+            }
         }
         if (child instanceof Component) {
             parent.addComponent(child);
@@ -84,6 +106,14 @@ type ClassMapping = (new () => any);
 
 export class SaveSystem extends System {
     classMappings: Record<string, ClassMapping> = {};
+    currentlyProcessing: boolean = false;
+    state?: SerializeState;
+    currentScene?: Scene;
+    tooAddQueue: SerialisedObject[] = [];
+    nextId: number = 0;
+    get saveId(): string {
+        return `auto-${this.nextId++}`;
+    }
     constructor(classMappings: ClassMapping[]) {
         super();
         for (const mapping of classMappings) {
@@ -108,134 +138,217 @@ export class SaveSystem extends System {
     update(): void {
         // throw new Error("Method not implemented.");
     }
-    generateSaveData(obj: SerializableObject): SerializedData | null {
-        const data: SerializedData = {
-            object: null,
-            children: []
-        }
-        if (isArray<SerializableObject>(obj)) {
-            for (const objChild of obj) {
-                let childData = this.generateSaveData(objChild);
-                if (childData) {
-                    data.children.push(childData);
-                }
-            }
-            if (data.children.length == 0) {
 
-                return null;
-            }
-            return data;
-        }
-
-        obj = obj as SerializableObject
-
-        if (!this.isMappedClass(obj.constructor.name)) {
-            return null;
-        }
-
-        if (isSerializable(obj)) {
-            const objectdata = obj.serialize();
-            data.object = {
-                className: obj.constructor.name,
-                data: objectdata,
-                id: obj.serializeId
-            }
-        }
-        const children = getChildren(obj) ?? [];
-        for (const child of children) {
-            const childData = this.generateSaveData(child);
-            if (childData) {
-                if (childData.object != null || childData.children.length != 0) {
-                    data.children.push(childData);
-                }
-            }
-        }
-
-        if (data.children.length == 0 && data.object == null) {
-            return null;
-        }
-
-        return data;
+    isSerializable(obj: any): obj is Serializable {
+        return isSerializable(obj) && this.isMappedClass(obj.constructor.name);
     }
 
-    save(obj: SerializableObject): any {
-        let saveData;
-        if (obj instanceof Scene) {
-            const entities = obj.entities.filter((e) => e.parent == null) as Entity[];
-            saveData = this.generateSaveData(entities)
-        } else {
-            saveData = this.generateSaveData(obj);
+    private setStateWithItemsToSave(parent: SerialisedObject | null, obj: SerializableObject) {
+        if (this.state == null) {
+            throw new Error('State is null');
         }
-        return saveData;
+
+        if (isArray<SerializableObject>(obj)) {
+            for (const objChild of obj) {
+                this.setStateWithItemsToSave(parent, objChild);
+            }
+            return;
+        }
+
+        obj = obj as SerializableObject;
+        if (!this.isSerializable(obj)) {
+            return;
+        }
+
+        let id = obj.serializeId ?? this.saveId;
+
+        let newObject = {
+            className: obj.constructor.name,
+            id: id,
+            parentId: parent?.id ?? '',
+            data: undefined,
+            ref: obj,
+            isInScene: true,
+            children: []
+        };
+        let latestIndex = this.state.items.push(newObject) - 1;
+        this.state.itemIndexes[id] = latestIndex;
+
+        if (parent == null) {
+            this.state.rootItems.push(latestIndex);
+        } else {
+            parent.children.push(id);
+        }
+
+        const children = getChildren(obj) ?? [];
+        for (const child of children) {
+            this.setStateWithItemsToSave(newObject, child);
+        }
+    }
+
+    save(obj: Scene): any {
+        this.currentScene = obj;
+        this.currentlyProcessing = true;
+        this.state = {
+            rootItems: [],
+            items: [],
+            itemIndexes: {}
+        }
+        const children = getChildren(obj);
+        for (const child of children) {
+            this.setStateWithItemsToSave(null, child);
+        }
+        if (this.state == null) {
+            throw new Error('State is null');
+        }
+
+        let state: any = { ...this.state };
+
+        for (const i in state.items) {
+            let item = state.items[i];
+            if (item.ref) {
+                item.ref.preSerialize?.();
+            }
+        }
+
+        for (const i in state.items) {
+            let item = state.items[i];
+            if (item.ref) {
+                item.data = item.ref.serialize()
+                if (item.data == null) {
+                    delete item.data;
+                }
+                if (item.children.length == 0) {
+                    delete item.children;
+                }
+                if (item.ref != null) {
+                    delete item.ref;
+                }
+            }
+        }
+
+        for (const i in state.items) {
+            let item: SerialisedObject = state.items[i];
+            if (item.ref) {
+                item.ref.postSerialize?.(item);
+            }
+        }
+
+
+        this.currentlyProcessing = true;
+        this.state = undefined;
+        this.currentScene = undefined;
+        return state;
     }
 
     deserializeObject(obj: any, data: SerializedData): SerializedData {
         if (isSerializable(obj)) {
             obj.deserialize(data.object?.data);
         }
-
-        // Here we prepare the mappings to see if we need to update a child record or if we need to create a new entity.       
-        let children = getChildren(obj);
-
-        let childrenMappings: Record<string, SerializableObject> = {}
-        if (obj instanceof Scene) {
-            for (const child of children) {
-                if (isSerializable(child)) {
-                    let id = child.serializeId;
-                    if (id) {
-                        childrenMappings[id] = child;
-                    }
-                }
-            }
-        } else {
-            for (const child of children) {
-                if (isSerializable(child)) {
-                    let id = child.serializeId;
-                    if (id) {
-                        childrenMappings[id] = child;
-                    }
-                }
-            }
-        }
-
-        for (const childData of data.children) {
-            let child = childrenMappings[childData.object?.id ?? ''];
-            if (!child) {
-                if (childData.object) {
-                    let childClass = this.getClassMapping(childData.object?.className);
-                    if (childClass) {
-
-                        child = new childClass();
-                        addChild(obj, child, childData.object?.data);
-                        this.deserializeObject(child, childData);
-
-
-                        console.log({
-                            childData,
-                            child
-                        });
-                    }
-                }
-            }
-            this.deserializeObject(child, childData);
-        }
-
-
         return data;
     }
 
-    load(options: LoadOptions) {
+    processAddQueue() {
+        if (this.tooAddQueue.length == 0) {
+            return;
+        }
+        let obj = this.tooAddQueue.shift();
+        if (obj == undefined) {
+            return;
+        }
+        if (obj.ref == null) {
+            return;
+        }
+
+        let parentId = obj?.parentId ?? '';
+        if (parentId != '') {
+            let parentIndex = this.state?.itemIndexes[parentId] ?? -1;
+            let parent = this.state?.items[parentIndex];
+            if (parent == null) {
+                throw new Error('Parent is null');
+            }
+            if (parent.ref == null) {
+                throw new Error('Parent ref is null');
+            }
+            let isInScene = parent?.isInScene ?? false;
+            if (parent.id == obj.id) {
+                throw new Error('Parent and child id are the same');
+            }
+
+            if (isInScene) {
+                addChild(parent.ref, obj.ref, obj.data);
+                obj.isInScene = true;
+            } else {
+                this.tooAddQueue.push(obj);
+            }
+        } else {
+            if (this.currentScene == null) {
+                throw new Error('Current scene is null');
+            }
+            addChild(this.currentScene, obj.ref, obj.data);
+
+            obj.isInScene = true;
+        }
+        this.processAddQueue();
+    }
+
+    load(scene: Scene, data: SerializeState | object | string) {
+        this.currentScene = scene;
+        this.currentlyProcessing = true;
         try {
-            let saveData: any = null;
-            if (isString(options.data)) {
+            let saveData: SerializeState | null = null;
+            if (isString(data)) {
                 try {
-                    saveData = JSON.parse(options.data);
+                    saveData = JSON.parse(data);
                 } catch (e) {
                     throw new Error('Invalid save data, could not parse json.');
                 }
             }
-            this.deserializeObject(options.obj, saveData);
-            return saveData;
+            if (saveData == null) {
+                throw new Error('Invalid save data');
+            }
+
+            this.state = saveData;
+
+            let allObjects: SerialisedObject[] = saveData.items.map((item) => {
+                let classMapping = this.getClassMapping(item.className);
+                if (classMapping) {
+                    let obj = new classMapping();
+                    obj.serializeId = item.id;
+                    item.ref = obj;
+                } else {
+                    console.error(`Could not find class mapping for ${item.className}`);
+                }
+                return item;
+            }).filter((item) => item != null) as SerialisedObject[];
+
+            for (const obj of allObjects) {
+                if (obj?.ref?.preDeserialize) {
+                    obj.ref?.preDeserialize?.();
+                }
+            }
+
+            for (const obj of allObjects) {
+                obj.ref?.deserialize(obj.data);
+            }
+
+            for (const obj of allObjects) {
+                this.tooAddQueue.push(obj);
+            }
+            this.processAddQueue();
+
+            for (const obj of allObjects) {
+                let ref = obj.ref;
+                if (ref instanceof Entity) {
+                    ref.once("add", () => {
+                        ref.postDeserialize?.(obj);
+                    });
+                }
+            }
+
+            this.currentlyProcessing = false;
+            this.state = undefined;
+            this.currentScene = undefined;
 
         }
         catch (e) {

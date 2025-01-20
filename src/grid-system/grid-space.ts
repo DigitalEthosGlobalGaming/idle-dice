@@ -1,10 +1,9 @@
 import * as ex from "excalibur";
-import { GridSystem } from "./grid-system";
 import { Serializable } from "../systems/save-system";
+import { GridSystem } from "./grid-system";
 
 export class GridSpace extends ex.Actor implements Serializable {
   serializeId?: string | undefined;
-
   _gridPos: ex.Vector | null = null;
   get gridPos(): ex.Vector | null {
     let index = this._gridIndex;
@@ -12,17 +11,18 @@ export class GridSpace extends ex.Actor implements Serializable {
       return null;
     }
     if (this._gridPos == null) {
-      this._gridPos =
-        this.grid?.getSpacePositionFromIndex(this.gridIndex) ?? null;
+      this._gridPos = this.grid?.getSpacePositionFromIndex(index) ?? null;
     }
     return this._gridPos;
   }
+
   _gridIndex: number = -1;
   get gridIndex(): number {
     return this._gridIndex;
   }
 
   set gridIndex(newIndex: number) {
+    this._gridPos = null;
     this._gridIndex = newIndex
   }
 
@@ -38,6 +38,7 @@ export class GridSpace extends ex.Actor implements Serializable {
   }
   set size(newSize: ex.Vector) {
     this._size = newSize;
+    this._gridPos = null;
   }
 
   getNeighbors(): ReturnType<GridSystem["getNeighbors"]> {
@@ -71,5 +72,4 @@ export class GridSpace extends ex.Actor implements Serializable {
   deserialize(data: any): void {
     this.gridIndex = data.gridIndex;
   }
-
 }

@@ -103,15 +103,17 @@ export class PlayerActionsUi extends Panel {
   hoveredAction: PlayerAction | null = null;
   acceptingInputs = false;
 
-  get currentAction(): PlayerAction {
-    let item = playerActions.find((a) => a.code == this.player.currentAction);
-    if (item == null) {
-      throw new Error("Current action not found");
-    }
-    return item;
+
+  get currentAction(): PlayerAction | null {
+    return playerActions.find((a) => a.code == this.player.currentAction) ?? null;
+
   }
   set currentAction(value: PlayerAction) {
+    if (this.player.currentAction == value.code) {
+      return;
+    }
     this.player.currentAction = value.code;
+    this.dirty = true;
   }
 
   changeAction(action: PlayerAction) {
@@ -126,12 +128,11 @@ export class PlayerActionsUi extends Panel {
     this.currentAction = action;
   }
 
-  onAdd(engine: ex.Engine): void {
-    super.onAdd(engine);
-    this.changeAction(playerActions[0]);
-  }
-
   onRender(): void {
+    if (this.player == null) {
+      return;
+    }
+
     const bounds = this.getParentBounds();
     const width = bounds?.width ?? 0;
     const height = bounds?.height ?? 0;
@@ -156,6 +157,11 @@ export class PlayerActionsUi extends Panel {
         description: action.tooltip,
       };
       this.buttons.push(button);
+    }
+
+    if (this.currentAction == null) {
+      this.changeAction(playerActions[0]);
+      return;
     }
   }
 }

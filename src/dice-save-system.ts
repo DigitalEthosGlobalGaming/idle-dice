@@ -1,10 +1,11 @@
 
+import { Scene } from "excalibur";
 import { Dice } from "./buildings/dice";
 import { Roller } from "./buildings/roller";
 import { GridSpace } from "./grid-system/grid-space";
 import { DiceGameGridSystem } from "./grid-system/grid-system-actor";
 import { Player } from "./player-systems/player";
-import { LoadOptions, SaveSystem, SerializableObject } from "./systems/save-system";
+import { SaveSystem } from "./systems/save-system";
 
 
 const classes = [
@@ -20,19 +21,20 @@ export class DiceSaveSystem extends SaveSystem {
         super(classes);
     }
 
-    save(obj: SerializableObject): any {
+    save(obj: Scene): any {
         const data = super.save(obj);
         localStorage.setItem("save", JSON.stringify(data));
         return data;
     }
 
-    load(options: LoadOptions): void {
-        options = {
-            obj: options.obj,
-            data: localStorage.getItem("save") ?? {},
+
+    load(scene: Scene): void {
+        let data = localStorage.getItem("save");
+        if (data == null) {
+            return;
         }
-        const data = super.load(options);
-        return data;
+
+        super.load(scene, data ?? '');
     }
 
 }

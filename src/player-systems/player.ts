@@ -1,49 +1,42 @@
 import * as ex from "excalibur";
-import { ExtendedKeyEvent } from "../input/extended-key-event";
 import { InputManager } from "../input/input-manager";
-import { Serializable } from "../systems/save-system";
+import { SerialisedObject, Serializable } from "../systems/save-system";
 import { PlayerBase } from "./player-base";
-import { random } from "../utility/random";
 
 
 export class Player extends PlayerBase implements Serializable {
   serializeId: string = "PLAYER";
   serialize() {
+    const upgradeData = this.upgrades.map((u) => {
+      return {
+        code: u.code,
+        level: u.level
+      }
+    }).filter((u) => u.level > 0);
     return {
       position: this.pos,
-      energy: this.scoreComponent.score
+      energy: this.scoreComponent.score,
+      upgrades: upgradeData
     }
   }
   deserialize(data: any): void {
     this.wishPosition = new ex.Vector(data.position._x, data.position._y);
-    this.scoreComponent.score = data.energy;
+    this.score = data.energy;
+  }
+
+  postDeserialize(data: SerialisedObject): void {
+    let savedUpgradeData = data?.data?.upgrades ?? [];
+    for (const playerUpgrade of this.upgrades) {
+      for (const savedUpgrade of savedUpgradeData) {
+        if (playerUpgrade.code == savedUpgrade.code) {
+          playerUpgrade.level = savedUpgrade.level;
+        }
+      }
+    }
   }
 
   onAdd(engine: ex.Engine): void {
     super.onAdd(engine);
     InputManager.register(this);
   }
-
-  onKeyUp(e: ExtendedKeyEvent) {
-    if (e.key == ex.Keys.NumpadAdd) {
-      this.getScene().saveSystem.save(this.getScene());
-    }
-    if (e.key == ex.Keys.NumpadSubtract) {
-      this.getScene().saveSystem.load({
-        obj: this.getScene(),
-        data: ""
-      }
-      );
-    }
-    if (e.key == ex.Keys.ArrowUp) {
-      const randomX = random.integer(16, 32);
-      const randomY = random.integer(16, 32);
-      const gridSystem = this.getScene().gridSystem;
-      if (gridSystem != null) {
-        gridSystem.size = new ex.Vector(randomX, randomY);
-      }
-    }
-  }
-
-
 }

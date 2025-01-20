@@ -1,11 +1,11 @@
 import * as ex from "excalibur";
 import { Building } from "../building";
+import { BetterDiceUpgrade } from "../components/upgrades/better-dice.upgrade";
 import { Config } from "../config";
 import { ease } from "../easing";
 import { Resources } from "../resources";
-import { random } from "../utility/random";
-import { BetterDiceUpgrade } from "../components/upgrades/better-dice.upgrade";
 import { Serializable } from "../systems/save-system";
+import { random } from "../utility/random";
 
 const possibleRolls: { [key: number]: number[][] } = {};
 const totalPossibleRolls = 100;
@@ -180,6 +180,17 @@ export class Dice extends Building implements Serializable {
     this.faces = data.faces;
     this.value = data.value;
     this.pos = ex.vec(data.pos._x, data.pos._y);
+  }
+
+  postDeserialize(): void {
+    let rollAnimation = getRandomRollAnimation(this.faces, this.speed);
+    const lastFrame = rollAnimation.animation.frames[rollAnimation.animation.frames.length - 1]?.graphic;
+    if (lastFrame == null) {
+      return;
+    }
+
+    this.graphics.add("roll", lastFrame);
+    this.graphics.use("roll");
   }
 
 

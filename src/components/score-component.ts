@@ -1,6 +1,7 @@
 import * as ex from "excalibur";
 import { FloatingScore } from "../ui/scores/floating-score";
 import { BaseComponent } from "./base-component";
+import { Player } from "../player-systems/player";
 
 export class ScoreComponent extends BaseComponent {
   private _score: number;
@@ -8,7 +9,7 @@ export class ScoreComponent extends BaseComponent {
 
   constructor() {
     super();
-    this._score = 0;
+    this._score = 10;
     this.scoreLabel = new ex.Label({
       text: `Energy: ${this._score}`,
       pos: new ex.Vector(10, 10),
@@ -18,6 +19,13 @@ export class ScoreComponent extends BaseComponent {
         color: ex.Color.White,
       }),
     });
+  }
+
+  onAdd(owner: ex.Entity): void {
+    super.onAdd?.(owner);
+    if (owner instanceof Player) {
+      this.score = owner._score;
+    }
   }
 
   public get score(): number {

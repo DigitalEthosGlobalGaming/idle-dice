@@ -109,14 +109,15 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
     return bounds.contains(vec);
   }
 
-  onAdd(): void {
+  onAdd(engine: ex.Engine): void {
+    super.onAdd(engine);
     InputManager.register(this);
-  }
+    if (this.ghost == null) {
+      this.ghost = new GridSpaceGhost(this.spaceSize);
+      this.addChild(this.ghost);
+      this.ghost.hide();
 
-  onInitialize(): void {
-    this.ghost = new GridSpaceGhost(this.spaceSize);
-    this.addChild(this.ghost);
-    this.ghost.hide();
+    }
     this.graphics.use(
       new Grid({
         rows: this.size.x,
@@ -127,6 +128,7 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
         thickness: 1,
       })
     );
+
 
     for (let i = 0; i < this.size.x; i++) {
       for (let j = 0; j < this.size.y; j++) {

@@ -1,9 +1,10 @@
 import * as ex from "excalibur";
 import { GridSpace } from "./grid-system/grid-space";
-import { GameScene } from "./scenes/game.scene";
 import { Player } from "./player-systems/player";
+import { GameScene } from "./scenes/game.scene";
+import { Serializable } from "./systems/save-system";
 
-export class Building extends ex.Actor {
+export class Building extends ex.Actor implements Serializable {
   tickRate = -1;
   lastTick = -1;
   get gridSpace(): GridSpace {
@@ -66,6 +67,12 @@ export class Building extends ex.Actor {
       width: width,
       height: height,
     });
+  }
+  serialize(): any {
+    return null;
+  }
+  deserialize(_data: any): void {
+
   }
 
   getNeighbors() {

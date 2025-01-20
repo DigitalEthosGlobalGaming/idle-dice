@@ -18,6 +18,7 @@ export class GameScene extends Level implements Serializable {
   gridSystem: DiceGameGridSystem | null = null;
   gridColor = new ex.Color(255 * 0, 255 * 0.1, 255 * 0.1, 1);
   saveSystem!: DiceSaveSystem;
+  timer: ex.Timer | null = null;
 
   override onActivate(ctx: ex.SceneActivationContext): void {
     super.onActivate(ctx);
@@ -25,17 +26,49 @@ export class GameScene extends Level implements Serializable {
       this.saveSystem = new DiceSaveSystem();
       this.saveSystem.addClassMapping(GameScene);
     }
+    this.load();
+  }
+
+  save() {
+    this.saveSystem?.save(this);
+  }
+  load() {
+    this.preLoad();
+    this.saveSystem?.load(this);
+    this.postLoad();
+  }
+
+  preLoad(): void {
+    this?.player?.kill();
+    this?.gridSystem?.kill();
+    if (this.timer != null) {
+      this.timer?.cancel();
+      this.removeTimer(this.timer);
+    }
+  }
+
+  postLoad(): void {
+    this.player = this.entities.find((e) => {
+      return e instanceof Player;
+    });
+    let gridSystem = this.entities.find((e) => {
+      return e instanceof DiceGameGridSystem;
+    });
+    if (gridSystem != null) {
+      this.gridSystem = gridSystem;
+    }
     let timer = new ex.Timer({
       fcn: () => {
         if (this.gridSystem == null) {
           this.gridSystem = new DiceGameGridSystem();
-          this.gridSystem.serializeId = "gridSystem";
-          this.gridSystem.size = new ex.Vector(32, 32);
-          this.gridSystem.spaceSize = new ex.Vector(32, 32);
           this.add(this.gridSystem);
         }
+        this.gridSystem.size = new ex.Vector(32, 32);
+        this.gridSystem.spaceSize = new ex.Vector(32, 32);
+
         if (this.player == null) {
           this.player = new Player();
+          this.player.score = 10;
           this.add(this.player);
           const gridSize = this.gridSystem.getBounds().center;
           this.player.wishPosition = gridSize.clone();
@@ -47,7 +80,7 @@ export class GameScene extends Level implements Serializable {
     timer.start();
   }
 
-  deserialize(data: any): void {
+  deserialize(_data: any): void {
 
   }
 

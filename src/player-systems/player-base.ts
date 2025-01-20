@@ -67,6 +67,9 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return this._currentAction;
   }
   set currentAction(value: PlayerActions) {
+    if (value == this._currentAction) {
+      return;
+    }
     this._currentAction = value;
     this.clearTooltips();
     this.playerUi.dirty = true;
@@ -78,6 +81,20 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         description: relatedAction.tooltip,
       });
     }
+    this.getScene().save();
+  }
+
+  _score: number = 0;
+
+  get score() {
+    return this?.scoreComponent?.score ?? this._score;
+  }
+  set score(value: number) {
+    if (this.scoreComponent == null) {
+      this._score = value;
+      return;
+    }
+    this.scoreComponent.score = value;
   }
 
   getCamera(): ex.Camera {
@@ -97,10 +114,14 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return this.scene;
   }
 
-  onInitialize(): void {
+  setup() {
+    if (this.scene == null) {
+      return;
+    }
     if (this.isSetup) {
       return;
     }
+
     this.isSetup = true;
     if (this.ghost == null) {
       this.ghost = new Ghost();
@@ -114,7 +135,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     if (this.scoreComponent == null) {
       this.scoreComponent = new ScoreComponent();
       this.addComponent(this.scoreComponent);
-      this.scoreComponent.score = 10;
+      this.scoreComponent.score = this.score;
     }
     if (this.playerUpgradesComponent == null) {
       this.playerUpgradesComponent = new PlayerUpgradesComponent();
@@ -142,6 +163,11 @@ export class PlayerBase extends ex.Actor implements InputHandler {
       })
     );
     timer?.start();
+  }
+
+  onAdd(engine: ex.Engine): void {
+    super.onAdd(engine);
+    this.setup();
   }
 
   onPointerMove(e: ExtendedPointerEvent) {
@@ -186,6 +212,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
           this.placeBuildable(space.globalPos);
         }
       }
+      this.getScene().save();
     }
   }
 

@@ -115,6 +115,7 @@ export class Upgrade {
         this.calculate();
     }
 
+
     buy() {
         const didBuy = this.player.spendEnergy(this.nextCost);
         if (didBuy) {
