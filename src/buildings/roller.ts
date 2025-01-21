@@ -1,5 +1,5 @@
-import { Building } from "../building";
-import { Resources } from "../resources";
+import { Building } from "@src/building";
+import { Resources } from "@src/resources";
 import { Dice } from "./dice";
 
 export class Roller extends Building {

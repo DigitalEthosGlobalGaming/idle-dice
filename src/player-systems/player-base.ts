@@ -1,23 +1,23 @@
 import * as ex from "excalibur";
-import { Building } from "../building";
-import { Dice } from "../buildings/dice";
-import { Roller } from "../buildings/roller";
-import { PlayerUpgradesComponent } from "../components/player-upgrades-component";
-import { ScoreComponent } from "../components/score-component";
-import { Upgrade } from "../components/upgrade-component";
-import { PassiveEnergyComponent } from "../components/upgrades/passive-energy.upgrade";
-import { Ghost } from "../ghost";
-import { GridSpace } from "../grid-system/grid-space";
-import { ButtonStates, InputHandler } from "../input/input-manager";
-import { GameScene } from "../scenes/game.scene";
-import { PlayerUi } from "../ui/scores/player-ui";
+import { Building } from "@src/player-systems/../building";
+import { Dice } from "@src/player-systems/../buildings/dice";
+import { Roller } from "@src/player-systems/../buildings/roller";
+import { PlayerUpgradesComponent } from "@src/player-systems/../components/player-upgrades-component";
+import { ScoreComponent } from "@src/player-systems/../components/score-component";
+import { Upgrade } from "@src/player-systems/../components/upgrade-component";
+import { PassiveEnergyComponent } from "@src/player-systems/../components/upgrades/passive-energy.upgrade";
+import { Ghost } from "@src/player-systems/../ghost";
+import { GridSpace } from "@src/player-systems/../grid-system/grid-space";
+import { ButtonStates, InputHandler } from "@src/player-systems/../input/input-manager";
+import { GameScene } from "@src/player-systems/../scenes/game.scene";
+import { PlayerUi } from "@src/player-systems/../ui/scores/player-ui";
 import {
   playerActions,
   PlayerActions,
   PlayerActionTypes,
 } from "./player-actions";
 import { Tooltip } from "./player-tooltip";
-import { ExtendedPointerEvent } from "../input/extended-pointer-event";
+import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
 
 type MouseState = {
   button: number;

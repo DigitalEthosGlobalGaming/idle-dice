@@ -1,15 +1,19 @@
 import * as ex from "excalibur";
-import { GameUpdate, gameUpdates } from "../game-updates";
-import { Level } from "../level";
-import { Label } from "../ui/elements/label";
-import { List } from "../ui/elements/list";
-import { Panel } from "../ui/panel";
-import { Button } from "../ui/elements/button";
+import { GameUpdate, gameUpdates } from "@src/scenes/../game-updates";
+import { Level } from "@src/scenes/../level";
+import { Label } from "@src/scenes/../ui/elements/label";
+import { List } from "@src/scenes/../ui/elements/list";
+import { Panel } from "@src/scenes/../ui/panel";
+import { Button } from "@src/scenes/../ui/elements/button";
+import { hashCheck } from "@src/utility/hash";
 
 class UpdateItem extends List {
   _gameUpdate: GameUpdate | null = null;
   set gameUpdate(value: GameUpdate | null) {
     this._gameUpdate = value;
+    if (hashCheck(value, this._gameUpdate)) {
+      return;
+    }
     this.allDirty = true;
   }
 
@@ -17,58 +21,56 @@ class UpdateItem extends List {
     return this._gameUpdate;
   }
 
-  onRender(): void {
-    super.onRender();
+  childRender() {
     if (this.gameUpdate == null) {
       return;
     }
-    if (!this.hasPanel("date")) {
-      const date = this.addPanel("date", Label);
-      date.fontSize = 20;
-      date.text = this.gameUpdate.date;
-    }
+    const date = this.addPanel("date", Label);
+    date.fontSize = 30;
+    date.text = this.gameUpdate.date;
 
     for (const category in this.gameUpdate.updates) {
-      if (this.hasPanel(category)) {
-        continue;
-      }
       const categoryLabel = this.addPanel(category, Label);
-      categoryLabel.pos = ex.vec(20, 0);
       categoryLabel.fontSize = 20;
       categoryLabel.text = category;
       const updates = this.gameUpdate.updates[category];
       for (const update of updates) {
-        if (this.hasPanel(update)) {
-          continue;
-        }
         const updateLabel = this.addPanel(update, Label);
-        updateLabel.pos = ex.vec(60, 0);
         updateLabel.fontSize = 20;
         updateLabel.text = update;
       }
     }
+    this.calculateSize();
+    console.log(this.size);
+  }
+
+  onRender(): void {
+    super.onRender();
+    this.childRender();
   }
 }
 
 class UpdatesUi extends Panel {
   onRender(): void {
     super.onRender();
+    this.size = this.screenSize.scale(0.9);
+    this.pos = this.screenSize.scale(0.5);
     const list = this.addPanel("list", List);
     list.spacing = 30;
+
     const updates = gameUpdates;
     for (const element of updates) {
-      const label = list.addPanel(`update-${element.id}`, UpdateItem);
-      label.gameUpdate = element;
+      const updateItem = list.addPanel(`update-${element.id}`, UpdateItem);
+      updateItem.gameUpdate = element;
     }
 
-    // if (!list.hasPanel("back")) {
-    //   const button = list.addPanel("back", Button);
-    //   button.text = "Back";
-    //   button.fontSize = 20;
-    //   button.onClick = () => {
-    //     this.scene?.engine.goToScene("WelcomeScene");
-    //   };
-    // }
+
+    const button = list.addPanel("back", Button);
+    button.text = "Back";
+    button.fontSize = 20;
+    button.onClick = () => {
+      this.scene?.engine.goToScene("WelcomeScene");
+    };
   }
 }
 
@@ -79,7 +81,6 @@ export class UpdatesScene extends Level {
     if (this.mainPanel == null) {
       this.mainPanel = new UpdatesUi();
       this.add(this.mainPanel);
-      this.mainPanel.pos = ex.vec(this.camera.viewport.width / 2, 0);
     }
   }
 

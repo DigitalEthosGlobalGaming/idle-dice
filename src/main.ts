@@ -1,10 +1,11 @@
 import * as ex from "excalibur";
 import { GameLoader } from "./game-loader";
-import { GameScene } from "./scenes/game.scene";
-import { WelcomeScene } from "./scenes/welcome.scene";
-import { CreditScene } from "./scenes/credits.scene";
-import { HowToPlayScene } from "./scenes/how-to-play.scene";
-import { UpdatesScene } from "./scenes/updates.scene";
+import { GameScene } from "@src/scenes/game.scene";
+import { WelcomeScene } from "@src/scenes/welcome.scene";
+import { CreditScene } from "@src/scenes/credits.scene";
+import { HowToPlayScene } from "@src/scenes/how-to-play.scene";
+import { UpdatesScene } from "@src/scenes/updates.scene";
+import { TestUserInterfaceScene } from "@src/scenes/test/user-interface/user-interface.scene";
 
 async function waitForFontLoad(font: string, timeout = 2000, interval = 100) {
   return new Promise((resolve, reject) => {
@@ -35,6 +36,7 @@ waitForFontLoad("24px DS-DIGI").then(() => {
       CreditScene,
       HowToPlayScene,
       UpdatesScene,
+      TestUserInterfaceScene
     },
   });
 

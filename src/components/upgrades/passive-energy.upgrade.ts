@@ -1,6 +1,6 @@
-import { Player } from "../../player-systems/player";
-import { GrowthType } from "../../utility/big-o-calculations";
-import { Upgrade } from "../upgrade-component";
+import { Player } from "@src/components/upgrades/../../player-systems/player";
+import { GrowthType } from "@src/components/upgrades/../../utility/big-o-calculations";
+import { Upgrade } from "@src/components/upgrades/../upgrade-component";
 
 const parts = [
     `Generates {value}⚡︎ every second.`,

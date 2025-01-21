@@ -1,9 +1,9 @@
 import * as ex from "excalibur";
-import { Level } from "../level";
-import { Panel } from "../ui/panel";
-import { Label } from "../ui/elements/label";
-import { List } from "../ui/elements/list";
-import { Button } from "../ui/elements/button";
+import { Level } from "@src/scenes/../level";
+import { Panel } from "@src/scenes/../ui/panel";
+import { Label } from "@src/scenes/../ui/elements/label";
+import { List } from "@src/scenes/../ui/elements/list";
+import { Button } from "@src/scenes/../ui/elements/button";
 
 const creditElements: any[] = [
   "Trent Jones - Developer",

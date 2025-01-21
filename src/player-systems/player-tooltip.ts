@@ -1,4 +1,4 @@
-import { Label } from "../ui/elements/label";
+import { Label } from "@src/player-systems/../ui/elements/label";
 
 export type Tooltip = {
     code: string;

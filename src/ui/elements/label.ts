@@ -1,8 +1,26 @@
+import { Panel } from "@src/ui/panel";
 import * as ex from "excalibur";
-import { Panel } from "../panel";
 
 export class Label extends Panel {
-  label: ex.Label | null = null;
+  _label: ex.Label | null = null;
+
+  get size(): ex.Vector {
+    let size = this.label?.font.measureText(this.text);
+    return new ex.Vector(size?.width ?? 0, size?.height ?? 0);
+  }
+  set size(_value: ex.Vector) {
+    throw new Error("Size is read only");
+  }
+
+  get label(): ex.Label {
+    if (this._label == null) {
+      this.updateLabel();
+    }
+    if (this._label == null) {
+      throw new Error("Label not created");
+    }
+    return this._label;
+  }
   _text: string = "";
 
   get text(): string {
@@ -12,17 +30,19 @@ export class Label extends Panel {
     if (value == "") {
       this.visible = false;
     }
+    if (value == this._text) {
+      return;
+    }
     this._text = value;
+    this.calculateSize();
+    this.updateLabel();
     this.dirty = true;
   }
 
-  private _labelAnchor = ex.vec(0, 0);
+  get anchor(): ex.Vector { return super.anchor; }
 
-  get labelAnchor(): ex.Vector {
-    return this._labelAnchor;
-  }
-  set labelAnchor(value: ex.Vector) {
-    this._labelAnchor = value;
+  set anchor(value: ex.Vector) {
+    super.anchor = value;
     this.dirty = true;
   }
 
@@ -35,6 +55,8 @@ export class Label extends Panel {
       return;
     }
     this._fontSize = value;
+    this.calculateSize();
+    this.updateLabel();
     this.dirty = true;
   }
 
@@ -44,38 +66,36 @@ export class Label extends Panel {
     parent.addChild(this);
   }
 
-  onRender(): void {
-    super.onRender();
-    if (this.text == "") {
-      this.visible = false;
-      return;
-    }
-
-    if (this.label == null) {
-      this.label = new ex.Label({
+  updateLabel() {
+    let label = this._label;
+    if (label == null) {
+      label = new ex.Label({
         font: new ex.Font({
           family: "ds-digi",
         }),
       });
-      this.addChild(this.label);
+      this.addChild(label);
     }
-    this.label.text = this.text;
-    this.label.font.family = "ds-digi";
-    this.label.color = this.color;
-    this.label.anchor = this.labelAnchor;
-    this.label.font.size = this.fontSize;
+    label.text = this.text;
+    label.font.family = "ds-digi";
+    label.color = this.color;
+    label.font.baseAlign = ex.BaseAlign.Middle;
+    label.font.textAlign = ex.TextAlign.Center;
+    label.font.size = this.fontSize;
+    this._label = label;
   }
 
-  updateSize() {
-    let size = this.label?.font.measureText(this.text);
-    this.size = new ex.Vector(size?.width ?? 0, size?.height ?? 0);
-  }
+  onRender(): void {
+    super.onRender();
+    let label = this.label;
+    label.text = this.text;
+    label.font.family = "ds-digi";
+    label.color = this.color;
+    label.font.size = this.fontSize;
 
-  override render() {
-    const wasDirty = this.dirty;
-    super.render();
-    if (wasDirty) {
-      this.updateSize();
+    if (this.text == "") {
+      this.visible = false;
+      return;
     }
   }
 }

@@ -1,12 +1,12 @@
-import * as ex from "excalibur";
-import { PlayerActionsUi } from "../../player-systems/player-actions-ui";
-import { Panel } from "../panel";
-import { PlayerTooltip, Tooltip } from "../../player-systems/player-tooltip";
-import { UpgradesPanel } from "../upgrades";
 import {
   PlayerActions,
   playerActions,
-} from "../../player-systems/player-actions";
+} from "@src/player-systems/player-actions";
+import { PlayerActionsUi } from "@src/player-systems/player-actions-ui";
+import { PlayerTooltip, Tooltip } from "@src/player-systems/player-tooltip";
+import { Panel } from "@src/ui/scores/../panel";
+import { UpgradesPanel } from "@src/ui/scores/../upgrades";
+import * as ex from "excalibur";
 
 export class PlayerUi extends Panel {
   isMoving = false;

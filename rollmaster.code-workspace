@@ -15,7 +15,7 @@
     ],
     "editor.formatOnSave": true,
     "editor.codeLens": true,
-    "eslint.alwaysShowStatus": true,
-    "github.copilot.advanced": {}
+    "github.copilot.advanced": {},
+    "javascript.preferences.importModuleSpecifier": "non-relative"
   }
 }

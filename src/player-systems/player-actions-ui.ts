@@ -1,10 +1,10 @@
 import * as ex from "excalibur";
-import { GameScene } from "../scenes/game.scene";
-import { Button } from "../ui/elements/button";
-import { Panel } from "../ui/panel";
+import { GameScene } from "@src/player-systems/../scenes/game.scene";
+import { Button } from "@src/player-systems/../ui/elements/button";
+import { Panel } from "@src/player-systems/../ui/panel";
 import { Player } from "./player";
 import { PlayerAction, playerActions } from "./player-actions";
-import { ExtendedPointerEvent } from "../input/extended-pointer-event";
+import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
 
 export class PlayerActionButton extends Button {
   _action: PlayerAction | null = null;

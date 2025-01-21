@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { Panel } from "../panel";
+import { Panel } from "@src/ui/panel";
 
 export class List extends Panel {
   _spacing: number = 0;
@@ -14,46 +14,55 @@ export class List extends Panel {
     this.dirty = true;
   }
 
+  get size(): ex.Vector {
+    let size = super.size.clone();
+    size.y = this.totalHeight;
+    return size;
+  }
+
+  get totalHeight(): number {
+    let totalSize: number = 0;
+    const childPanels = this.getChildrenPanels();
+    let lastChildHeight = 0;
+    for (let i = 0; i < childPanels.length; i++) {
+      const child = childPanels[i];
+      totalSize += child.size.y + this.spacing;
+      lastChildHeight = child.height;
+    }
+    return totalSize + lastChildHeight;
+  }
+
   onInitialize(engine: ex.Engine): void {
     super.onInitialize(engine);
     this.on("childadded", () => {
-      // this.updatePositions();
-      // this.dirty = true;
+      this.updatePositions();
     });
   }
 
   updatePositions(): void {
     const childPanels = this.getChildrenPanels();
-    let currentY = 0;
-    let hasChanged = false;
+    let totalSize: number = 0;
+
     for (let i = 0; i < childPanels.length; i++) {
       const child = childPanels[i];
+      totalSize += child.size.y;
+    }
 
-      currentY += child.size.y + this._spacing;
-      if (child.pos.y != currentY) {
-        child.pos.y = currentY;
-        child.dirty = true;
-        hasChanged = true;
+    for (let i = 0; i < childPanels.length; i++) {
+      const child = childPanels[i];
+      let yPos = (this.size.y - totalSize) / 2;
+      yPos = yPos + child.size.y * i + this.spacing * i;
+      if (child.pos.y != yPos) {
+        child.pos = new ex.Vector(child.pos.x, yPos);
       }
     }
-
-    if (hasChanged) {
-      this.calculateSize();
-    }
-    this.level.drawDebug(this.globalBounds, this.id);
   }
 
   override render(): void {
     const wasDirty = this.isChildDirty;
-
     super.render();
     if (wasDirty) {
-      const dirtyPanels = this.dirtyPanels;
-      for (const panel of dirtyPanels) {
-        console.log(panel.element);
-      }
-      // console.log(dirtyPanels);
-      // this.updatePositions();
+      this.updatePositions();
     }
   }
 }

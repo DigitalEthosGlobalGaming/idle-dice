@@ -1,13 +1,13 @@
-import * as ex from "excalibur";
+import { ExtendedPointerEvent } from "@src/input/extended-pointer-event";
 import {
   ButtonStates,
   InputHandler,
   InputManager,
-} from "../input/input-manager";
-import { Level } from "../level";
-import { Player } from "../player-systems/player";
-import { getNineslice } from "../resources";
-import { ExtendedPointerEvent } from "../input/extended-pointer-event";
+} from "@src/input/input-manager";
+import { Level } from "@src/level";
+import { Player } from "@src/player-systems/player";
+import { getNineslice } from "@src/resources";
+import * as ex from "excalibur";
 
 export enum PanelBackgrounds {
   "ButtonSquareFlat" = "ButtonSquareFlat",
@@ -32,6 +32,89 @@ export class Panel extends ex.Actor implements InputHandler {
     for (let child of this.getChildrenPanels()) {
       child.allDirty = value;
     }
+  }
+
+  get topCenter(): ex.Vector {
+    return ex.vec(
+      0,
+      this.top
+    );
+  }
+  get bottomCenter(): ex.Vector {
+    return ex.vec(
+      0,
+      this.bottom
+    );
+  }
+  get leftCenter(): ex.Vector {
+    return ex.vec(
+      this.left,
+      0
+    );
+  }
+  get rightCenter(): ex.Vector {
+    return ex.vec(
+      this.right,
+      0
+    );
+  }
+
+  get topLeft(): ex.Vector {
+    return ex.vec(
+      this.left,
+      this.top
+    );
+  }
+  get topRight(): ex.Vector {
+    return ex.vec(
+      this.right,
+      this.top
+    );
+  }
+  get bottomLeft(): ex.Vector {
+    return ex.vec(
+      this.left,
+      this.bottom
+    );
+  }
+  get bottomRight(): ex.Vector {
+    return ex.vec(
+      this.right,
+      this.bottom
+    );
+  }
+
+  get top(): number {
+    return -this.halfHeight + this.pos.y;
+  }
+  get bottom(): number {
+    return this.halfHeight + this.pos.y;
+  }
+  get left(): number {
+    return -this.halfWidth + this.pos.x;
+  }
+  get right(): number {
+    return this.halfWidth + this.pos.x;
+  }
+  get halfHeight(): number {
+    return this.height / 2;
+  }
+  get halfWidth(): number {
+    return this.width / 2;
+  }
+
+  get yPos(): number {
+    return this.pos.y;
+  }
+  get xPos(): number {
+    return this.pos.x;
+  }
+
+  get height(): number {
+    return this.size.y;
+  }
+  get width(): number {
+    return this.size.x;
   }
 
   get level(): Level {
@@ -75,8 +158,26 @@ export class Panel extends ex.Actor implements InputHandler {
     this.dirty = true;
   }
 
+  get screenSize(): ex.Vector {
+    let screen = this.scene?.engine.screen;
+    return ex.vec(screen?.drawWidth ?? 0, screen?.drawHeight ?? 0);
+  }
+  get screenWidth(): number {
+    let screen = this.scene?.engine.screen;
+    return screen?.drawWidth ?? 0;
+  }
+  get screenHeight(): number {
+    let screen = this.scene?.engine.screen;
+    return screen?.drawHeight ?? 0;
+  }
+
+
   _size: ex.Vector | undefined = undefined;
   _customSize: boolean = false;
+
+  get halfSize(): ex.Vector {
+    return this.size.clone().scale(0.5);
+  }
   get size(): ex.Vector {
     if (this.visible == false) {
       return ex.vec(0, 0);
@@ -99,8 +200,12 @@ export class Panel extends ex.Actor implements InputHandler {
     if (this._size?.x == value.x && this._size?.y == value.y) {
       return;
     }
-    let oldSize = this.size.clone();
-    this._size?.setTo(value?.x ?? 0, value?.y ?? 0);
+    let oldSize = (this._size?.clone() ?? ex.vec(0, 0));
+    if (this._size == null) {
+      this._size = ex.vec(value.x, value.y);
+    } else {
+      this._size.setTo(value.x, value.y);
+    }
     if (value != null) {
       this.onResize(oldSize, this.size);
     }
@@ -158,8 +263,14 @@ export class Panel extends ex.Actor implements InputHandler {
     return false;
   }
 
-  acceptingInputs?: boolean | ButtonStates[];
-
+  _acceptingInputs?: boolean | ButtonStates[];
+  get acceptingInputs(): boolean | ButtonStates[] {
+    return this._acceptingInputs ?? true;
+  }
+  set acceptingInputs(value: boolean | ButtonStates[]) {
+    this._acceptingInputs = value;
+    InputManager.register(this);
+  }
   get bounds(): ex.BoundingBox {
     const width = this.size?.x ?? 0;
     const height = this.size?.y ?? 0;
@@ -174,15 +285,11 @@ export class Panel extends ex.Actor implements InputHandler {
   }
 
   get globalBounds(): ex.BoundingBox {
-    const width = this.size?.x ?? 0;
-    const height = this.size?.y ?? 0;
-    const halfWidth = width / 2;
-    const halfHeight = height / 2;
     return new ex.BoundingBox(
-      this.globalPos.x - halfWidth,
-      this.globalPos.y - halfHeight,
-      this.globalPos.x + halfWidth,
-      this.globalPos.y + halfHeight
+      this.globalPos.x - this.halfWidth,
+      this.globalPos.y - this.halfHeight,
+      this.globalPos.x + this.halfWidth,
+      this.globalPos.y + this.halfHeight
     );
   }
 
@@ -208,11 +315,14 @@ export class Panel extends ex.Actor implements InputHandler {
   }
 
   calculateSize() {
+    if (this._customSize) {
+      return;
+    }
     let oldSize = this._size?.clone() ?? ex.vec(0, 0);
     let children = this.getChildrenPanels();
     let bottomRight = ex.vec(0, 0);
     for (let child of children) {
-      let childBottomRight = child.bounds.bottomRight;
+      let childBottomRight = child.bottomRight;
       if (childBottomRight.x > bottomRight.x) {
         bottomRight.x = childBottomRight.x;
       }
@@ -225,6 +335,7 @@ export class Panel extends ex.Actor implements InputHandler {
     }
     if (oldSize.distance(bottomRight) != 0) {
       this._size = bottomRight;
+      this.emit("resize", { oldSize, newSize: this.size });
       this.dirty = true;
     }
   }
@@ -245,6 +356,9 @@ export class Panel extends ex.Actor implements InputHandler {
     this.graphics.use(this.graphicsGroup);
   }
 
+  clearGraphics() {
+    this.graphicsGroup.members = [];
+  }
   addGraphic(graphic: ex.Graphic, offset?: ex.Vector) {
     offset =
       offset ??
@@ -294,6 +408,13 @@ export class Panel extends ex.Actor implements InputHandler {
       this.addChild(element);
       this.emit("childadded", element);
     }
+    let subscription = element.on("resize", () => {
+      this.calculateSize();
+    });
+    element.once("kill", () => {
+      subscription.close();
+    });
+
     this.calculateSize();
     return element;
   }
@@ -317,10 +438,10 @@ export class Panel extends ex.Actor implements InputHandler {
     this.isHovered = true;
     this.onHoverChanged(e);
   }
-  onPointerUp(_e: ex.PointerEvent): void {}
-  onPointerDown(_e: ex.PointerEvent): void {}
+  onPointerUp(_e: ex.PointerEvent): void { }
+  onPointerDown(_e: ex.PointerEvent): void { }
 
-  onHoverChanged(_e: ex.PointerEvent) {}
+  onHoverChanged(_e: ex.PointerEvent) { }
 
   getCurrentTick() {
     const engine = this.scene?.engine;
@@ -351,27 +472,39 @@ export class Panel extends ex.Actor implements InputHandler {
     this.lastRenderTick = tick;
     if (this._background != null) {
       let first: any = this.graphicsGroup.members?.[0];
-      let newMembers: unknown[] = [...this.graphicsGroup.members];
-      if (first != null && !(first.graphic instanceof ex.NineSlice)) {
-        newMembers = [null, ...this.graphicsGroup.members];
-      }
-      if (first == null || first.graphic instanceof ex.NineSlice) {
+      let newMembers = this.graphicsGroup.members;
+      if (!(first?.graphic instanceof ex.NineSlice)) {
+        newMembers.unshift({
+          graphic: getNineslice({
+            name: this._background,
+            width: this.size.x,
+            height: this.size.y,
+          }),
+          offset: ex.vec(-this.size.x / 2, -this.size.y / 2)
+        });
+      } else {
         newMembers[0] = {
           graphic: getNineslice({
             name: this._background,
             width: this.size.x,
             height: this.size.y,
           }),
-          offset: ex.vec(-this.size.x / 2, -this.size.y / 2),
+          offset: ex.vec(-this.size.x / 2, -this.size.y / 2)
         };
-        this.graphics.use(this.graphicsGroup);
       }
-      this.graphicsGroup.members =
-        newMembers as typeof this.graphicsGroup.members;
+
+      this.graphicsGroup.members = newMembers;
+      if (this.name == 'icon-and-text-button') {
+        console.log(newMembers);
+      }
+
+      this.graphics.use(this.graphicsGroup);
 
       if (first?.graphic instanceof ex.NineSlice) {
         first.graphic.tint = this.backgroundColor ?? ex.Color.White;
       }
+
+      this.graphics.use(this.graphicsGroup);
     }
 
     this.onRender();
@@ -423,7 +556,7 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onRender() {}
+  onRender() { }
 
   getParent<T = Panel>(): T | null {
     let parent = this.parent;
@@ -457,5 +590,6 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) {}
+  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) {
+  }
 }

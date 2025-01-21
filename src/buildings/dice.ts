@@ -1,11 +1,11 @@
 import * as ex from "excalibur";
-import { Building } from "../building";
-import { BetterDiceUpgrade } from "../components/upgrades/better-dice.upgrade";
-import { Config } from "../config";
-import { ease } from "../easing";
-import { Resources } from "../resources";
-import { Serializable } from "../systems/save-system";
-import { random } from "../utility/random";
+import { Building } from "@src/building";
+import { BetterDiceUpgrade } from "@src/components/upgrades/better-dice.upgrade";
+import { Config } from "@src/config";
+import { ease } from "@src/easing";
+import { Resources } from "@src/resources";
+import { Serializable } from "@src/systems/save-system";
+import { random } from "@src/utility/random";
 
 const possibleRolls: { [key: number]: number[][] } = {};
 const totalPossibleRolls = 100;

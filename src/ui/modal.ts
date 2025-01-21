@@ -1,6 +1,7 @@
 import * as ex from "excalibur";
-import { InputHandler } from "../input/input-manager";
-import { Panel } from "./panel";
+import { InputHandler } from "@src/input/input-manager";
+import { Panel } from "@src/ui/panel";
+
 
 export enum PanelBackgrounds {
   "ButtonSquareFlat" = "ButtonSquareFlat",

@@ -1,7 +1,7 @@
 import * as ex from "excalibur";
 import { GridSpace } from "./grid-system/grid-space";
 import { Player } from "./player-systems/player";
-import { GameScene } from "./scenes/game.scene";
+import { GameScene } from "@src/scenes/game.scene";
 import { Serializable } from "./systems/save-system";
 
 export class Building extends ex.Actor implements Serializable {

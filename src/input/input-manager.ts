@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { Level } from "../level";
+import { Level } from "@src/input/../level";
 import { ExtendedPointerEvent } from "./extended-pointer-event";
 import { ExtendedKeyEvent } from "./extended-key-event";
 
@@ -35,6 +35,17 @@ export type ButtonStates = "MouseLeft" | "MouseRight";
 
 export class InputManager extends ex.Entity {
   static InputManagers: InputManager[] = [];
+  static Events = {
+    pointerDown: "im-pointer-down",
+    pointerUp: "im-pointer-up",
+    pointerMove: "im-pointer-move",
+    keyPress: "im-key-press",
+    keyDown: "im-key-down",
+    keyUp: "im-key-up",
+    hoverChange: "im-hover-change",
+    pointerEnter: "im-pointer-enter",
+    pointerLeave: "im-pointer-leave",
+  }
   subscriptions: ex.Subscription[] = [];
   entities: { [key: string]: InputHandler } = {};
   currentHoveredEntities: { [key: string]: InputHandler } = {};
@@ -102,6 +113,7 @@ export class InputManager extends ex.Entity {
       if (entity.onPointerDown != null) {
         entity.onPointerDown(extendedEvent);
       }
+      entity.emit(InputManager.Events.pointerDown, extendedEvent);
     }
 
     this.scene?.emit("im-pointer-down", extendedEvent);
@@ -118,6 +130,8 @@ export class InputManager extends ex.Entity {
       if (entity.onPointerUp != null) {
         entity.onPointerUp(extendedEvent);
       }
+
+      entity.emit(InputManager.Events.pointerUp, extendedEvent);
     }
     this.scene?.emit("im-pointer-up", extendedEvent);
   }
@@ -135,20 +149,23 @@ export class InputManager extends ex.Entity {
       if (entity.onPointerMove != null) {
         entity.onPointerMove(extendedEvent);
       }
+      entity.emit(InputManager.Events.pointerMove, extendedEvent);
       if (!previousHoveredEntities[entity.id]) {
         if (entity.onPointerEnter != null) {
           entity.onPointerEnter(extendedEvent);
         }
+        entity.emit(InputManager.Events.pointerEnter, extendedEvent);
       }
       delete previousHoveredEntities[entity.id];
     }
     for (let entity of Object.values(previousHoveredEntities)) {
       if (entity.onPointerLeave != null) {
         entity.onPointerLeave(extendedEvent);
+        entity.emit(InputManager.Events.pointerLeave, extendedEvent);
       }
     }
 
-    this.scene?.emit("im-pointer-move", extendedEvent);
+    this.scene?.emit(InputManager.Events.pointerMove, extendedEvent);
   }
 
   onKeyUp(evt: ex.KeyEvent) {
@@ -158,6 +175,7 @@ export class InputManager extends ex.Entity {
       if (entity.onKeyUp != null) {
         entity.onKeyUp(extendedEvent);
       }
+      entity.emit(InputManager.Events.keyUp, extendedEvent);
     }
   }
 
@@ -168,6 +186,7 @@ export class InputManager extends ex.Entity {
       if (entity.onKeyDown != null) {
         entity.onKeyDown(extendedEvent);
       }
+      entity.emit(InputManager.Events.keyDown, extendedEvent);
     }
   }
 
@@ -177,6 +196,7 @@ export class InputManager extends ex.Entity {
     for (let entity of entities) {
       if (entity.onKeyPress != null) {
         entity.onKeyPress(extendedEvent);
+        entity.emit(InputManager.Events.keyPress, extendedEvent);
       }
     }
   }
@@ -202,11 +222,14 @@ export class InputManager extends ex.Entity {
       return;
     }
 
-    inputManager.entities[entity.id] = entity;
+    let isNew = inputManager.entities[entity.id] == null;
+    if (isNew) {
+      inputManager.entities[entity.id] = entity;
 
-    entity.on("kill", () => {
-      delete inputManager.entities[entity.id];
-    });
+      entity.on("kill", () => {
+        delete inputManager.entities[entity.id];
+      });
+    }
   }
 
   override kill(): void {

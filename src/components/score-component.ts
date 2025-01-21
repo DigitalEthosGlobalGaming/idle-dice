@@ -1,7 +1,7 @@
 import * as ex from "excalibur";
-import { FloatingScore } from "../ui/scores/floating-score";
+import { FloatingScore } from "@src/ui/scores/floating-score";
 import { BaseComponent } from "./base-component";
-import { Player } from "../player-systems/player";
+import { Player } from "@src/player-systems/player";
 
 export class ScoreComponent extends BaseComponent {
   private _score: number;

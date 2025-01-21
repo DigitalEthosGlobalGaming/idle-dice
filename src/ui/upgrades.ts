@@ -1,9 +1,9 @@
 import * as ex from "excalibur";
-import { Upgrade } from "../components/upgrade-component";
-import { Button } from "../ui/elements/button";
-import { Label } from "../ui/elements/label";
-import { List } from "../ui/elements/list";
-import { Panel } from "../ui/panel";
+import { Upgrade } from "@src/components/upgrade-component";
+import { Button } from "@src/ui/elements/button";
+import { Label } from "@src/ui/elements/label";
+import { List } from "@src/ui/elements/list";
+import { Panel } from "@src/ui/panel";
 import { Modal } from "./modal";
 
 

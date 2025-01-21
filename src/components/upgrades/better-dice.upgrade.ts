@@ -1,5 +1,5 @@
-import { GrowthType } from "../../utility/big-o-calculations";
-import { Upgrade } from "../upgrade-component";
+import { GrowthType } from "@src/components/upgrades/../../utility/big-o-calculations";
+import { Upgrade } from "@src/components/upgrades/../upgrade-component";
 
 
 export class BetterDiceUpgrade extends Upgrade {

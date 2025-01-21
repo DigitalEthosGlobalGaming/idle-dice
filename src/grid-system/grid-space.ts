@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { Serializable } from "../systems/save-system";
+import { Serializable } from "@src/grid-system/../systems/save-system";
 import { GridSystem } from "./grid-system";
 
 export class GridSpace extends ex.Actor implements Serializable {

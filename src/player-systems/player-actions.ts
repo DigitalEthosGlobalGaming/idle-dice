@@ -1,5 +1,5 @@
 import { ImageSource } from "excalibur";
-import { Resources } from "../resources";
+import { Resources } from "@src/player-systems/../resources";
 export enum PlayerActions {
   NONE = "NONE",
   NEWDICE = "NEW_DICE",

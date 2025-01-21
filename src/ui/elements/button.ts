@@ -1,7 +1,7 @@
 import * as ex from "excalibur";
-import { Panel, PanelBackgrounds } from "../panel";
-import { Tooltip } from "../../player-systems/player-tooltip";
-import { Label } from "./label";
+import { Panel, PanelBackgrounds } from "@src/ui/elements/../panel";
+import { Tooltip } from "@src/player-systems/player-tooltip";
+import { Label } from "@src/ui/elements/label";
 
 export type ButtonIcon = {
   imageSource: ex.ImageSource;
@@ -14,7 +14,7 @@ type ButtonOptions = {
   onClick?: (e: ex.PointerEvent) => void;
 };
 export class Button extends Panel {
-  label?: Label;
+  private label?: Label;
   iconSprite?: ex.Sprite;
   options: ButtonOptions = {};
   _tooltip?: Tooltip;
@@ -40,16 +40,9 @@ export class Button extends Panel {
       }
     }
   }
-  hoverColor?: ex.Color;
+  hoverColor?: ex.Color = ex.Color.Gray;
   originalColor?: ex.Color;
 
-  set text(value: string) {
-    this.options.text = value;
-    if (this.label != null) {
-      this.label.text = value;
-    }
-    this.dirty = true;
-  }
 
   set icon(value: ButtonIcon) {
     let oldIcon = this.options.icon;
@@ -58,22 +51,81 @@ export class Button extends Panel {
     if (newKey == oldKey) {
       return;
     }
+
+    this.clearGraphics();
     this.iconSprite = undefined;
     this.options.icon = value;
     this.dirty = true;
   }
 
-  set fontSize(value: number) {
-    if (this.fontSize == value) {
+  get text() {
+    return this.options.text ?? "";
+  }
+
+
+  set text(value: string | undefined | null) {
+    value = value ?? "";
+    if (this.text == value) {
       return;
     }
-    if (this.label != null) {
-      this.label.fontSize = value;
+    this.options.text = value;
+    this.setupLabel();
+    this.dirty = true;
+  }
+
+  private _fontSize: number = 0;
+  set fontSize(value: number) {
+    if (this._fontSize == value) {
+      return;
     }
+    this._fontSize = value;
+    if (this.text == "") {
+      return;
+    }
+    this.setupLabel();
     this.dirty = true;
   }
   get fontSize(): number {
-    return this.label?.fontSize ?? 0;
+    return this._fontSize;
+  }
+
+  get labelSize(): ex.Vector {
+    if (this.text == "") {
+      return new ex.Vector(0, 0);
+    }
+    if (this.label == null) {
+      return new ex.Vector(0, 0);
+    }
+    return this.label.size;
+  }
+  get labelWidth(): number {
+    return this.labelSize.x;
+  }
+  get labelHeight(): number {
+    return this.labelSize.y;
+  }
+
+  get iconSize(): ex.Vector {
+    if (this.options?.icon == null) {
+      return new ex.Vector(0, 0);
+    }
+    return new ex.Vector(this.options.icon.width ?? 0, this.options.icon.height ?? 0);
+  }
+  get iconWidth(): number {
+    return this.iconSize.x;
+  }
+  get iconHeight(): number {
+    return this.iconSize.y;
+  }
+  get width(): number {
+    return this.padding + this.iconWidth + this.labelWidth;
+  }
+  get height(): number {
+    return this.padding + this.labelHeight + this.iconHeight;
+  }
+
+  get size(): ex.Vector {
+    return ex.vec(this.width, this.height);
   }
 
   set onClick(value: (e: ex.PointerEvent) => void) {
@@ -83,7 +135,7 @@ export class Button extends Panel {
   constructor(parent: Panel) {
     super(parent);
     this.background = PanelBackgrounds.ButtonSquareFlat;
-    this.padding = 10;
+    this.padding = 20;
   }
 
   onHoverChanged(e: ex.PointerEvent): void {
@@ -116,45 +168,29 @@ export class Button extends Panel {
     }
   }
 
-  calculateSize(): ex.Vector {
-    const width = this.width;
-    const height = this.height;
-    const size = new ex.Vector(width, height);
-
-    if (this.options.icon != null) {
-      size.x = this.options.icon.width;
-      size.y = this.options.icon.height;
+  setupLabel() {
+    const text = this.text;
+    if (text != "") {
+      this.label = this.addPanel("label", Label);
+    } else {
+      this.label?.kill();
+      this.label = undefined;
+      return;
     }
-    size.x = size.x + (this.label?.size.x ?? 0);
-    size.y = size.y + (this.label?.size.y ?? 0);
-    return size;
-  }
 
-  render(): void {
-    let wasDirty = this.dirty;
-
-    super.render();
-    if (wasDirty) {
-      const newSize = this.calculateSize();
-      if (this._size?.x != newSize.x || this._size?.y != newSize.y) {
-        this.size = newSize;
-      }
-    }
+    this.label.color = this.color;
+    this.label.fontSize = this._fontSize;
+    this.label.text = text ?? "";
   }
 
   override onRender(): void {
     super.onRender();
-    const { text, icon } = this.options ?? {
+    const { icon } = this.options ?? {
       text: "Hello world",
     };
-    if ((text ?? "") != "") {
-      if (this.label == null) {
-        this.label = this.addPanel("label", Label);
-        this.label.labelAnchor = ex.vec(0.5, 0.5);
-      }
-      this.label.color = this.color;
-      this.label.text = text ?? "";
-    }
+
+    this.setupLabel();
+
     if (icon != null) {
       if (this.iconSprite == null) {
         this.iconSprite = ex.Sprite.from(icon.imageSource);
@@ -162,7 +198,36 @@ export class Button extends Panel {
           width: icon.width,
           height: icon.height,
         };
-        this.addGraphic(this.iconSprite, new ex.Vector(-32, -32));
+        let offset = new ex.Vector(icon.width, icon.height).scale(-0.5);
+        if (this.label != null) {
+          let totalWidth = this.width;
+          let labelPercent = this.labelWidth / totalWidth;
+          let iconSize = (this.iconWidth / 2) + 5
+          let labelPos = -totalWidth * labelPercent + this.labelWidth - iconSize;
+          this.label.pos = ex.vec(labelPos, 0);
+          offset = offset.add(new ex.Vector(labelPos + this.labelWidth / 2 + iconSize, 0));
+        }
+        this.addGraphic(this.iconSprite, offset);
+      }
+    }
+
+    // if (this.label != null && this.icon != null) {
+
+    // } else {
+    //   if (this.label != null) {
+    //     this.label.pos = ex.vec(0, 0);
+    //   }
+    // }
+  }
+
+  override render(): void {
+    const wasDirty = this.isChildDirty;
+    super.render();
+    if (wasDirty) {
+      let oldSize = super.size;
+      let newSize = this.size;
+      if (!oldSize.equals(newSize)) {
+        this.dirty = true;
       }
     }
   }

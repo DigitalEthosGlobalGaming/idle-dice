@@ -1,6 +1,6 @@
 import * as ex from "excalibur";
 import { GridSpace } from "./grid-space";
-import { Serializable } from "../systems/save-system";
+import { Serializable } from "@src/grid-system/../systems/save-system";
 
 export class GridSystem extends ex.Actor implements Serializable {
   private _spaces: (GridSpace | null)[] = [];

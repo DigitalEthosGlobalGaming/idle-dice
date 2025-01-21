@@ -1,6 +1,6 @@
-import {Component} from "excalibur";
-import { Player } from "../player-systems/player";
-import { PlayerUi } from "../ui/scores/player-ui";
+import { Component } from "excalibur";
+import { Player } from "@src/player-systems/player";
+import { PlayerUi } from "@src/ui/scores/player-ui";
 
 export class BaseComponent extends Component {
     player?: Player;
