@@ -50,6 +50,12 @@ jobs:
           npm ci
           VITE_BUILD_VERSION=$BUILD_VERSION npm run build -- --base=roll-masters
 
+      - name: Retrieve History
+        run: |
+          git clone --branch gh-pages --single-branch https://github.com/${{ github.repository }} gh-pages
+          mkdir -p dist-history
+          cp -r gh-pages/v-* dist-history/
+
       - name: Copy to versioned subfolder
         run: |
           mkdir -p dist-history/v-$BUILD_VERSION
