@@ -44,22 +44,25 @@ jobs:
           git tag "roll-masters-$BUILD_VERSION"
           git push origin "roll-masters-$BUILD_VERSION"
 
-      # Runs a single command using the runners shell
-      - name: Build Roll Masters
-        run: |
-          npm ci
-          VITE_BUILD_VERSION=$BUILD_VERSION npm run build -- --base=roll-masters
-
       - name: Retrieve History
         run: |
           git clone --branch gh-pages --single-branch https://github.com/${{ github.repository }} gh-pages
           mkdir -p dist-history
-          cp -r gh-pages/v-* dist-history/
+
+      - name: Build Roll Masters - Versioned
+        run: |
+          npm ci
+          VITE_BUILD_VERSION=$BUILD_VERSION npm run build -- --base=roll-masters/v-$BUILD_VERSION
+          mkdir -p dist-history/v-$BUILD_VERSION
+          cp -r dist/* dist-history/v-$BUILD_VERSION
+
+      - name: Build Roll Masters - Latest
+        run: |
+          npm ci
+          VITE_BUILD_VERSION=$BUILD_VERSION npm run build -- --base=roll-masters
 
       - name: Copy to versioned subfolder
         run: |
-          mkdir -p dist-history/v-$BUILD_VERSION
-          cp -r dist/* dist-history/v-$BUILD_VERSION
           cp -r dist-history/* dist/
           rm -rf dist-history
 
