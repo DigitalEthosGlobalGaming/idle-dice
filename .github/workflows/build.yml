@@ -52,10 +52,10 @@ jobs:
 
       - name: Copy to versioned subfolder
         run: |
-          mkdir -p dist-history/$BUILD_VERSION
-          cp -r dist/* dist-history/$BUILD_VERSION
-          mkdir -p dist/$BUILD_VERSION
-          cp -r dist-history/$BUILD_VERSION dist/$BUILD_VERSION
+          mkdir -p dist-history/v-$BUILD_VERSION
+          cp -r dist/* dist-history/v-$BUILD_VERSION
+          mkdir -p dist/v-$BUILD_VERSION
+          cp -r dist-history/v-$BUILD_VERSION dist/v-$BUILD_VERSION
           rm -rf dist-history
 
       # Runs a set of commands using the runners shell
