@@ -65,7 +65,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = PlayerActions.UPGRADES;
+  _currentAction: PlayerActions = PlayerActions.NONE;
   get currentAction() {
     return this._currentAction;
   }
