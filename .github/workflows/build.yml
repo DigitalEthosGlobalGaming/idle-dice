@@ -54,8 +54,7 @@ jobs:
         run: |
           mkdir -p dist-history/v-$BUILD_VERSION
           cp -r dist/* dist-history/v-$BUILD_VERSION
-          mkdir -p dist/v-$BUILD_VERSION
-          cp -r dist-history/v-$BUILD_VERSION dist/v-$BUILD_VERSION
+          cp -r dist-history/v-$BUILD_VERSION dist
           rm -rf dist-history
 
       # Runs a set of commands using the runners shell
