@@ -55,6 +55,8 @@ jobs:
           git clone --branch gh-pages --single-branch https://github.com/${{ github.repository }} gh-pages
           mkdir -p dist-history
           cp -r gh-pages/v-* dist-history/
+          echo "Moved folders:"
+          ls dist-history
 
       - name: Copy to versioned subfolder
         run: |
