@@ -17,7 +17,7 @@ const classes = {
 
 export class DiceSaveSystem extends SaveSystem {
   constructor() {
-    super(classes);
+    super(Object.values(classes));
   }
 
   save(obj: Scene): any {

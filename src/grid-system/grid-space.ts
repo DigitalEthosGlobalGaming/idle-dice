@@ -3,6 +3,7 @@ import { Serializable } from "@src/grid-system/../systems/save-system";
 import { GridSystem } from "./grid-system";
 
 export class GridSpace extends ex.Actor implements Serializable {
+  static serializeName: string = "GridSpace";
   serializeId?: string | undefined;
   _gridPos: ex.Vector | null = null;
   get gridPos(): ex.Vector | null {
@@ -23,7 +24,7 @@ export class GridSpace extends ex.Actor implements Serializable {
 
   set gridIndex(newIndex: number) {
     this._gridPos = null;
-    this._gridIndex = newIndex
+    this._gridIndex = newIndex;
   }
 
   get grid(): GridSystem | null {
@@ -53,7 +54,7 @@ export class GridSpace extends ex.Actor implements Serializable {
     return this.grid.getNeighbors(this);
   }
 
-  handleClick: () => void = () => { };
+  handleClick: () => void = () => {};
 
   getBounds(): ex.BoundingBox {
     return new ex.BoundingBox(

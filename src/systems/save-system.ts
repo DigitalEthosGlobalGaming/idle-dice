@@ -116,24 +116,40 @@ export class SaveSystem extends System {
   get saveId(): string {
     return `auto-${this.nextId++}`;
   }
-  constructor(classMappings: Record<string, ClassMapping>) {
+  constructor(classMappings: ClassMapping[]) {
     super();
-    for (const key in classMappings) {
-      this.classMappings[key] = classMappings[key];
+    for (const item of classMappings) {
+      this.addClassMapping(item);
     }
+  }
+
+  getSerializeName(obj: any): string {
+    if (typeof obj == "string") {
+      return obj;
+    }
+    return (
+      obj?.constructor?.serializeName ??
+      obj?.prototype?.constructor?.serializeName ??
+      obj?.className
+    );
   }
 
   addClassMapping(mapping: ClassMapping) {
-    this.classMappings[mapping.name] = mapping;
-  }
-  getClassMapping(className: string | object): ClassMapping | null {
-    if (typeof className !== "string") {
-      className = className.constructor.name;
+    let name = this.getSerializeName(mapping);
+    if (name == null) {
+      throw new Error("Mapping does not have a serialize name");
     }
-
-    return this.classMappings?.[className] ?? null;
+    if (this.classMappings[name] != null) {
+      throw new Error(`Mapping for ${name} already exists`);
+    }
+    this.classMappings[name] = mapping;
   }
-  isMappedClass(className: string | ClassMapping): boolean {
+  getClassMapping(
+    className: string | object | Serializable
+  ): ClassMapping | null {
+    return this.classMappings?.[this.getSerializeName(className)] ?? null;
+  }
+  isMappedClass(className: string | ClassMapping | Serializable): boolean {
     return this.getClassMapping(className) !== null;
   }
   systemType: SystemType = SystemType.Draw;
@@ -142,7 +158,7 @@ export class SaveSystem extends System {
   }
 
   isSerializable(obj: any): obj is Serializable {
-    return isSerializable(obj) && this.isMappedClass(obj.constructor.name);
+    return isSerializable(obj) && this.isMappedClass(obj);
   }
 
   private setStateWithItemsToSave(
@@ -168,7 +184,7 @@ export class SaveSystem extends System {
     let id = obj.serializeId ?? this.saveId;
 
     let newObject = {
-      className: obj.constructor.name,
+      className: this.getSerializeName(obj),
       id: id,
       parentId: parent?.id ?? "",
       data: undefined,
@@ -316,7 +332,7 @@ export class SaveSystem extends System {
 
       let allObjects: SerialisedObject[] = saveData.items
         .map((item) => {
-          let classMapping = this.getClassMapping(item.className);
+          let classMapping = this.getClassMapping(item);
           if (classMapping) {
             let obj = new classMapping();
             obj.serializeId = item.id;

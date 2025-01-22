@@ -3,13 +3,14 @@ import { GridSpace } from "./grid-space";
 import { Serializable } from "@src/grid-system/../systems/save-system";
 
 export class GridSystem extends ex.Actor implements Serializable {
+  static serializeName: string = "GridSystem";
   private _spaces: (GridSpace | null)[] = [];
 
   constructor() {
     super({
       width: 50,
       height: 50,
-    })
+    });
   }
 
   getChildObjects(): any[] {
@@ -41,7 +42,6 @@ export class GridSystem extends ex.Actor implements Serializable {
   private _spaceSize: ex.Vector = ex.vec(0, 0);
   private _size: ex.Vector = ex.vec(0, 0);
 
-
   get spaceSize(): ex.Vector {
     return this._spaceSize;
   }
@@ -68,7 +68,10 @@ export class GridSystem extends ex.Actor implements Serializable {
 
     for (let i in oldSpaces) {
       let iIndex: number = parseInt(i);
-      let newPosition = new ex.Vector(iIndex % oldSize.x, Math.floor(iIndex / oldSize.x));
+      let newPosition = new ex.Vector(
+        iIndex % oldSize.x,
+        Math.floor(iIndex / oldSize.x)
+      );
       if (newPosition.x >= size.x || newPosition.y >= size.y) {
         oldSpaces[iIndex]?.kill();
         continue;
@@ -90,7 +93,7 @@ export class GridSystem extends ex.Actor implements Serializable {
         ex.vec(halfWorldSize.x, -halfWorldSize.y),
         ex.vec(halfWorldSize.x, halfWorldSize.y),
         ex.vec(-halfWorldSize.x, halfWorldSize.y),
-      ]
+      ],
     });
 
     this.collider.set(newCollider);
@@ -109,8 +112,6 @@ export class GridSystem extends ex.Actor implements Serializable {
   get worldSize() {
     return this.size.clone().scale(this.spaceSize);
   }
-
-
 
   isInBounds(position: ex.Vector) {
     const index = this.getSpaceIndex(position);
@@ -170,7 +171,7 @@ export class GridSystem extends ex.Actor implements Serializable {
   getSpacePositionFromIndex(index: number) {
     const xPos = index % this.size.x;
     const yPos = Math.floor(index / this.size.x);
-    return new ex.Vector(xPos, yPos)
+    return new ex.Vector(xPos, yPos);
   }
   getSpaceFromWorldPosition(position: ex.Vector) {
     return this.getSpace(
@@ -193,8 +194,8 @@ export class GridSystem extends ex.Actor implements Serializable {
 
     foundSpace.gridIndex = index;
     foundSpace.serializeId = `grid-space-${index}`;
-    const xPos = (position.x * this.spaceSize.x) + this.spaceSize.x / 2;
-    const yPos = (position.y * this.spaceSize.y) + this.spaceSize.y / 2;
+    const xPos = position.x * this.spaceSize.x + this.spaceSize.x / 2;
+    const yPos = position.y * this.spaceSize.y + this.spaceSize.y / 2;
     if (foundSpace.pos.x != xPos || foundSpace.pos.y != yPos) {
       foundSpace.pos.setTo(xPos, yPos);
     }
@@ -206,8 +207,7 @@ export class GridSystem extends ex.Actor implements Serializable {
     return {
       spaceSize: this.spaceSize,
       size: this.size,
-    }
-
+    };
   }
   deserialize(data: any): void {
     if (data == null) {

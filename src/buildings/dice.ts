@@ -129,6 +129,7 @@ function getRandomRollAnimation(
 }
 
 export class Dice extends Building implements Serializable {
+  static serializeName: string = "Dice";
   rolling: boolean = false;
   private _faces: number = 6;
   private _speed: number = 1;
@@ -184,7 +185,9 @@ export class Dice extends Building implements Serializable {
 
   postDeserialize(): void {
     let rollAnimation = getRandomRollAnimation(this.faces, this.speed);
-    const lastFrame = rollAnimation.animation.frames[rollAnimation.animation.frames.length - 1]?.graphic;
+    const lastFrame =
+      rollAnimation.animation.frames[rollAnimation.animation.frames.length - 1]
+        ?.graphic;
     if (lastFrame == null) {
       return;
     }
@@ -192,7 +195,6 @@ export class Dice extends Building implements Serializable {
     this.graphics.add("roll", lastFrame);
     this.graphics.use("roll");
   }
-
 
   onTrigger() {
     this.rollDice();

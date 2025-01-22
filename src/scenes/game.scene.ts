@@ -5,8 +5,8 @@ import { Level } from "@src/scenes/../level";
 import { Player } from "@src/scenes/../player-systems/player";
 import { Serializable } from "@src/scenes/../systems/save-system";
 
-
 export class GameScene extends Level implements Serializable {
+  static serializeName = "GameScene";
   serialize() {
     return null;
     // throw new Error("Method not implemented.");
@@ -80,9 +80,7 @@ export class GameScene extends Level implements Serializable {
     timer.start();
   }
 
-  deserialize(_data: any): void {
-
-  }
+  deserialize(_data: any): void {}
 
   onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {
     const gridBounds = this.gridSystem?.getBounds();

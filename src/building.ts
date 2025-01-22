@@ -5,6 +5,7 @@ import { GameScene } from "@src/scenes/game.scene";
 import { Serializable } from "./systems/save-system";
 
 export class Building extends ex.Actor implements Serializable {
+  static serializeName: string = "Building";
   tickRate = -1;
   lastTick = -1;
   get gridSpace(): GridSpace {
@@ -71,9 +72,7 @@ export class Building extends ex.Actor implements Serializable {
   serialize(): any {
     return null;
   }
-  deserialize(_data: any): void {
-
-  }
+  deserialize(_data: any): void {}
 
   getNeighbors() {
     return this.gridSpace.getNeighbors();
@@ -99,12 +98,12 @@ export class Building extends ex.Actor implements Serializable {
     }
   }
 
-  onTick(_delta: number) { }
+  onTick(_delta: number) {}
 
-  onBuild() { }
+  onBuild() {}
 
   trigger() {
     this.onTrigger();
   }
-  onTrigger() { }
+  onTrigger() {}
 }
