@@ -69,12 +69,13 @@ jobs:
 
       - name: Create Historic html page
         run: |
-          cp history.html dist-history/index.html
+          mkdir -p dist/history
+          cp history.html dist/index.html
           history_content=""
           for dir in dist/v-*; do
             history_content="$history_content<li><a href=\"${dir##*/}\">${dir##*/}</a></li>"
           done
-          sed -i "s|__HISTORY__|$history_content|" dist-history/index.html
+          sed -i "s|__HISTORY__|$history_content|" dist/history/index.html
 
       # Runs a set of commands using the runners shell
       - name: Deploy to GitHub Pages
