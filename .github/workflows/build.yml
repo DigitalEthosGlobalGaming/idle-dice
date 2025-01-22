@@ -45,14 +45,13 @@ jobs:
         run: cp -R dist dist-latest
 
       - name: Build Roll Masters (versioned)
-        run: npm run build -- --base=/roll-masters/$BUILD_VERSION
+        run: npm run build -- --base=roll-masters/$BUILD_VERSION
 
       - name: Combine builds
         run: |
           mkdir -p "dist-latest/$BUILD_VERSION"
           mv dist/* "dist-latest/$BUILD_VERSION"
           mv dist-latest dist
-          touch dist/.nojekyll
 
       # Runs a set of commands using the runners shell
       - name: Deploy to GitHub Pages
