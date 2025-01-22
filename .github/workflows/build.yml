@@ -50,10 +50,10 @@ jobs:
           npm ci
           VITE_BUILD_VERSION=$BUILD_VERSION npm run build -- --base=roll-masters
 
-      # - name: Copy to versioned subfolder
-      #   run: |
-      #     mkdir dist/roll-masters
-      #     mv dist/* dist/roll-masters
+      - name: Copy to versioned subfolder
+        run: |
+          mkdir dist/roll-masters
+          mv dist/* dist/roll-masters
 
       # Runs a set of commands using the runners shell
       - name: Deploy to GitHub Pages
