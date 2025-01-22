@@ -15,8 +15,9 @@ export const Scenes: Record<string, string> = {
 class WelcomeUi extends Panel {
   onRender(): void {
     super.onRender();
-    this.size = this.screenSize.scale(0.9);
-    this.pos = this.screenSize.scale(0.5);
+    const screenSize = this.screenSize;
+    this.size = screenSize.scale(0.9);
+    this.pos = screenSize.scale(0.5);
 
     const list = this.addPanel("list", List);
     list.spacing = 30;
@@ -39,6 +40,16 @@ class WelcomeUi extends Panel {
         this.scene?.engine.goToScene(Scenes[title]);
       };
     }
+
+    let versionLabel1 = this.addPanel("version-label-2", Label);
+    versionLabel1.fontSize = 30;
+    versionLabel1.text = `Version ${
+      import.meta.env.VITE_BUILD_VERSION || "dev"
+    }`;
+    versionLabel1.bottomRight = ex.vec(
+      screenSize.x / 2 - 10,
+      screenSize.y / 2 - 10
+    );
   }
 }
 

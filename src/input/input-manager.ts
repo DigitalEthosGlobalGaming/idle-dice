@@ -148,13 +148,12 @@ export class InputManager extends ex.Entity {
     let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
 
     if (this.showDebug) {
-      const mouseBounds = new ex.BoundingBox(
-        evt.worldPos.x,
-        evt.worldPos.y,
-        evt.worldPos.x + 5,
-        evt.worldPos.y + 5
-      );
-      this.level.drawDebug(mouseBounds, "im-pointer-move");
+      this.level.drawDebug({
+        id: "im-debug-pointer-move",
+        type: "circle",
+        pos: evt.worldPos,
+        radius: 5,
+      });
     }
 
     let previousHoveredEntities = this.currentHoveredEntities ?? {};

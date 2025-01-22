@@ -34,56 +34,121 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
+  // Positional Setters and Getters
+  /**
+   *
+   * These are used to set and get the related position of the panel.
+   * This takes into account the size of the panel.
+   * Important thing to note is that by default panels are anchored at the center.
+   */
+
   get topCenter(): ex.Vector {
     return ex.vec(0, this.top);
   }
+  set topCenter(value: ex.Vector) {
+    this.top = value.y;
+  }
+
   get bottomCenter(): ex.Vector {
     return ex.vec(0, this.bottom);
   }
+  set bottomCenter(value: ex.Vector) {
+    this.bottom = value.y;
+    this.xPos = value.x;
+  }
+
   get leftCenter(): ex.Vector {
     return ex.vec(this.left, 0);
   }
+  set leftCenter(value: ex.Vector) {
+    this.left = value.x;
+  }
+
   get rightCenter(): ex.Vector {
     return ex.vec(this.right, 0);
+  }
+  set rightCenter(value: ex.Vector) {
+    this.right = value.x;
   }
 
   get topLeft(): ex.Vector {
     return ex.vec(this.left, this.top);
   }
+  set topLeft(value: ex.Vector) {
+    this.left = value.x;
+    this.top = value.y;
+  }
+
   get topRight(): ex.Vector {
     return ex.vec(this.right, this.top);
   }
+  set topRight(value: ex.Vector) {
+    this.right = value.x;
+    this.top = value.y;
+  }
+
   get bottomLeft(): ex.Vector {
     return ex.vec(this.left, this.bottom);
   }
+  set bottomLeft(value: ex.Vector) {
+    this.left = value.x;
+    this.bottom = value.y;
+  }
+
   get bottomRight(): ex.Vector {
     return ex.vec(this.right, this.bottom);
+  }
+  set bottomRight(value: ex.Vector) {
+    this.right = value.x;
+    this.bottom = value.y;
   }
 
   get top(): number {
     return -this.halfHeight + this.pos.y;
   }
+  set top(value: number) {
+    this.pos.y = value + this.halfHeight;
+  }
+
   get bottom(): number {
     return this.halfHeight + this.pos.y;
   }
+  set bottom(value: number) {
+    this.pos.y = value - this.halfHeight;
+  }
+
   get left(): number {
     return -this.halfWidth + this.pos.x;
   }
+  set left(value: number) {
+    this.pos.x = value + this.halfWidth;
+  }
+
   get right(): number {
     return this.halfWidth + this.pos.x;
   }
-  get halfHeight(): number {
-    return this.height / 2;
-  }
-  get halfWidth(): number {
-    return this.width / 2;
+  set right(value: number) {
+    this.pos.x = value - this.halfWidth;
   }
 
+  get center(): ex.Vector {
+    return ex.vec(this.pos.x, this.pos.y);
+  }
+  set center(value: ex.Vector) {
+    this.pos.x = value.x;
+    this.pos.y = value.y;
+  }
   get yPos(): number {
     return this.pos.y;
   }
+  set yPos(value: number) {
+    this.pos.y = value;
+  }
   get xPos(): number {
     return this.pos.x;
+  }
+  set xPos(value: number) {
+    this.pos.x = value;
   }
 
   get height(): number {
@@ -91,6 +156,12 @@ export class Panel extends ex.Actor implements InputHandler {
   }
   get width(): number {
     return this.size.x;
+  }
+  get halfHeight(): number {
+    return this.height / 2;
+  }
+  get halfWidth(): number {
+    return this.width / 2;
   }
 
   get level(): Level {
@@ -102,6 +173,9 @@ export class Panel extends ex.Actor implements InputHandler {
 
   get player(): Player | undefined {
     return this.level.player;
+  }
+  get parentPanel(): Panel | null {
+    return this.parent instanceof Panel ? this.parent : null;
   }
 
   private graphicsGroup!: ex.GraphicsGroup;
@@ -425,6 +499,24 @@ export class Panel extends ex.Actor implements InputHandler {
 
     this.calculateSize();
     return element;
+  }
+
+  removePanel(panel: string | Panel) {
+    if (panel instanceof Panel) {
+      panel = panel.name;
+    }
+    let child = this.children.find((c) => c.name == panel);
+    if (child != null) {
+      child.kill();
+    }
+  }
+  removeAllPanels() {
+    const children = this.getPanelChildren();
+    for (let child of children) {
+      if (child instanceof Panel) {
+        child.kill();
+      }
+    }
   }
 
   getPanelChildren(): Panel[] {

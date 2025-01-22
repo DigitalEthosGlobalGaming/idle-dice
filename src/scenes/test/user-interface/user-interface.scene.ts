@@ -16,7 +16,6 @@ export const Scenes: Record<string, string> = {
 };
 
 class Controller extends ex.Entity implements InputHandler {
-
   onAdd(engine: ex.Engine): void {
     super.onAdd(engine);
     InputManager.register(this);
@@ -25,7 +24,7 @@ class Controller extends ex.Entity implements InputHandler {
   onKeyUp(evt: ExtendedKeyEvent): void {
     let scene = this.scene;
     if (!(scene instanceof TestUserInterfaceScene)) {
-      return
+      return;
     }
     if (evt.key == ex.Keys.ArrowUp) {
       scene.testId++;
@@ -38,10 +37,7 @@ class Controller extends ex.Entity implements InputHandler {
     return false;
   }
   globalZ: number = 0;
-
 }
-
-
 
 export class TestUserInterfaceScene extends Level {
   currentTestPanel?: Panel;
@@ -49,9 +45,9 @@ export class TestUserInterfaceScene extends Level {
     TestPanelContainer,
     TestLabelPanel,
     TestListPanel,
-    TestButtonPanel
-  ]
-  _testId: number = 3;
+    TestButtonPanel,
+  ];
+  _testId: number = 1;
   get testId(): number {
     return this._testId;
   }
@@ -80,7 +76,6 @@ export class TestUserInterfaceScene extends Level {
     }
     this.add(newPanel);
     this.currentTestPanel = newPanel;
-    console.log("STARTING NEW PANEL");
   }
 
   onActivate(context: ex.SceneActivationContext): void {
@@ -88,7 +83,6 @@ export class TestUserInterfaceScene extends Level {
     this.add(new Controller());
     this.startTest();
   }
-
 
   onDeactivate(context: ex.SceneActivationContext): void {
     super.onDeactivate(context);
