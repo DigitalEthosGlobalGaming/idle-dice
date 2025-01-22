@@ -13,52 +13,49 @@ export class Level extends ex.Scene {
   player?: Player;
   debugElements: Record<string, DebugDrawElements> = {};
 
-  drawDebug(bounds: ex.BoundingBox, id: string | number) {
+  drawDebug(
+    bounds: ex.BoundingBox,
+    id: string | number,
+    color?: ex.Color
+  ): void {
     id = (id || Date.now()).toString();
     this.debugElements[id] = {
       bounds,
-      color: ex.Color.Red,
+      color: color ?? ex.Color.Red,
       endTime: Date.now() + 1000,
     };
   }
 
   onPostDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {
     super.onPostDraw(ctx, elapsed);
-    const debugElements = this.debugElements;
-    for (const index in debugElements) {
-      if (!debugElements.hasOwnProperty(index)) {
-        continue;
-      }
-      const element = debugElements[index];
-      if (element.endTime < Date.now()) {
-        delete debugElements[index];
-        continue;
-      }
+    const debugElements = Object.values(this.debugElements);
+    if (debugElements.length > 0) {
+      let oldZ = ctx.z;
+      let center = this.camera.viewport.topLeft;
+      ctx.translate(-center.x, -center.y);
+      ctx.z = 100000;
+      for (const index in debugElements) {
+        if (!debugElements.hasOwnProperty(index)) {
+          continue;
+        }
+        const element = debugElements[index];
+        if (element.endTime < Date.now()) {
+          delete debugElements[index];
+          continue;
+        }
+        const bounds = element.bounds;
 
-      ctx.drawLine(
-        element.bounds.topLeft,
-        ex.vec(element.bounds.right, element.bounds.top),
-        element.color,
-        1
-      );
-      ctx.drawLine(
-        ex.vec(element.bounds.right, element.bounds.top),
-        element.bounds.bottomRight,
-        element.color,
-        1
-      );
-      ctx.drawLine(
-        element.bounds.bottomRight,
-        ex.vec(element.bounds.left, element.bounds.bottom),
-        element.color,
-        1
-      );
-      ctx.drawLine(
-        ex.vec(element.bounds.left, element.bounds.bottom),
-        element.bounds.topLeft,
-        element.color,
-        1
-      );
+        ctx.drawRectangle(
+          bounds.topLeft,
+          bounds.width,
+          bounds.height,
+          ex.Color.fromRGB(0, 0, 0, 0),
+          element.color,
+          2
+        );
+      }
+      ctx.translate(center.x, center.y);
+      ctx.z = oldZ;
     }
   }
 

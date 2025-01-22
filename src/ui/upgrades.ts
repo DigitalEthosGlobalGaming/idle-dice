@@ -6,7 +6,6 @@ import { List } from "@src/ui/elements/list";
 import { Panel } from "@src/ui/panel";
 import { Modal } from "./modal";
 
-
 class UpgradeListItem extends Panel {
   _upgrade?: Upgrade;
   get upgrade(): Upgrade {
@@ -26,7 +25,7 @@ class UpgradeListItem extends Panel {
       return;
     }
     const buyButton = this.addPanel("buy-button", Button);
-    buyButton.pos.setTo(
+    buyButton.pos = ex.vec(
       buyButton.size.x / 2 + buyButton.padding + 5,
       buyButton.pos.y
     );
@@ -39,7 +38,7 @@ class UpgradeListItem extends Panel {
         "{nextValue}": this.upgrade.nextValue.toString(),
         "{cost}": this.upgrade.cost.toString(),
         "{value}": this.upgrade.value.toString(),
-      }
+      };
       let description = this.upgrade.description;
       for (const key in replacements) {
         description = description.replaceAll(key, replacements[key]);
@@ -53,7 +52,7 @@ class UpgradeListItem extends Panel {
         title: title,
         description: description,
       };
-    }
+    };
     buyButton.onClick = () => {
       this.upgrade.buy();
       updateTooltip();
@@ -63,23 +62,14 @@ class UpgradeListItem extends Panel {
     updateTooltip();
 
     const label = this.addPanel("label", Label);
-    let labelPos = buyButton.pos.clone();
-    labelPos.setTo(labelPos.x + buyButton.size.x, 0);
+    label.align = "left";
     label.fontSize = 20;
-    label.labelAnchor = ex.vec(0, 0.5);
-    label.pos = labelPos;
     let text = `LV ${this.upgrade.level} ${this.upgrade.name}`;
     if (this.upgrade.level == 0) {
       text = `Unlock ${this.upgrade.name}`;
     }
     label.text = text;
-  }
-}
-
-export class UpgradesList extends List {
-  onRender(): void {
-    super.onRender();
-    this.spacing = 0;
+    label.pos = ex.vec(buyButton.right + label.halfWidth + 10, 0);
   }
 }
 
@@ -89,16 +79,13 @@ export class UpgradeUi extends Panel {
       return;
     }
     const title = this.addPanel("title", Label);
-    title.pos = ex.vec(0, 10);
+    title.pos = ex.vec(0, title.halfHeight + 10);
     title.text = "Research";
-    title.labelAnchor = ex.vec(0.5, 0);
     title.fontSize = 40;
 
-    const list = this.addPanel("list", UpgradesList);
-    list.pos = ex.vec(
-      -this.getParentBounds().width / 2,
-      title.bounds.bottom + 10
-    );
+    const list = this.addPanel("list", List);
+
+    list.spacing = 20;
 
     const upgrades = this.player.upgrades;
     for (const i in upgrades) {
@@ -106,6 +93,10 @@ export class UpgradeUi extends Panel {
       const upgradePanel = list.addPanel(upgrade.code, UpgradeListItem);
       upgradePanel.upgrade = upgrade;
     }
+    list.pos = ex.vec(
+      -this.getParentBounds().width / 2,
+      title.pos.y + title.height + list.halfHeight
+    );
   }
 }
 

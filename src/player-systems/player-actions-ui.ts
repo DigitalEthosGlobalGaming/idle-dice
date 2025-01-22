@@ -1,10 +1,10 @@
-import * as ex from "excalibur";
+import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
 import { GameScene } from "@src/player-systems/../scenes/game.scene";
 import { Button } from "@src/player-systems/../ui/elements/button";
 import { Panel } from "@src/player-systems/../ui/panel";
+import * as ex from "excalibur";
 import { Player } from "./player";
 import { PlayerAction, playerActions } from "./player-actions";
-import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
 
 export class PlayerActionButton extends Button {
   _action: PlayerAction | null = null;
@@ -101,12 +101,14 @@ export class PlayerActionsUi extends Panel {
   buttons: PlayerActionButton[] = [];
 
   hoveredAction: PlayerAction | null = null;
-  acceptingInputs = false;
-
+  get acceptingInputs() {
+    return false;
+  }
 
   get currentAction(): PlayerAction | null {
-    return playerActions.find((a) => a.code == this.player.currentAction) ?? null;
-
+    return (
+      playerActions.find((a) => a.code == this.player.currentAction) ?? null
+    );
   }
   set currentAction(value: PlayerAction) {
     if (this.player.currentAction == value.code) {

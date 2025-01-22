@@ -45,7 +45,8 @@ export class InputManager extends ex.Entity {
     hoverChange: "im-hover-change",
     pointerEnter: "im-pointer-enter",
     pointerLeave: "im-pointer-leave",
-  }
+  };
+  showDebug = true;
   subscriptions: ex.Subscription[] = [];
   entities: { [key: string]: InputHandler } = {};
   currentHoveredEntities: { [key: string]: InputHandler } = {};
@@ -54,19 +55,25 @@ export class InputManager extends ex.Entity {
     MouseRight: false,
   };
 
+  get level(): Level {
+    if (!(this.scene instanceof Level)) {
+      throw new Error("InputManager must be added to a Level scene.");
+    }
+    return this.scene as Level;
+  }
+
   onAdd(engine: ex.Engine): void {
     super.onAdd(engine);
-    if (this.scene?.entities.indexOf(this) === -1) {
-      const inputManagers = this.scene?.entities.filter(
+    const level = this.level;
+    if (level.entities.indexOf(this) === -1) {
+      const inputManagers = level.entities.filter(
         (entity) => entity instanceof InputManager
       );
       if (inputManagers && inputManagers.length > 0) {
         throw new Error("There can only be one InputManager in a scene.");
       }
     }
-    if (this.scene instanceof Level) {
-      this.scene.inputSystem = this;
-    }
+    this.level.inputSystem = this;
     InputManager.InputManagers.push(this);
 
     this.subscriptions.push(
@@ -108,6 +115,7 @@ export class InputManager extends ex.Entity {
     }
 
     let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
+
     let entities = extendedEvent.entities;
     for (let entity of entities) {
       if (entity.onPointerDown != null) {
@@ -138,6 +146,17 @@ export class InputManager extends ex.Entity {
 
   onPointerMove(evt: ex.PointerEvent) {
     let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
+
+    if (this.showDebug) {
+      const mouseBounds = new ex.BoundingBox(
+        evt.worldPos.x,
+        evt.worldPos.y,
+        evt.worldPos.x + 5,
+        evt.worldPos.y + 5
+      );
+      this.level.drawDebug(mouseBounds, "im-pointer-move");
+    }
+
     let previousHoveredEntities = this.currentHoveredEntities ?? {};
     this.currentHoveredEntities = {};
 

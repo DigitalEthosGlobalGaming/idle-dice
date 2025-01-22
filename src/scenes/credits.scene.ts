@@ -19,12 +19,14 @@ const creditElements: any[] = [
 class CreditUi extends Panel {
   onRender(): void {
     super.onRender();
+    this.size = this.screenSize.scale(0.9);
+    this.pos = this.screenSize.scale(0.5);
+
     const list = this.addPanel("list", List);
     for (const element of creditElements) {
       const label = list.addPanel(element, Label);
       label.fontSize = 30;
       label.text = element;
-      label.labelAnchor = ex.vec(0.5, 0.5);
     }
 
     const button = list.addPanel("back", Button);
@@ -43,7 +45,6 @@ export class CreditScene extends Level {
     if (this.mainPanel == null) {
       this.mainPanel = new CreditUi();
       this.add(this.mainPanel);
-      this.mainPanel.pos = ex.vec(this.camera.viewport.width / 2, 0);
     }
   }
 

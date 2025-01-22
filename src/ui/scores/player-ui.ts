@@ -27,7 +27,9 @@ export class PlayerUi extends Panel {
     return item?.code ?? null;
   }
 
-  acceptingInputs = false;
+  get acceptingInputs() {
+    return false;
+  }
 
   onRender(): void {
     const bounds = this.scene?.camera?.viewport;
@@ -52,8 +54,10 @@ export class PlayerUi extends Panel {
       this._tooltipElement = this.addPanel("player-tooltip", PlayerTooltip);
     }
     this._tooltipElement.tooltip = this.tooltip;
-    this._tooltipElement.labelAnchor = ex.vec(1, 0);
     this._tooltipElement.fontSize = 20;
-    this._tooltipElement.pos = ex.vec(bounds.width - 10, 10);
+    this._tooltipElement.pos = ex.vec(
+      bounds.width - this._tooltipElement.halfWidth - 10,
+      10
+    );
   }
 }

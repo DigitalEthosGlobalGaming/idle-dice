@@ -1,13 +1,16 @@
-import * as ex from "excalibur";
 import { GameUpdate, gameUpdates } from "@src/scenes/../game-updates";
 import { Level } from "@src/scenes/../level";
+import { Button } from "@src/scenes/../ui/elements/button";
 import { Label } from "@src/scenes/../ui/elements/label";
 import { List } from "@src/scenes/../ui/elements/list";
 import { Panel } from "@src/scenes/../ui/panel";
-import { Button } from "@src/scenes/../ui/elements/button";
 import { hashCheck } from "@src/utility/hash";
+import * as ex from "excalibur";
 
 class UpdateItem extends List {
+  onInitialize(engine: ex.Engine): void {
+    super.onInitialize(engine);
+  }
   _gameUpdate: GameUpdate | null = null;
   set gameUpdate(value: GameUpdate | null) {
     this._gameUpdate = value;
@@ -28,20 +31,22 @@ class UpdateItem extends List {
     const date = this.addPanel("date", Label);
     date.fontSize = 30;
     date.text = this.gameUpdate.date;
+    date.color = this.color;
 
     for (const category in this.gameUpdate.updates) {
       const categoryLabel = this.addPanel(category, Label);
+      categoryLabel.color = this.color;
       categoryLabel.fontSize = 20;
       categoryLabel.text = category;
       const updates = this.gameUpdate.updates[category];
       for (const update of updates) {
         const updateLabel = this.addPanel(update, Label);
+        updateLabel.color = this.color;
         updateLabel.fontSize = 20;
         updateLabel.text = update;
+        updateLabel.pos.x = updateLabel.halfWidth;
       }
     }
-    this.calculateSize();
-    console.log(this.size);
   }
 
   onRender(): void {
@@ -56,6 +61,7 @@ class UpdatesUi extends Panel {
     this.size = this.screenSize.scale(0.9);
     this.pos = this.screenSize.scale(0.5);
     const list = this.addPanel("list", List);
+    list.color = ex.Color.fromRGB(0, 0, 0, 0);
     list.spacing = 30;
 
     const updates = gameUpdates;
@@ -63,7 +69,6 @@ class UpdatesUi extends Panel {
       const updateItem = list.addPanel(`update-${element.id}`, UpdateItem);
       updateItem.gameUpdate = element;
     }
-
 
     const button = list.addPanel("back", Button);
     button.text = "Back";

@@ -43,7 +43,6 @@ export class Button extends Panel {
   hoverColor?: ex.Color = ex.Color.Gray;
   originalColor?: ex.Color;
 
-
   set icon(value: ButtonIcon) {
     let oldIcon = this.options.icon;
     let newKey = `${value.imageSource.path}-${value.width}-${value.height}`;
@@ -61,7 +60,6 @@ export class Button extends Panel {
   get text() {
     return this.options.text ?? "";
   }
-
 
   set text(value: string | undefined | null) {
     value = value ?? "";
@@ -109,7 +107,10 @@ export class Button extends Panel {
     if (this.options?.icon == null) {
       return new ex.Vector(0, 0);
     }
-    return new ex.Vector(this.options.icon.width ?? 0, this.options.icon.height ?? 0);
+    return new ex.Vector(
+      this.options.icon.width ?? 0,
+      this.options.icon.height ?? 0
+    );
   }
   get iconWidth(): number {
     return this.iconSize.x;
@@ -202,10 +203,13 @@ export class Button extends Panel {
         if (this.label != null) {
           let totalWidth = this.width;
           let labelPercent = this.labelWidth / totalWidth;
-          let iconSize = (this.iconWidth / 2) + 5
-          let labelPos = -totalWidth * labelPercent + this.labelWidth - iconSize;
+          let iconSize = this.iconWidth / 2 + 5;
+          let labelPos =
+            -totalWidth * labelPercent + this.labelWidth - iconSize;
           this.label.pos = ex.vec(labelPos, 0);
-          offset = offset.add(new ex.Vector(labelPos + this.labelWidth / 2 + iconSize, 0));
+          offset = offset.add(
+            new ex.Vector(labelPos + this.labelWidth / 2 + iconSize, 0)
+          );
         }
         this.addGraphic(this.iconSprite, offset);
       }

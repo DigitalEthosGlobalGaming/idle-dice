@@ -1,12 +1,30 @@
 import { Panel } from "@src/ui/panel";
 import * as ex from "excalibur";
 
+type textAligns = "left" | "center" | "right";
 export class Label extends Panel {
   _label: ex.Label | null = null;
 
+  _align: textAligns = "center";
+
+  get align(): textAligns {
+    return this._align;
+  }
+  set align(value: textAligns) {
+    if (value == this._align) {
+      return;
+    }
+    this._align = value;
+    this.dirty = true;
+  }
   get size(): ex.Vector {
-    let size = this.label?.font.measureText(this.text);
-    return new ex.Vector(size?.width ?? 0, size?.height ?? 0);
+    if (this.label == null) {
+      this.updateLabel();
+    }
+    if (this._size == null) {
+      this.calculateSize();
+    }
+    return this._size ?? new ex.Vector(0, 0);
   }
   set size(_value: ex.Vector) {
     throw new Error("Size is read only");
@@ -34,12 +52,13 @@ export class Label extends Panel {
       return;
     }
     this._text = value;
-    this.calculateSize();
     this.updateLabel();
     this.dirty = true;
   }
 
-  get anchor(): ex.Vector { return super.anchor; }
+  get anchor(): ex.Vector {
+    return super.anchor;
+  }
 
   set anchor(value: ex.Vector) {
     super.anchor = value;
@@ -55,7 +74,6 @@ export class Label extends Panel {
       return;
     }
     this._fontSize = value;
-    this.calculateSize();
     this.updateLabel();
     this.dirty = true;
   }
@@ -64,6 +82,28 @@ export class Label extends Panel {
     super();
     this.text = text;
     parent.addChild(this);
+  }
+
+  override calculateSize(): void {
+    if (this.label == null) {
+      this.updateLabel();
+    }
+    if (this.label == null) {
+      return;
+    }
+    let oldSize = this._size ?? new ex.Vector(0, 0);
+    let size = this.label.font.measureText(this.text);
+    const nextX = size.width;
+    const nextY = size.height;
+    if (oldSize.x != nextX || oldSize.y != nextY) {
+      this._size = new ex.Vector(nextX, nextY);
+      this.dirty = true;
+      if (this.parent instanceof Panel) {
+        this.parent.calculateSize();
+      }
+      this.emit("resize", { oldSize, newSize: this.size });
+      this.dirty = true;
+    }
   }
 
   updateLabel() {
@@ -76,13 +116,18 @@ export class Label extends Panel {
       });
       this.addChild(label);
     }
+    let oldData = `${label.text} ${label.font.size}`;
     label.text = this.text;
     label.font.family = "ds-digi";
     label.color = this.color;
     label.font.baseAlign = ex.BaseAlign.Middle;
     label.font.textAlign = ex.TextAlign.Center;
     label.font.size = this.fontSize;
+    let newData = `${label.text} ${label.font.size}`;
     this._label = label;
+    if (oldData != newData) {
+      this.calculateSize();
+    }
   }
 
   onRender(): void {
@@ -92,7 +137,18 @@ export class Label extends Panel {
     label.font.family = "ds-digi";
     label.color = this.color;
     label.font.size = this.fontSize;
-
+    if (this.align == "left") {
+      label.pos = ex.vec(-this.halfWidth, this.label.pos.y);
+      label.font.textAlign = ex.TextAlign.Left;
+    }
+    if (this.align == "center") {
+      label.pos = ex.vec(0, this.label.pos.y);
+      label.font.textAlign = ex.TextAlign.Center;
+    }
+    if (this.align == "right") {
+      label.pos = ex.vec(this.halfWidth, this.label.pos.y);
+      label.font.textAlign = ex.TextAlign.Right;
+    }
     if (this.text == "") {
       this.visible = false;
       return;

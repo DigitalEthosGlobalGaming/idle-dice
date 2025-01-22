@@ -1,7 +1,7 @@
 import { forceArray } from "./utility/force-array";
 import { quickHash } from "./utility/hash";
 
-type Category = "Features" | "Fixes";
+type Category = "Features" | "Fixes" | "Technical";
 // Date will be formated as "YYYY-MM-DD"
 // Key in updates is the category
 // Value in updates is the list of updates for that category
@@ -32,6 +32,12 @@ function addUpdate(date: string, category: Category, items: string | string[]) {
 addUpdate("2025-01-20", "Features", "Added in updates menu.");
 addUpdate("2025-01-20", "Features", "Added in saving and loading.");
 addUpdate("2025-01-20", "Fixes", "Fixed ui breaking when screen was resized.");
-addUpdate("2025-01-19", "Features", "Testing");
+addUpdate(
+  "2025-01-22",
+  "Technical",
+  "Refactored the UI to be more stable and easier to use."
+);
 
-export const gameUpdates = Object.values(updates);
+export const gameUpdates = Object.values(updates).sort((a, b) => {
+  return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());
+});

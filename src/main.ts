@@ -36,13 +36,13 @@ waitForFontLoad("24px DS-DIGI").then(() => {
       CreditScene,
       HowToPlayScene,
       UpdatesScene,
-      TestUserInterfaceScene
+      TestUserInterfaceScene,
     },
   });
 
   const loader = new GameLoader();
 
   game.start(loader).then(() => {
-    game.goToScene("UpdatesScene");
+    game.goToScene("WelcomeScene");
   });
 });

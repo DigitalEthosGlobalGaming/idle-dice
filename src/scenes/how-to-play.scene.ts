@@ -24,7 +24,7 @@ class HowToPlayUi extends Panel {
     this.pos = this.screenSize.scale(0.5);
 
     const list = this.addPanel("list", List);
-    list.padding = 10;
+    list.padding = 15;
 
     for (const elementIndex in elements) {
       const label = list.addPanel(elementIndex, Label);

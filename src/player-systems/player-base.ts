@@ -8,7 +8,10 @@ import { Upgrade } from "@src/player-systems/../components/upgrade-component";
 import { PassiveEnergyComponent } from "@src/player-systems/../components/upgrades/passive-energy.upgrade";
 import { Ghost } from "@src/player-systems/../ghost";
 import { GridSpace } from "@src/player-systems/../grid-system/grid-space";
-import { ButtonStates, InputHandler } from "@src/player-systems/../input/input-manager";
+import {
+  ButtonStates,
+  InputHandler,
+} from "@src/player-systems/../input/input-manager";
 import { GameScene } from "@src/player-systems/../scenes/game.scene";
 import { PlayerUi } from "@src/player-systems/../ui/scores/player-ui";
 import {
@@ -62,7 +65,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = PlayerActions.NONE;
+  _currentAction: PlayerActions = PlayerActions.UPGRADES;
   get currentAction() {
     return this._currentAction;
   }
@@ -194,7 +197,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) { }
+  onPointerDown(_e: ExtendedPointerEvent) {}
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -342,5 +345,4 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     this.scoreComponent.updateScore(-amount);
     return true;
   }
-
 }

@@ -35,53 +35,29 @@ export class Panel extends ex.Actor implements InputHandler {
   }
 
   get topCenter(): ex.Vector {
-    return ex.vec(
-      0,
-      this.top
-    );
+    return ex.vec(0, this.top);
   }
   get bottomCenter(): ex.Vector {
-    return ex.vec(
-      0,
-      this.bottom
-    );
+    return ex.vec(0, this.bottom);
   }
   get leftCenter(): ex.Vector {
-    return ex.vec(
-      this.left,
-      0
-    );
+    return ex.vec(this.left, 0);
   }
   get rightCenter(): ex.Vector {
-    return ex.vec(
-      this.right,
-      0
-    );
+    return ex.vec(this.right, 0);
   }
 
   get topLeft(): ex.Vector {
-    return ex.vec(
-      this.left,
-      this.top
-    );
+    return ex.vec(this.left, this.top);
   }
   get topRight(): ex.Vector {
-    return ex.vec(
-      this.right,
-      this.top
-    );
+    return ex.vec(this.right, this.top);
   }
   get bottomLeft(): ex.Vector {
-    return ex.vec(
-      this.left,
-      this.bottom
-    );
+    return ex.vec(this.left, this.bottom);
   }
   get bottomRight(): ex.Vector {
-    return ex.vec(
-      this.right,
-      this.bottom
-    );
+    return ex.vec(this.right, this.bottom);
   }
 
   get top(): number {
@@ -171,7 +147,6 @@ export class Panel extends ex.Actor implements InputHandler {
     return screen?.drawHeight ?? 0;
   }
 
-
   _size: ex.Vector | undefined = undefined;
   _customSize: boolean = false;
 
@@ -187,7 +162,7 @@ export class Panel extends ex.Actor implements InputHandler {
       if (this.padding) {
         size = size.add(ex.vec(this.padding * 2, this.padding * 2));
       }
-      return size;
+      return size ?? ex.vec(0, 0);
     }
     if (this._size == undefined) {
       this.calculateSize();
@@ -200,7 +175,7 @@ export class Panel extends ex.Actor implements InputHandler {
     if (this._size?.x == value.x && this._size?.y == value.y) {
       return;
     }
-    let oldSize = (this._size?.clone() ?? ex.vec(0, 0));
+    let oldSize = this._size?.clone() ?? ex.vec(0, 0);
     if (this._size == null) {
       this._size = ex.vec(value.x, value.y);
     } else {
@@ -263,6 +238,26 @@ export class Panel extends ex.Actor implements InputHandler {
     return false;
   }
 
+  get innerWidth(): number {
+    let leftPos: number | null = null;
+    let rightPos: number | null = null;
+    let children = this.getChildrenPanels();
+    for (let child of children) {
+      leftPos = leftPos ?? child.pos.x;
+      if (child.pos.x < leftPos) {
+        leftPos = child.pos.x;
+      }
+      rightPos = rightPos ?? child.width + child.pos.x;
+      if (child.width + child.pos.x > rightPos) {
+        rightPos = child.width + child.pos.x;
+      }
+    }
+    if (leftPos == null || rightPos == null) {
+      return 0;
+    }
+    return rightPos - leftPos;
+  }
+
   _acceptingInputs?: boolean | ButtonStates[];
   get acceptingInputs(): boolean | ButtonStates[] {
     return this._acceptingInputs ?? true;
@@ -271,6 +266,7 @@ export class Panel extends ex.Actor implements InputHandler {
     this._acceptingInputs = value;
     InputManager.register(this);
   }
+
   get bounds(): ex.BoundingBox {
     const width = this.size?.x ?? 0;
     const height = this.size?.y ?? 0;
@@ -320,21 +316,33 @@ export class Panel extends ex.Actor implements InputHandler {
     }
     let oldSize = this._size?.clone() ?? ex.vec(0, 0);
     let children = this.getChildrenPanels();
-    let bottomRight = ex.vec(0, 0);
+    let topLeft: ex.Vector | null = null;
+    let bottomRight: ex.Vector | null = null;
     for (let child of children) {
+      child.calculateSize();
       let childBottomRight = child.bottomRight;
-      if (childBottomRight.x > bottomRight.x) {
-        bottomRight.x = childBottomRight.x;
-      }
-      if (childBottomRight.y > bottomRight.y) {
-        bottomRight.y = childBottomRight.y;
-      }
+      bottomRight = bottomRight ?? childBottomRight;
+      bottomRight.x = Math.min(bottomRight.x, childBottomRight.x);
+      bottomRight.y = Math.min(bottomRight.y, childBottomRight.y);
+
+      let childTopLeft = child.topLeft;
+      topLeft = topLeft ?? childTopLeft;
+      topLeft.x = Math.min(topLeft.x, childTopLeft.x);
+      topLeft.y = Math.min(topLeft.y, childTopLeft.y);
     }
     if (this._size == undefined) {
       this._size = ex.vec(0, 0);
     }
-    if (oldSize.distance(bottomRight) != 0) {
-      this._size = bottomRight;
+
+    topLeft = topLeft ?? ex.vec(0, 0);
+    bottomRight = bottomRight ?? ex.vec(0, 0);
+    let newSize = bottomRight.sub(topLeft);
+
+    if (oldSize.distance(newSize) != 0) {
+      this._size = newSize;
+      if (this.parent instanceof Panel) {
+        this.parent.calculateSize();
+      }
       this.emit("resize", { oldSize, newSize: this.size });
       this.dirty = true;
     }
@@ -438,10 +446,10 @@ export class Panel extends ex.Actor implements InputHandler {
     this.isHovered = true;
     this.onHoverChanged(e);
   }
-  onPointerUp(_e: ex.PointerEvent): void { }
-  onPointerDown(_e: ex.PointerEvent): void { }
+  onPointerUp(_e: ex.PointerEvent): void {}
+  onPointerDown(_e: ex.PointerEvent): void {}
 
-  onHoverChanged(_e: ex.PointerEvent) { }
+  onHoverChanged(_e: ex.PointerEvent) {}
 
   getCurrentTick() {
     const engine = this.scene?.engine;
@@ -480,7 +488,7 @@ export class Panel extends ex.Actor implements InputHandler {
             width: this.size.x,
             height: this.size.y,
           }),
-          offset: ex.vec(-this.size.x / 2, -this.size.y / 2)
+          offset: ex.vec(-this.size.x / 2, -this.size.y / 2),
         });
       } else {
         newMembers[0] = {
@@ -489,12 +497,12 @@ export class Panel extends ex.Actor implements InputHandler {
             width: this.size.x,
             height: this.size.y,
           }),
-          offset: ex.vec(-this.size.x / 2, -this.size.y / 2)
+          offset: ex.vec(-this.size.x / 2, -this.size.y / 2),
         };
       }
 
       this.graphicsGroup.members = newMembers;
-      if (this.name == 'icon-and-text-button') {
+      if (this.name == "icon-and-text-button") {
         console.log(newMembers);
       }
 
@@ -556,7 +564,7 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onRender() { }
+  onRender() {}
 
   getParent<T = Panel>(): T | null {
     let parent = this.parent;
@@ -590,6 +598,5 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) {
-  }
+  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) {}
 }
