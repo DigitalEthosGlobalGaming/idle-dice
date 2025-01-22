@@ -60,10 +60,14 @@ jobs:
 
       - name: Copy to versioned subfolder
         run: |
+
+          ls dist-history
           mkdir -p dist-history/v-$BUILD_VERSION
           cp -r dist/* dist-history/v-$BUILD_VERSION
-          cp -r dist-history/v-$BUILD_VERSION dist
+          ls dist-history
+          cp -r dist-history/* dist/
           rm -rf dist-history
+          ls dist
 
       # Runs a set of commands using the runners shell
       - name: Deploy to GitHub Pages
