@@ -52,8 +52,11 @@ jobs:
 
       - name: Copy to versioned subfolder
         run: |
-          mkdir dist/roll-masters
-          cp -r dist/* dist/roll-masters
+          mkdir -p dist-history/$BUILD_VERSION
+          cp -r dist/* dist-history/$BUILD_VERSION
+          mkdir -p dist/$BUILD_VERSION
+          cp -r dist-history/* dist/$BUILD_VERSION
+          rm -rf dist-history
 
       # Runs a set of commands using the runners shell
       - name: Deploy to GitHub Pages
