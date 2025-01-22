@@ -38,6 +38,12 @@ addUpdate(
   "Refactored the UI to be more stable and easier to use."
 );
 
+addUpdate(
+  "2025-01-23",
+  "Technical",
+  "Added in the ability to view history builds and added the version number to the welcome screen."
+);
+
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());
 });
