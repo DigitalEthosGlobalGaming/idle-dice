@@ -1,9 +1,9 @@
-import * as ex from "excalibur";
 import { DiceSaveSystem } from "@src/scenes/../dice-save-system";
 import { DiceGameGridSystem } from "@src/scenes/../grid-system/grid-system-actor";
 import { Level } from "@src/scenes/../level";
 import { Player } from "@src/scenes/../player-systems/player";
 import { Serializable } from "@src/scenes/../systems/save-system";
+import * as ex from "excalibur";
 
 export class GameScene extends Level implements Serializable {
   static serializeName = "GameScene";

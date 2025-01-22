@@ -24,6 +24,7 @@ async function waitForFontLoad(font: string, timeout = 2000, interval = 100) {
     setTimeout(() => clearInterval(poller), timeout);
   });
 }
+
 // Load font before game start
 waitForFontLoad("24px DS-DIGI").then(() => {
   const game = new ex.Engine({
@@ -41,7 +42,6 @@ waitForFontLoad("24px DS-DIGI").then(() => {
   });
 
   const loader = new GameLoader();
-
   game.start(loader).then(() => {
     game.goToScene("WelcomeScene");
   });

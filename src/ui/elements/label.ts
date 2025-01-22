@@ -78,10 +78,12 @@ export class Label extends Panel {
     this.dirty = true;
   }
 
-  constructor(parent: Panel, text: string) {
+  constructor(parent: Panel | null, text: string) {
     super();
     this.text = text;
-    parent.addChild(this);
+    if (parent != null) {
+      parent.addChild(this);
+    }
   }
 
   override calculateSize(): void {

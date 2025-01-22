@@ -301,7 +301,7 @@ export class Panel extends ex.Actor implements InputHandler {
     this.dirty = true;
   }
 
-  constructor(parent?: Panel) {
+  constructor(parent?: Panel | null) {
     super();
     if (parent != null) {
       parent.addChild(this);
