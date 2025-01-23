@@ -108,13 +108,30 @@ export class InputManager extends ex.Entity {
     );
   }
 
+  _paused: boolean = false;
+  set paused(value: boolean) {
+    this._paused = value;
+  }
+
+  get paused(): boolean {
+    return !this.isInCurrentScene || this._paused;
+  }
+
+  get isInCurrentScene(): boolean {
+    return this.scene?.isCurrentScene() ?? false;
+  }
+
+
   onPointerDown(evt: ex.PointerEvent) {
+    if (this.paused) {
+      return;
+    }
     const mouseButton = ("Mouse" + evt.button.toString()) as ButtonStates;
     if ((mouseButton as string) != "MouseNoButton") {
       this.buttonStates[mouseButton] = true;
     }
 
-    let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
+    let extendedEvent = ExtendedPointerEvent.extend(evt, this);
 
     let entities = extendedEvent.entities;
     for (let entity of entities) {
@@ -128,11 +145,14 @@ export class InputManager extends ex.Entity {
   }
 
   onPointerUp(evt: ex.PointerEvent) {
+    if (this.paused) {
+      return;
+    }
     const mouseButton = ("Mouse" + evt.button.toString()) as ButtonStates;
     if ((mouseButton as string) != "MouseNoButton") {
       this.buttonStates[mouseButton] = false;
     }
-    let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
+    let extendedEvent = ExtendedPointerEvent.extend(evt, this);
     let entities = extendedEvent.entities;
     for (let entity of entities) {
       if (entity.onPointerUp != null) {
@@ -145,7 +165,10 @@ export class InputManager extends ex.Entity {
   }
 
   onPointerMove(evt: ex.PointerEvent) {
-    let extendedEvent = ExtendedPointerEvent.extendPointerEvent(evt, this);
+    if (this.paused) {
+      return;
+    }
+    let extendedEvent = ExtendedPointerEvent.extend(evt, this);
 
     if (this.showDebug) {
       this.level.drawDebug({
@@ -187,8 +210,12 @@ export class InputManager extends ex.Entity {
   }
 
   onKeyUp(evt: ex.KeyEvent) {
-    let extendedEvent = ExtendedKeyEvent.extendPointerEvent(evt, this);
+    if (this.paused) {
+      return;
+    }
+    let extendedEvent = ExtendedKeyEvent.extend(evt, this);
     let entities = Object.values(this.entities);
+    this.level.onKeyUp(extendedEvent);
     for (let entity of entities) {
       if (entity.onKeyUp != null) {
         entity.onKeyUp(extendedEvent);
@@ -208,7 +235,11 @@ export class InputManager extends ex.Entity {
   }
 
   onKeyDown(evt: ex.KeyEvent) {
-    let extendedEvent = ExtendedKeyEvent.extendPointerEvent(evt, this);
+    if (this.paused) {
+      return;
+    }
+    let extendedEvent = ExtendedKeyEvent.extend(evt, this);
+    this.level.onKeyDown(extendedEvent);
     let entities = Object.values(this.entities);
     for (let entity of entities) {
       if (entity.onKeyDown != null) {
@@ -219,7 +250,10 @@ export class InputManager extends ex.Entity {
   }
 
   onKeyPress(evt: ex.KeyEvent) {
-    let extendedEvent = ExtendedKeyEvent.extendPointerEvent(evt, this);
+    if (this.paused) {
+      return;
+    }
+    let extendedEvent = ExtendedKeyEvent.extend(evt, this);
     let entities = Object.values(this.entities);
     for (let entity of entities) {
       if (entity.onKeyPress != null) {

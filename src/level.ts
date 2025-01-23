@@ -1,6 +1,7 @@
 import * as ex from "excalibur";
 import { InputManager } from "./input/input-manager";
 import { Player } from "./player-systems/player";
+import { ExtendedKeyEvent } from "./input/extended-key-event";
 
 type DebugDrawElementsRect = {
   id?: string;
@@ -122,12 +123,16 @@ export class Level extends ex.Scene {
 
   override onActivate(context: ex.SceneActivationContext): void {
     super.onActivate(context);
-    this.add(new InputManager());
+    if (this.inputSystem == null) {
+      let inputSystem = new InputManager();
+      this.inputSystem = inputSystem;
+      this.add(inputSystem);
+    }
   }
 
-  override onDeactivate(context: ex.SceneActivationContext): void {
-    super.onDeactivate(context);
-    this.inputSystem?.kill();
-    this.remove(this.inputSystem);
+
+  onKeyUp(_evt: ExtendedKeyEvent): void {
+  }
+  onKeyDown(_evt: ExtendedKeyEvent): void {
   }
 }

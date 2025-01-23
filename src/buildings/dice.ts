@@ -130,11 +130,20 @@ function getRandomRollAnimation(
 
 export class Dice extends Building implements Serializable {
   static serializeName: string = "Dice";
+  friendlyName: string = "Dice";
   rolling: boolean = false;
   private _faces: number = 6;
   private _speed: number = 1;
   private _value: number = 0;
   private _multiplier: number = 1;
+
+  get tooltip() {
+    let str = `Click to roll`;
+    if (this.multiplier != 1) {
+      str += `\nx${this.multiplier} Multi`;
+    }
+    return str;
+  }
 
   get multiplier(): number {
     return this._multiplier;
@@ -161,11 +170,11 @@ export class Dice extends Building implements Serializable {
     this._faces = value;
   }
 
-  get speed(): number {
+  get rollSpeed(): number {
     return this._speed;
   }
 
-  set speed(value: number) {
+  set rollSpeed(value: number) {
     if (value <= 0) {
       throw new Error("Speed must be greater than 0");
     }
@@ -182,13 +191,13 @@ export class Dice extends Building implements Serializable {
   serialize() {
     return {
       faces: this.faces,
-      speed: this.speed,
+      speed: this.rollSpeed,
       value: this.value,
       pos: this.pos,
     };
   }
   deserialize(data: any): void {
-    this.speed = data.speed;
+    this.rollSpeed = data.rollSpeed;
     this.faces = data.faces;
     this.value = data.value;
     this.pos = ex.vec(data.pos._x, data.pos._y);
@@ -196,7 +205,7 @@ export class Dice extends Building implements Serializable {
 
   postDeserialize(): void {
     try {
-      let rollAnimation = getRandomRollAnimation(this.faces, this.speed);
+      let rollAnimation = getRandomRollAnimation(this.faces, this.rollSpeed);
       const lastFrame =
         rollAnimation.animation.frames[
           rollAnimation.animation.frames.length - 1
@@ -228,11 +237,11 @@ export class Dice extends Building implements Serializable {
     if (this.faces <= 1) {
       return;
     }
-    if (this.speed <= 0) {
+    if (this.rollSpeed <= 0) {
       return;
     }
     this.rolling = true;
-    const speed = this.speed;
+    const speed = this.rollSpeed;
     const faces = this.faces;
     const roll = getRandomRollAnimation(faces, speed);
     const animation = roll.animation;

@@ -19,13 +19,13 @@ export enum PlayerActionTypes {
 
 export type PlayerAction =
   | {
-      name: string;
-      code: PlayerActions;
-      type: PlayerActionTypes.MENU;
-      image: ImageSource;
-      tooltip: string;
-      unlocked?: boolean;
-    }
+    name: string;
+    code: PlayerActions;
+    type: PlayerActionTypes.MENU;
+    image: ImageSource;
+    tooltip: string;
+    unlocked?: boolean;
+  }
   | PlayerActionBuildable;
 
 type PlayerActionBuildable = {
@@ -58,7 +58,7 @@ export const playerActions: PlayerAction[] = [
   {
     code: PlayerActions.NEWROLLER,
     image: Resources.ChessPawn,
-    name: "Buy Roller",
+    name: "Buy Pawn",
     type: PlayerActionTypes.BUILDABLE,
     unlocked: true,
     building: {
@@ -70,7 +70,7 @@ export const playerActions: PlayerAction[] = [
   {
     code: PlayerActions.NEWKNIGHT,
     image: Resources.ChessKnight,
-    name: "Buy Roller",
+    name: "Buy Wandering Knight",
     type: PlayerActionTypes.BUILDABLE,
     building: {
       cost: () => 1000,

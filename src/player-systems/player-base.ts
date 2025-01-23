@@ -296,7 +296,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
           if (this.currentAction == PlayerActions.NEWDICE) {
             let newDice = new Dice();
             newDice.faces = 6;
-            newDice.speed = 1;
+            newDice.rollSpeed = 1;
             space.addChild(newDice);
             newDice.onBuild();
           } else {
@@ -344,12 +344,16 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     if (this.tooltips.find((t) => t.code == value.code) != null) {
       return;
     }
-    this.tooltips.push(value);
+    this.tooltips.unshift(value);
     this.updateTooltip();
   }
 
-  hideTooltip(value: Tooltip) {
-    this.tooltips = this.tooltips.filter((t) => t.code != value.code);
+  hideTooltip(value: Tooltip | string) {
+    let code = value;
+    if (typeof value != "string") {
+      code = value.code;
+    }
+    this.tooltips = this.tooltips.filter((t) => t.code != code);
     this.updateTooltip();
   }
   get upgrades(): Upgrade[] {
@@ -370,10 +374,12 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return true;
   }
 
+
   onHighlightSpaceChange(
     oldSpace: GridSpace | null,
     newSpace: GridSpace | null
   ) {
+    let firstBuilding: Building | null = null;
     if (oldSpace != null) {
       const buildings = oldSpace.children.filter(
         (item) => item instanceof Building
@@ -387,10 +393,26 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         (item) => item instanceof Building
       );
       for (let building of buildings) {
+        if (firstBuilding == null) {
+          firstBuilding = building;
+        }
         building.wishScale = 1.5;
       }
     }
 
+    this.hideTooltip("building-tooltip");
     this._highlightedSpace = newSpace;
+    if (firstBuilding != null) {
+
+      let tooltip = firstBuilding.tooltip;
+      if (tooltip != null) {
+        let tooltipObject = {
+          code: "building-tooltip",
+          title: firstBuilding.friendlyName,
+          description: tooltip,
+        }
+        this.showTooltip(tooltipObject);
+      }
+    }
   }
 }

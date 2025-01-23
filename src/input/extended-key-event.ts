@@ -4,7 +4,7 @@ import { ButtonStates, InputManager } from "./input-manager";
 export class ExtendedKeyEvent extends ex.KeyEvent {
     inputManager!: InputManager;
 
-    static extendPointerEvent(
+    static extend(
         evt: ex.KeyEvent,
         manager: InputManager
     ): ExtendedKeyEvent {

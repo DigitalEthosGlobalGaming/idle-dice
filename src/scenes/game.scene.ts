@@ -1,3 +1,4 @@
+import { ExtendedKeyEvent } from "@src/input/extended-key-event";
 import { DiceSaveSystem } from "@src/scenes/../dice-save-system";
 import { DiceGameGridSystem } from "@src/scenes/../grid-system/grid-system-actor";
 import { Level } from "@src/scenes/../level";
@@ -12,6 +13,7 @@ export class GameScene extends Level implements Serializable {
     // throw new Error("Method not implemented.");
   }
 
+  previouslyLoaded: boolean = false;
   score: number = 0;
   best: number = 0;
   random = new ex.Random();
@@ -22,19 +24,26 @@ export class GameScene extends Level implements Serializable {
 
   override onActivate(ctx: ex.SceneActivationContext): void {
     super.onActivate(ctx);
-    if (this.saveSystem == null) {
-      this.saveSystem = new DiceSaveSystem();
-      this.saveSystem.addClassMapping(GameScene);
+    this.inputSystem.paused = true;
+    if (!this.previouslyLoaded) {
+      this.previouslyLoaded = true;
+      if (this.saveSystem == null) {
+        this.saveSystem = new DiceSaveSystem();
+        this.saveSystem.addClassMapping(GameScene);
+      }
+      this.addTimer(
+        new ex.Timer({
+          fcn: () => {
+            this.load();
+          },
+          interval: 250,
+        })
+      ).start();
+    } else {
+      this.postLoad();
     }
-    this.addTimer(
-      new ex.Timer({
-        fcn: () => {
-          this.load();
-        },
-        interval: 250,
-      })
-    ).start();
   }
+
 
   save() {
     this.saveSystem?.save(this);
@@ -80,6 +89,7 @@ export class GameScene extends Level implements Serializable {
           const gridSize = this.gridSystem.getBounds().center;
           this.player.wishPosition = gridSize.clone();
         }
+        this.inputSystem.paused = false;
       },
       interval: 250,
     });
@@ -87,7 +97,14 @@ export class GameScene extends Level implements Serializable {
     timer.start();
   }
 
-  deserialize(_data: any): void {}
+  onKeyUp(evt: ExtendedKeyEvent) {
+    if (evt.key == ex.Keys.Escape) {
+      this.save();
+      this.engine.goToScene("WelcomeScene");
+    }
+  }
+
+  deserialize(_data: any): void { }
 
   onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {
     const gridBounds = this.gridSystem?.getBounds();

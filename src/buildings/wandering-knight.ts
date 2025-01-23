@@ -8,7 +8,7 @@ import { random } from "@src/utility/random";
 
 export class WanderingKnight extends Building {
   static serializeName: string = "WanderingKnight";
-  tickRate: number = 500;
+  tickRate: number = random.integer(450, 550);
 
   constructor() {
     super();
@@ -58,8 +58,7 @@ export class WanderingKnight extends Building {
   }
 
   moveTo(space: GridSpace) {
-    this.gridSpace.removeChild(this);
-    space.addChild(this);
+    super.moveTo(space);
     const diceToBonus = this.neighboringDice;
     for (let dice of diceToBonus) {
       if (dice.rolling != true) {
@@ -69,6 +68,7 @@ export class WanderingKnight extends Building {
         dice.multiplier += value;
       }
     }
+    this.tickRate = random.integer(450, 550);
   }
 
   move() {

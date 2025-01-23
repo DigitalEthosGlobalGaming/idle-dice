@@ -13,7 +13,7 @@ export class ExtendedPointerEvent extends ex.PointerEvent {
         return entities;
     }
 
-    static extendPointerEvent(
+    static extend(
         evt: ex.PointerEvent,
         manager: InputManager
     ): ExtendedPointerEvent {

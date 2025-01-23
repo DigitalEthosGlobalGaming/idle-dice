@@ -8,6 +8,10 @@ import { random } from "@src/utility/random";
 
 export class Roller extends Building {
   static serializeName: string = "Roller";
+  friendlyName: string = "Pawn";
+  get tooltip(): string | null {
+    return "Regularily rolls all dice in neighboring spaces.";
+  }
   needsToRoll = false;
   static globalTimer: Timer | null = null;
   static lastGlobalTick = 0;

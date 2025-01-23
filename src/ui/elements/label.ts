@@ -108,6 +108,19 @@ export class Label extends Panel {
     }
   }
 
+  adjustFontsizeToWidth(width: number) {
+    let label = this.label;
+    let currentFontSize = 0;
+    let currentWidth = 0;
+
+    while (currentWidth < width) {
+      currentFontSize = currentFontSize + 1;
+      label.font.size = currentFontSize;
+      currentWidth = label.font.measureText(this.text).width;
+    }
+    this.fontSize = currentFontSize;
+  }
+
   updateLabel() {
     let label = this._label;
     if (label == null) {

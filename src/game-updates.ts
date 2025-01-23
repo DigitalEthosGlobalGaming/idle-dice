@@ -58,6 +58,29 @@ addUpdate(
   "Features",
   "Added in wandering knights which move around and empower dice."
 );
+// 2025-01-24
+addUpdate(
+  "2025-01-24",
+  "Fixes",
+  "Fixed an issue where the knight would move off the screen."
+);
+addUpdate(
+  "2025-01-24",
+  "Features",
+  "Knights now move to their new position instead of teleporting."
+);
+addUpdate(
+  "2025-01-24",
+  "Features",
+  "Escape now goes back to the main menu."
+);
+addUpdate(
+  "2025-01-24",
+  "Features",
+  "Added in tooltips when hovering over buildings."
+);
+
+
 
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());

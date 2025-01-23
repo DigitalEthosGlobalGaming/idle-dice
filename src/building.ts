@@ -1,14 +1,21 @@
+import { GameScene } from "@src/scenes/game.scene";
 import * as ex from "excalibur";
 import { GridSpace } from "./grid-system/grid-space";
 import { Player } from "./player-systems/player";
-import { GameScene } from "@src/scenes/game.scene";
 import { Serializable } from "./systems/save-system";
 
 export class Building extends ex.Actor implements Serializable {
   static serializeName: string = "Building";
+  friendlyName: string = "Building";
   tickRate = -1;
   lastTick = -1;
   wishScale = 1;
+  wishPos = ex.vec(0, 0);
+  speed = 0.1;
+
+  get tooltip(): string | null {
+    return null;
+  }
   get gridSpace(): GridSpace {
     if (this.parent instanceof GridSpace) {
       return this.parent;
@@ -73,7 +80,7 @@ export class Building extends ex.Actor implements Serializable {
   serialize(): any {
     return null;
   }
-  deserialize(_data: any): void {}
+  deserialize(_data: any): void { }
 
   getNeighbors() {
     return this.gridSpace.getNeighbors();
@@ -82,6 +89,34 @@ export class Building extends ex.Actor implements Serializable {
   resetTicker() {
     const now = new Date().getTime();
     this.lastTick = now;
+  }
+
+  updateScale() {
+    const xDistance = Math.abs(this.scale.x - this.wishScale);
+    const yDistance = Math.abs(this.scale.y - this.wishScale);
+    if (xDistance < 0.1 && yDistance < 0.1) {
+      this.scale = new ex.Vector(this.wishScale, this.wishScale);
+    } else {
+      this.scale = ex.lerpVector(
+        this.scale,
+        new ex.Vector(this.wishScale, this.wishScale),
+        0.1
+      );
+    }
+  }
+  updatePosition() {
+    const speed = this.speed;
+    const xDistance = Math.abs(this.pos.x - this.wishPos.x);
+    const yDistance = Math.abs(this.pos.y - this.wishPos.y);
+    if (xDistance < speed && yDistance < speed) {
+      this.pos = new ex.Vector(this.wishPos.x, this.wishPos.y);
+    } else {
+      this.pos = ex.lerpVector(
+        this.pos,
+        new ex.Vector(this.wishPos.x, this.wishPos.y),
+        speed
+      );
+    }
   }
 
   onPreUpdate(_engine: ex.Engine, _elapsed: number): void {
@@ -97,25 +132,26 @@ export class Building extends ex.Actor implements Serializable {
         }
       }
     }
-    const xDistance = Math.abs(this.scale.x - this.wishScale);
-    const yDistance = Math.abs(this.scale.y - this.wishScale);
-    if (xDistance < 0.1 && yDistance < 0.1) {
-      this.scale = new ex.Vector(this.wishScale, this.wishScale);
-    } else {
-      this.scale = ex.lerpVector(
-        this.scale,
-        new ex.Vector(this.wishScale, this.wishScale),
-        0.1
-      );
-    }
+
+    this.updateScale();
+    this.updatePosition();
   }
 
-  onTick(_delta: number) {}
+  moveTo(space: GridSpace) {
+    this.wishScale = 1;
+    let offset = this.globalPos.clone().sub(space.globalPos);
+    this.gridSpace.removeChild(this);
+    space.addChild(this);
+    this.pos = offset;
+  }
 
-  onBuild() {}
+
+  onTick(_delta: number) { }
+
+  onBuild() { }
 
   trigger() {
     this.onTrigger();
   }
-  onTrigger() {}
+  onTrigger() { }
 }
