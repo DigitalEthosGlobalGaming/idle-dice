@@ -73,7 +73,7 @@ jobs:
           cp history.html dist/history/index.html
           history_content=""
           for dir in dist/v-*; do
-            history_content="$history_content<li><a href=\"${dir##*/}\">${dir##*/}</a></li>"
+            history_content="$history_content<li><a href=\"/roll-masters/${dir##*/}\">${dir##*/}</a></li>"
           done
           sed -i "s|__HISTORY__|$history_content|" dist/history/index.html
 
