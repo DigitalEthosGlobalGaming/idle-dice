@@ -6,7 +6,7 @@ import {
 } from "@src/player-systems/player-actions";
 
 export class WanderingKnightUpgrade extends Upgrade {
-  override name = "Wandering Knight Boosters";
+  override name = "Wandering Knight";
   get description(): string {
     if (this.level == 0) {
       return [
