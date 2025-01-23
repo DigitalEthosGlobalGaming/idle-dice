@@ -359,7 +359,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   }
 
   spendEnergy(amount: number): boolean {
-    return true;
     if (this.scoreComponent.score < amount) {
       return false;
     }
