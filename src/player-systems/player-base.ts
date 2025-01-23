@@ -20,6 +20,7 @@ import {
   PlayerActionTypes,
 } from "./player-actions";
 import { Tooltip } from "./player-tooltip";
+import { Environment } from "@src/env";
 
 type MouseState = {
   button: number;
@@ -209,7 +210,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) {}
+  onPointerDown(_e: ExtendedPointerEvent) { }
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -359,6 +360,9 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   }
 
   spendEnergy(amount: number): boolean {
+    if (Environment.isDev) {
+      return true;
+    }
     if (this.scoreComponent.score < amount) {
       return false;
     }

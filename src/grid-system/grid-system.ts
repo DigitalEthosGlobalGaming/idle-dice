@@ -142,6 +142,9 @@ export class GridSystem extends ex.Actor implements Serializable {
   }
 
   getSpaceIndex(position: ex.Vector) {
+    if (position.x < 0 || position.y < 0 || position.x >= this.size.x || position.y >= this.size.y) {
+      return -1;
+    }
     return position.y * this.size.x + position.x;
   }
 
