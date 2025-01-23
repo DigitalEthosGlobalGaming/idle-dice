@@ -97,7 +97,10 @@ export class PlayerActionsUi extends Panel {
     }
     return this.level.player;
   }
-  playerActions: PlayerAction[] = playerActions;
+  get playerActions(): PlayerAction[] {
+    return playerActions.filter((a) => a.unlocked);
+  }
+
   buttons: PlayerActionButton[] = [];
 
   hoveredAction: PlayerAction | null = null;
@@ -160,7 +163,6 @@ export class PlayerActionsUi extends Panel {
       };
       this.buttons.push(button);
     }
-
     if (this.currentAction == null) {
       this.changeAction(playerActions[0]);
       return;

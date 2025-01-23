@@ -594,9 +594,6 @@ export class Panel extends ex.Actor implements InputHandler {
       }
 
       this.graphicsGroup.members = newMembers;
-      if (this.name == "icon-and-text-button") {
-        console.log(newMembers);
-      }
 
       this.graphics.use(this.graphicsGroup);
 

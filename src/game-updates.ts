@@ -53,6 +53,11 @@ addUpdate(
   "Features",
   "Hovering over buildings animate them to be larger."
 );
+addUpdate(
+  "2025-01-23",
+  "Features",
+  "Added in wandering knights which move around and empower dice."
+);
 
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());

@@ -38,7 +38,7 @@ export class ScoreComponent extends BaseComponent {
       const ui = this.getUi();
       ui.addChild(this.scoreLabel);
     }
-    this.scoreLabel.text = `Energy: ${this._score}⚡︎`;
+    this.scoreLabel.text = `Energy: ${Math.floor(this._score)}⚡︎`;
   }
 
   public updateScore(points: number) {

@@ -66,7 +66,9 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
         this.ghost.hide();
       }
     }
-    this.player.highlightedSpace = space;
+    if (this.player != null) {
+      this.player.highlightedSpace = space;
+    }
   }
   ghost!: GridSpaceGhost;
 
@@ -77,9 +79,9 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
 
     throw new Error("Scene is not a Level");
   }
-  get player(): Player {
+  get player(): Player | null {
     if (this.level.player == null) {
-      throw new Error("Player is null");
+      return null;
     }
     return this.level.player;
   }
@@ -91,7 +93,7 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
   onPointerUp(evt: ExtendedPointerEvent): void {
     let space = this.getSpaceFromWorldPosition(evt.worldPos);
     if (space != null) {
-      this.player.onSpaceClicked(space);
+      this.player?.onSpaceClicked(space);
     }
   }
 

@@ -7,13 +7,14 @@ import { Engine, Timer } from "excalibur";
 import { random } from "@src/utility/random";
 
 export class Roller extends Building {
+  static serializeName: string = "Roller";
   needsToRoll = false;
   static globalTimer: Timer | null = null;
   static lastGlobalTick = 0;
   static rollers: Record<number, Roller> = {};
   static rollerQueue: Roller[] = [];
   static rollsPerTick = 1;
-  static rollRate = 5000;
+  static rollRate = 10000;
   static rollRollers() {
     if (Roller.lastGlobalTick == 0) {
       Roller.lastGlobalTick = Date.now() + Roller.rollRate;
@@ -51,7 +52,7 @@ export class Roller extends Building {
   }
   constructor() {
     super();
-    this.spriteImage = Resources.ChessQueen;
+    this.spriteImage = Resources.ChessPawn;
   }
   onAdd(engine: Engine): void {
     if (Roller.globalTimer == null) {

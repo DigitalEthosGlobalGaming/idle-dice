@@ -1,26 +1,25 @@
-import * as ex from "excalibur";
 import { Building } from "@src/player-systems/../building";
 import { Dice } from "@src/player-systems/../buildings/dice";
-import { Roller } from "@src/player-systems/../buildings/roller";
 import { PlayerUpgradesComponent } from "@src/player-systems/../components/player-upgrades-component";
 import { ScoreComponent } from "@src/player-systems/../components/score-component";
 import { Upgrade } from "@src/player-systems/../components/upgrade-component";
 import { PassiveEnergyComponent } from "@src/player-systems/../components/upgrades/passive-energy.upgrade";
 import { Ghost } from "@src/player-systems/../ghost";
 import { GridSpace } from "@src/player-systems/../grid-system/grid-space";
+import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
 import {
   ButtonStates,
   InputHandler,
 } from "@src/player-systems/../input/input-manager";
 import { GameScene } from "@src/player-systems/../scenes/game.scene";
 import { PlayerUi } from "@src/player-systems/../ui/scores/player-ui";
+import * as ex from "excalibur";
 import {
   playerActions,
   PlayerActions,
   PlayerActionTypes,
 } from "./player-actions";
 import { Tooltip } from "./player-tooltip";
-import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
 
 type MouseState = {
   button: number;
@@ -44,6 +43,7 @@ const costs: { [key in PlayerActions]: number } = {
   NONE: 0,
   NEW_DICE: 10,
   NEWROLLER: 100,
+  NEWKNIGHT: 1000,
   REMOVE: 0,
   UPGRADES: 0,
 };
@@ -286,19 +286,27 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
     let existingBuilding = space.children.find((c) => c instanceof Building);
     if (existingBuilding == null) {
+      const action = playerActions.find((a) => a.code == this.currentAction);
       let cost = costs[this.currentAction];
-      if (this.spendEnergy(cost)) {
-        if (this.currentAction == PlayerActions.NEWDICE) {
-          let newDice = new Dice();
-          newDice.faces = 6;
-          newDice.speed = 1;
-          existingBuilding = newDice;
-          space.addChild(existingBuilding);
-          existingBuilding.onBuild();
-        }
-        if (this.currentAction == PlayerActions.NEWROLLER) {
-          const entity = new Roller();
-          space.addChild(entity);
+      if (action?.type == PlayerActionTypes.BUILDABLE) {
+        cost = action.building.cost();
+
+        if (this.spendEnergy(cost)) {
+          if (this.currentAction == PlayerActions.NEWDICE) {
+            let newDice = new Dice();
+            newDice.faces = 6;
+            newDice.speed = 1;
+            space.addChild(newDice);
+            newDice.onBuild();
+          } else {
+            if (action.building.classRef == null) {
+              this.removeBuildable(space.globalPos);
+            } else {
+              const building = new action.building.classRef();
+              space.addChild(building);
+              building.onBuild();
+            }
+          }
         }
       }
     } else {
@@ -346,11 +354,12 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   get upgrades(): Upgrade[] {
     return Object.values(this.playerUpgradesComponent.upgrades);
   }
-  getUpgrade<T extends Upgrade>(t: new (...args: any[]) => T): T | null {
+  getUpgrade<T extends Upgrade>(t: new () => T): T | null {
     return this.playerUpgradesComponent.getUpgrade(t);
   }
 
   spendEnergy(amount: number): boolean {
+    return true;
     if (this.scoreComponent.score < amount) {
       return false;
     }

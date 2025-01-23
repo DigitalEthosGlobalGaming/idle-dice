@@ -134,6 +134,17 @@ export class Dice extends Building implements Serializable {
   private _faces: number = 6;
   private _speed: number = 1;
   private _value: number = 0;
+  private _multiplier: number = 1;
+
+  get multiplier(): number {
+    return this._multiplier;
+  }
+  set multiplier(value: number) {
+    this._multiplier = Math.round(value * 10) / 10;
+    const clampedValue = Math.min(10, Math.max(0, value));
+    const yellowIntensity = Math.floor((clampedValue / 10) * 255);
+    this.color = ex.Color.fromRGB(255, 255, 255 - yellowIntensity);
+  }
 
   get faces(): number {
     return this._faces;
@@ -244,13 +255,19 @@ export class Dice extends Building implements Serializable {
     animation.events.on("end", () => {
       this.pos = originalPosition;
       this.onRollFinish();
+      if (animation.currentFrame?.graphic != null) {
+        this.graphics.add("roll", animation.currentFrame?.graphic);
+        this.graphics.use("roll");
+      }
     });
   }
 
   onRollFinish() {
     this.rolling = false;
-    const score = this.player.getUpgrade(BetterDiceUpgrade)?.value ?? 0;
-    this.player.scoreComponent.createScore(this, this.value + score);
+    let score = this.player.getUpgrade(BetterDiceUpgrade)?.value ?? 0;
+    let totalScore = Math.floor(this.value * this.multiplier) + score;
+    this.multiplier = 1;
+    this.player.scoreComponent.createScore(this, totalScore);
   }
 
   start() {

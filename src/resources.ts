@@ -19,6 +19,10 @@ export const Resources = {
   DiceOut: new ex.ImageSource("./images/board-game-icons/dice_out.png"),
   Pouch: new ex.ImageSource("./images/board-game-icons/pouch.png"),
   ChessQueen: new ex.ImageSource("./images/board-game-icons/chess_queen.png"),
+  ChessKing: new ex.ImageSource("./images/board-game-icons/chess_king.png"),
+  ChessRook: new ex.ImageSource("./images/board-game-icons/chess_rook.png"),
+  ChessKnight: new ex.ImageSource("./images/board-game-icons/chess_knight.png"),
+  ChessPawn: new ex.ImageSource("./images/board-game-icons/chess_pawn.png"),
   SuitDiamonds: new ex.ImageSource(
     "./images/board-game-icons/suit_diamonds.png"
   ),

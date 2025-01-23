@@ -26,7 +26,14 @@ export class GameScene extends Level implements Serializable {
       this.saveSystem = new DiceSaveSystem();
       this.saveSystem.addClassMapping(GameScene);
     }
-    this.load();
+    this.addTimer(
+      new ex.Timer({
+        fcn: () => {
+          this.load();
+        },
+        interval: 250,
+      })
+    ).start();
   }
 
   save() {

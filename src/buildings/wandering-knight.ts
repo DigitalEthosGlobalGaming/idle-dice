@@ -1,0 +1,84 @@
+import { Building } from "@src/building";
+import { Dice } from "@src/buildings/dice";
+import { WanderingKnightUpgrade } from "@src/components/upgrades/wandering-knight.upgrade";
+import { GridSpace } from "@src/grid-system/grid-space";
+import { Resources } from "@src/resources";
+import { random } from "@src/utility/random";
+// import { Player } from "@src/player-systems/player";
+
+export class WanderingKnight extends Building {
+  static serializeName: string = "WanderingKnight";
+  tickRate: number = 500;
+
+  constructor() {
+    super();
+    this.spriteImage = Resources.ChessKnight;
+  }
+
+  onTick(_delta: number): void {
+    super.onTick(_delta);
+    this.move();
+  }
+
+  getFreeNeighbor() {
+    const neighbors = this.getNeighbors();
+    let freeNeighbors = [];
+    for (let neighborIndex in neighbors) {
+      const neighbor = neighbors[neighborIndex as keyof typeof neighbors];
+      if (neighbor == null) {
+        continue;
+      }
+      let children = neighbor.children;
+      let hasBuilding = children.some((child) => child instanceof Building);
+      if (!hasBuilding) {
+        freeNeighbors.push(neighbor);
+      }
+    }
+    return freeNeighbors;
+  }
+  get neighboringBuildings() {
+    const results: Building[] = [];
+    const neighbors = Object.values(this.getNeighbors());
+    for (let neighbor of neighbors) {
+      const children = neighbor?.children ?? [];
+      for (let child of children) {
+        if (child instanceof Building) {
+          results.push(child);
+        }
+      }
+    }
+    return results;
+  }
+
+  get neighboringDice() {
+    const neighbors = this.neighboringBuildings.filter(
+      (item) => item instanceof Dice
+    );
+    return neighbors as Dice[];
+  }
+
+  moveTo(space: GridSpace) {
+    this.gridSpace.removeChild(this);
+    space.addChild(this);
+    const diceToBonus = this.neighboringDice;
+    for (let dice of diceToBonus) {
+      if (dice.rolling != true) {
+        let value =
+          (this.player.getUpgrade(WanderingKnightUpgrade)?.value ?? 1) / 10;
+        value = Math.floor(value * 10) / 10;
+        dice.multiplier += value;
+      }
+    }
+  }
+
+  move() {
+    let freeNeighbors = this.getFreeNeighbor();
+    if (freeNeighbors.length == 0) {
+      return;
+    }
+    const freeSpace = random.fromArray(freeNeighbors);
+    if (freeSpace) {
+      this.moveTo(freeSpace);
+    }
+  }
+}
