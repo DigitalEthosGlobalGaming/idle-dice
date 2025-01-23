@@ -50,7 +50,7 @@ export class ScoreComponent extends BaseComponent {
       throw new Error("Owner is null");
     }
 
-    if (FloatingScore.numberOfInstances >= 20) {
+    if (FloatingScore.numberOfInstances >= 50) {
       this.updateScore(value);
       return;
     }
