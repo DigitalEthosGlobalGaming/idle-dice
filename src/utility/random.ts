@@ -6,8 +6,11 @@ const randomObj = {
   number: (min: number, max: number): number => {
     return Math.random() * (max - min) + min;
   },
-  array: <T>(arr: T[]): T => {
+  fromArray: <T>(arr: T[]): T => {
     return arr[Math.floor(Math.random() * arr.length)];
+  },
+  array: <T>(arr: T[]): T[] => {
+    return arr.sort(() => Math.random() - 0.5);
   },
   boolean: (): boolean => {
     return Math.random() > 0.5;

@@ -15,7 +15,7 @@ function getNewRoll(faces: number[], lastNumber: number): number {
   if (faces.length === 0) {
     return -1;
   }
-  return random.array(tempFaces);
+  return random.fromArray(tempFaces);
 }
 
 export const diceResources = [
@@ -125,7 +125,7 @@ function getRandomRollAnimation(
   numbers: number[];
 } {
   const diceFaces = getPossibleRollAnimations(faces, speed);
-  return random.array(diceFaces);
+  return random.fromArray(diceFaces);
 }
 
 export class Dice extends Building implements Serializable {
@@ -184,16 +184,22 @@ export class Dice extends Building implements Serializable {
   }
 
   postDeserialize(): void {
-    let rollAnimation = getRandomRollAnimation(this.faces, this.speed);
-    const lastFrame =
-      rollAnimation.animation.frames[rollAnimation.animation.frames.length - 1]
-        ?.graphic;
-    if (lastFrame == null) {
-      return;
-    }
+    try {
+      let rollAnimation = getRandomRollAnimation(this.faces, this.speed);
+      const lastFrame =
+        rollAnimation.animation.frames[
+          rollAnimation.animation.frames.length - 1
+        ]?.graphic;
 
-    this.graphics.add("roll", lastFrame);
-    this.graphics.use("roll");
+      if (lastFrame == null) {
+        return;
+      }
+
+      this.graphics.add("roll", lastFrame);
+      this.graphics.use("roll");
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   onTrigger() {
