@@ -66,6 +66,7 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
         this.ghost.hide();
       }
     }
+    this.player.highlightedSpace = space;
   }
   ghost!: GridSpaceGhost;
 
@@ -116,7 +117,6 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
       this.ghost = new GridSpaceGhost(this.spaceSize);
       this.addChild(this.ghost);
       this.ghost.hide();
-
     }
     this.graphics.use(
       new Grid({
@@ -128,7 +128,6 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
         thickness: 1,
       })
     );
-
 
     for (let i = 0; i < this.size.x; i++) {
       for (let j = 0; j < this.size.y; j++) {

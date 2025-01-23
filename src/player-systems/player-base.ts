@@ -61,6 +61,18 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   draggingBuilding: Building | null = null;
   playerUi!: PlayerUi;
 
+  _highlightedSpace: GridSpace | null = null;
+  get highlightedSpace(): GridSpace | null {
+    return this._highlightedSpace;
+  }
+  set highlightedSpace(space: GridSpace | null) {
+    let oldSpace = this._highlightedSpace;
+    if (space?.name == this._highlightedSpace?.name) {
+      return;
+    }
+    this.onHighlightSpaceChange(oldSpace, space);
+  }
+
   cameraMovementData: CameraMovementData | null = null;
   wishPosition = ex.vec(0, 0);
   isSetup = false;
@@ -344,5 +356,29 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
     this.scoreComponent.updateScore(-amount);
     return true;
+  }
+
+  onHighlightSpaceChange(
+    oldSpace: GridSpace | null,
+    newSpace: GridSpace | null
+  ) {
+    if (oldSpace != null) {
+      const buildings = oldSpace.children.filter(
+        (item) => item instanceof Building
+      );
+      for (let building of buildings) {
+        building.wishScale = 1;
+      }
+    }
+    if (newSpace != null) {
+      const buildings = newSpace.children.filter(
+        (item) => item instanceof Building
+      );
+      for (let building of buildings) {
+        building.wishScale = 1.5;
+      }
+    }
+
+    this._highlightedSpace = newSpace;
   }
 }

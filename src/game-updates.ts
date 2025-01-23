@@ -43,6 +43,16 @@ addUpdate(
   "Technical",
   "Added in the ability to view history builds and added the version number to the welcome screen."
 );
+addUpdate(
+  "2025-01-23",
+  "Features",
+  "Dice rollers now all roll at the same time."
+);
+addUpdate(
+  "2025-01-23",
+  "Features",
+  "Hovering over buildings animate them to be larger."
+);
 
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());

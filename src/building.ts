@@ -8,6 +8,7 @@ export class Building extends ex.Actor implements Serializable {
   static serializeName: string = "Building";
   tickRate = -1;
   lastTick = -1;
+  wishScale = 1;
   get gridSpace(): GridSpace {
     if (this.parent instanceof GridSpace) {
       return this.parent;
@@ -95,6 +96,17 @@ export class Building extends ex.Actor implements Serializable {
           this.onTick(now);
         }
       }
+    }
+    const xDistance = Math.abs(this.scale.x - this.wishScale);
+    const yDistance = Math.abs(this.scale.y - this.wishScale);
+    if (xDistance < 0.1 && yDistance < 0.1) {
+      this.scale = new ex.Vector(this.wishScale, this.wishScale);
+    } else {
+      this.scale = ex.lerpVector(
+        this.scale,
+        new ex.Vector(this.wishScale, this.wishScale),
+        0.1
+      );
     }
   }
 
