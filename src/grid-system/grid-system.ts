@@ -181,7 +181,7 @@ export class GridSystem extends ex.Actor implements Serializable {
 
   getSpace<T = GridSpace>(position: ex.Vector): T | null {
     const index = this.getSpaceIndex(position);
-    if (index < 0 && index >= this.spaces.length) {
+    if (index < 0 || index >= this.spaces.length) {
       return null;
     }
 

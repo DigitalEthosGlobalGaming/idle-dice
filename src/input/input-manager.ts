@@ -46,7 +46,7 @@ export class InputManager extends ex.Entity {
     pointerEnter: "im-pointer-enter",
     pointerLeave: "im-pointer-leave",
   };
-  showDebug = true;
+  showDebug = false;
   subscriptions: ex.Subscription[] = [];
   entities: { [key: string]: InputHandler } = {};
   currentHoveredEntities: { [key: string]: InputHandler } = {};
@@ -194,6 +194,16 @@ export class InputManager extends ex.Entity {
         entity.onKeyUp(extendedEvent);
       }
       entity.emit(InputManager.Events.keyUp, extendedEvent);
+    }
+    if (evt.key == "Space") {
+      const actorGroups: Record<string, ex.Actor[]> = {};
+      this.scene?.actors.forEach((actor) => {
+        if (actorGroups[actor.constructor.name] == null) {
+          actorGroups[actor.constructor.name] = [];
+        }
+        actorGroups[actor.constructor.name].push(actor);
+      });
+      console.table(actorGroups, ["length"]);
     }
   }
 
