@@ -10,6 +10,7 @@ export class PassiveEnergyComponent extends Upgrade {
   constructor() {
     super();
     this.level = 1;
+    this.maxLevel = 20;
     this.calculate();
   }
   get description(): string {

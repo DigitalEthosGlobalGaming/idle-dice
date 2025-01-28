@@ -1,4 +1,3 @@
-import * as ex from "excalibur";
 import { Building } from "@src/building";
 import { BetterDiceUpgrade } from "@src/components/upgrades/better-dice.upgrade";
 import { Config } from "@src/config";
@@ -6,6 +5,7 @@ import { ease } from "@src/easing";
 import { Resources } from "@src/resources";
 import { Serializable } from "@src/systems/save-system";
 import { random } from "@src/utility/random";
+import * as ex from "excalibur";
 
 const possibleRolls: { [key: number]: number[][] } = {};
 const totalPossibleRolls = 100;
@@ -187,6 +187,10 @@ export class Dice extends Building implements Serializable {
 
   set value(value: number) {
     this._value = value;
+  }
+  onInitialize(engine: ex.Engine): void {
+    super.onInitialize(engine);
+    this.player.unlockAction("NEWROLLER");
   }
   serialize() {
     return {

@@ -22,6 +22,9 @@ export class Building extends ex.Actor implements Serializable {
     }
     throw new Error("parent is not a grid space");
   }
+  get gridPos(): ex.Vector {
+    return this.gridSpace.gridPos ?? ex.vec(0, 0);
+  }
   get level() {
     if (this.scene instanceof GameScene) {
       return this.scene;
@@ -80,7 +83,7 @@ export class Building extends ex.Actor implements Serializable {
   serialize(): any {
     return null;
   }
-  deserialize(_data: any): void { }
+  deserialize(_data: any): void {}
 
   getNeighbors() {
     return this.gridSpace.getNeighbors();
@@ -104,6 +107,19 @@ export class Building extends ex.Actor implements Serializable {
       );
     }
   }
+
+  getSpace(pos: ex.Vector) {
+    return this.level.gridSystem?.getSpace(pos);
+  }
+
+  getBuilding(pos: ex.Vector) {
+    let space = this.level.gridSystem?.getSpace(pos);
+    if (space == null) {
+      return null;
+    }
+    return space.children.find((child) => child instanceof Building);
+  }
+
   updatePosition() {
     const speed = this.speed;
     const xDistance = Math.abs(this.pos.x - this.wishPos.x);
@@ -145,13 +161,12 @@ export class Building extends ex.Actor implements Serializable {
     this.pos = offset;
   }
 
+  onTick(_delta: number) {}
 
-  onTick(_delta: number) { }
-
-  onBuild() { }
+  onBuild() {}
 
   trigger() {
     this.onTrigger();
   }
-  onTrigger() { }
+  onTrigger() {}
 }

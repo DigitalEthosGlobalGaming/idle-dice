@@ -40,15 +40,6 @@ type CameraMovementData = {
   lastPos: ex.Vector;
 };
 
-const costs: { [key in PlayerActions]: number } = {
-  NONE: 0,
-  NEW_DICE: 10,
-  NEWROLLER: 100,
-  NEWKNIGHT: 1000,
-  REMOVE: 0,
-  UPGRADES: 0,
-};
-
 export class PlayerBase extends ex.Actor implements InputHandler {
   collides(_vec: ex.Vector): boolean {
     return false;
@@ -210,7 +201,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) { }
+  onPointerDown(_e: ExtendedPointerEvent) {}
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -288,7 +279,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     let existingBuilding = space.children.find((c) => c instanceof Building);
     if (existingBuilding == null) {
       const action = playerActions.find((a) => a.code == this.currentAction);
-      let cost = costs[this.currentAction];
+      let cost = 0;
       if (action?.type == PlayerActionTypes.BUILDABLE) {
         cost = action.building.cost();
 
@@ -359,7 +350,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   get upgrades(): Upgrade[] {
     return Object.values(this.playerUpgradesComponent.upgrades);
   }
-  getUpgrade<T extends Upgrade>(t: new () => T): T | null {
+  getUpgrade<T extends Upgrade>(t: (new () => T) | string): T | null {
     return this.playerUpgradesComponent.getUpgrade(t);
   }
 
@@ -373,7 +364,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     this.scoreComponent.updateScore(-amount);
     return true;
   }
-
 
   onHighlightSpaceChange(
     oldSpace: GridSpace | null,
@@ -403,16 +393,50 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     this.hideTooltip("building-tooltip");
     this._highlightedSpace = newSpace;
     if (firstBuilding != null) {
-
       let tooltip = firstBuilding.tooltip;
       if (tooltip != null) {
         let tooltipObject = {
           code: "building-tooltip",
           title: firstBuilding.friendlyName,
           description: tooltip,
-        }
+        };
         this.showTooltip(tooltipObject);
       }
+    }
+  }
+
+  data: { [key: string]: any } = {};
+  setData(key: string, data: any) {
+    if (this.data == null) {
+      this.data = {};
+    }
+    this.data[key] = data;
+  }
+  getData(key: string) {
+    return this.data[key];
+  }
+
+  unlockAction(action: PlayerActions | string) {
+    let playerAction = playerActions.find((a) => a.code == action);
+    if (playerAction != null) {
+      playerAction.unlocked = true;
+    }
+    this.setData(`actions.${action}`, true);
+    if (this.playerUi != null) {
+      this.playerUi.allDirty = true;
+    }
+  }
+  unlockResearch(research: string) {
+    let upgrade = this.getUpgrade(research);
+    if (upgrade != null) {
+      upgrade.canResearch = true;
+    } else {
+      console.warn(`Could not find upgrade ${research}`);
+    }
+
+    this.setData(`research.${research}`, true);
+    if (this.playerUi != null) {
+      this.playerUi.allDirty = true;
     }
   }
 }

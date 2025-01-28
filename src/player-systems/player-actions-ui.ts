@@ -161,6 +161,7 @@ export class PlayerActionsUi extends Panel {
         title: action.name,
         description: action.tooltip,
       };
+      button.sound = "ChipLay1";
       this.buttons.push(button);
     }
     if (this.currentAction == null) {

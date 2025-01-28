@@ -2,6 +2,8 @@ import * as ex from "excalibur";
 import { Panel, PanelBackgrounds } from "@src/ui/elements/../panel";
 import { Tooltip } from "@src/player-systems/player-tooltip";
 import { Label } from "@src/ui/elements/label";
+import { SoundManager } from "@src/sound-manager";
+import { SoundKey } from "@src/resources";
 
 export type ButtonIcon = {
   imageSource: ex.ImageSource;
@@ -57,6 +59,8 @@ export class Button extends Panel {
     this.dirty = true;
   }
 
+  disabled: boolean = false;
+
   get text() {
     return this.options.text ?? "";
   }
@@ -85,6 +89,14 @@ export class Button extends Panel {
   }
   get fontSize(): number {
     return this._fontSize;
+  }
+
+  private _sound: SoundKey = "ChipLay2";
+  set sound(value: SoundKey) {
+    this._sound = value;
+  }
+  get sound(): SoundKey {
+    return this._sound;
   }
 
   get labelSize(): ex.Vector {
@@ -163,6 +175,10 @@ export class Button extends Panel {
 
   onPointerDown(_e: ex.PointerEvent): void {
     super.onPointerDown(_e);
+    if (this.disabled) {
+      return;
+    }
+    SoundManager.play("ChipLay2");
     this.emit("button-clicked", _e);
     if (this.options.onClick != null) {
       this.options.onClick(_e);

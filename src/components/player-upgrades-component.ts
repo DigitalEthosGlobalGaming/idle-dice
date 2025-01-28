@@ -4,6 +4,7 @@ import { Upgrade } from "./upgrade-component";
 import { BetterDiceUpgrade } from "./upgrades/better-dice.upgrade";
 import { PassiveEnergyComponent } from "./upgrades/passive-energy.upgrade";
 import { WanderingKnightUpgrade } from "@src/components/upgrades/wandering-knight.upgrade";
+import { BishopUpgrade } from "@src/components/upgrades/bishop.upgrade";
 
 export class PlayerUpgradesComponent extends ex.Component {
   upgrades: { [key: string]: Upgrade } = {};
@@ -16,6 +17,7 @@ export class PlayerUpgradesComponent extends ex.Component {
     this.addUpgrade(PassiveEnergyComponent);
     this.addUpgrade(BetterDiceUpgrade);
     this.addUpgrade(WanderingKnightUpgrade);
+    this.addUpgrade(BishopUpgrade);
   }
 
   addUpgrade<T extends Upgrade>(t: new () => T): T {
@@ -32,13 +34,17 @@ export class PlayerUpgradesComponent extends ex.Component {
     return upgrade as T;
   }
 
-  getUpgrade<T extends Upgrade>(t: new () => T): T | null {
-    let upgrade = this.upgrades[t.name];
-    if (upgrade.player == null) {
-      upgrade.player = this.player;
+  getUpgrade<T extends Upgrade>(t: (new () => T) | string): T | null {
+    if (typeof t == "string") {
+      return this.upgrades[t] as T;
     }
+    let upgrade = this.upgrades[t.name];
+
     if (upgrade == null) {
       return null;
+    }
+    if (upgrade.player == null) {
+      upgrade.player = this.player;
     }
     return upgrade as T;
   }

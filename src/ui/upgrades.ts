@@ -68,8 +68,16 @@ class UpgradeListItem extends Panel {
     if (this.upgrade.level == 0) {
       text = `Unlock ${this.upgrade.name}`;
     }
+
+    if (this.upgrade.isMaxLevel) {
+      text = `Maxed ${this.upgrade.name}`;
+      buyButton.visible = false;
+
+      label.pos = ex.vec(buyButton.left + label.halfWidth, 0);
+    } else {
+      label.pos = ex.vec(buyButton.right + label.halfWidth + 10, 0);
+    }
     label.text = text;
-    label.pos = ex.vec(buyButton.right + label.halfWidth + 10, 0);
   }
 }
 
@@ -83,20 +91,31 @@ export class UpgradeUi extends Panel {
     title.text = "Research";
     title.fontSize = 40;
 
-    const list = this.addPanel("list", List);
+    const upgrades = this.player.upgrades.filter((u) => u.canResearch);
+    if (upgrades.length == 0) {
+      const info = this.addPanel("info", Label);
+      info.fontSize = 24;
+      info.pos = ex.vec(0, title.pos.y + title.height + info.halfHeight);
+      info.text = "Keep playing to unlock upgrades!";
+    } else {
+      this.removePanel("info");
+      const list = this.addPanel("list", List);
+      list.spacing = 20;
 
-    list.spacing = 20;
-
-    const upgrades = this.player.upgrades;
-    for (const i in upgrades) {
-      const upgrade = upgrades[i];
-      const upgradePanel = list.addPanel(upgrade.code, UpgradeListItem);
-      upgradePanel.upgrade = upgrade;
+      for (const i in upgrades) {
+        const upgrade = upgrades[i];
+        if (upgrade.canResearch) {
+          const upgradePanel = list.addPanel(upgrade.code, UpgradeListItem);
+          upgradePanel.upgrade = upgrade;
+        } else {
+          list.removePanel(upgrade.code);
+        }
+      }
+      list.pos = ex.vec(
+        -this.getParentBounds().width / 2,
+        title.pos.y + title.height + list.halfHeight
+      );
     }
-    list.pos = ex.vec(
-      -this.getParentBounds().width / 2,
-      title.pos.y + title.height + list.halfHeight
-    );
   }
 }
 
