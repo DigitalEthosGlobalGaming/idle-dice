@@ -86,6 +86,11 @@ addUpdate(
   "Features",
   "Added in a new Bishop piece that rolls diagonals."
 );
+addUpdate(
+  "2025-01-29",
+  "Features",
+  "Game now saves every 30 seconds."
+);
 
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());

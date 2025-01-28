@@ -20,6 +20,7 @@ export class GameScene extends Level implements Serializable {
   gridSystem: DiceGameGridSystem | null = null;
   gridColor = new ex.Color(255 * 0, 255 * 0.1, 255 * 0.1, 1);
   saveSystem!: DiceSaveSystem;
+  autosaveTimer: ex.Timer | null = null;
   timer: ex.Timer | null = null;
 
   override onActivate(ctx: ex.SceneActivationContext): void {
@@ -46,12 +47,29 @@ export class GameScene extends Level implements Serializable {
 
 
   save() {
-    this.saveSystem?.save(this);
+    try {
+      this.saveSystem?.save(this);
+    } catch (e) {
+      console.error(e);
+    }
   }
   load() {
     this.preLoad();
     this.saveSystem?.load(this);
     this.postLoad();
+    if (this.autosaveTimer == null) {
+      this.autosaveTimer = new ex.Timer({
+        fcn: () => {
+          if (this.isCurrentScene()) {
+            this.save();
+          }
+        },
+        interval: 1000 * 30,
+        repeats: true
+      });
+      this.addTimer(this.autosaveTimer);
+      this.autosaveTimer.start();
+    }
   }
 
   preLoad(): void {

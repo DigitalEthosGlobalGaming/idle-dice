@@ -90,7 +90,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         description: relatedAction.tooltip,
       });
     }
-    this.getScene().save();
   }
 
   _score: number = 0;
@@ -203,7 +202,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) {}
+  onPointerDown(_e: ExtendedPointerEvent) { }
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -221,7 +220,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
           this.placeBuildable(space.globalPos);
         }
       }
-      this.getScene().save();
     }
   }
 

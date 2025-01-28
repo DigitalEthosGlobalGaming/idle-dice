@@ -20,7 +20,11 @@
 
 ## TODO
 
-### Wandering Knight
+### King
+
+### Rook
+
+### Queen
 
 ### Game Version
 
