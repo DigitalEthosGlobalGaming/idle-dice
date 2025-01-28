@@ -38,7 +38,7 @@ export class WanderingKnightUpgrade extends Upgrade {
       this.player.unlockAction("NEWKNIGHT");
     }
     if (this.level >= 5) {
-      this.player.unlockResearch("BishopUpgrade");
+      this.player.unlockResearch("Bishop");
     }
   }
 }

@@ -1,9 +1,12 @@
+import { Environment } from "@src/env";
 import { Building } from "@src/player-systems/../building";
 import { Dice } from "@src/player-systems/../buildings/dice";
-import { PlayerUpgradesComponent } from "@src/player-systems/../components/player-upgrades-component";
+import {
+  PlayerUpgradesComponent,
+  upgrades,
+} from "@src/player-systems/../components/player-upgrades-component";
 import { ScoreComponent } from "@src/player-systems/../components/score-component";
 import { Upgrade } from "@src/player-systems/../components/upgrade-component";
-import { PassiveEnergyComponent } from "@src/player-systems/../components/upgrades/passive-energy.upgrade";
 import { Ghost } from "@src/player-systems/../ghost";
 import { GridSpace } from "@src/player-systems/../grid-system/grid-space";
 import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
@@ -20,7 +23,6 @@ import {
   PlayerActionTypes,
 } from "./player-actions";
 import { Tooltip } from "./player-tooltip";
-import { Environment } from "@src/env";
 
 type MouseState = {
   button: number;
@@ -161,7 +163,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     const timer = this.scene?.addTimer(
       new ex.Timer({
         fcn: () => {
-          const upgrade = this.getUpgrade(PassiveEnergyComponent);
+          const upgrade = this.getUpgrade("PassiveEnergy");
           let upgradeAmount = upgrade?.value ?? 1;
           this.scoreComponent.updateScore(upgradeAmount);
         },
@@ -350,7 +352,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   get upgrades(): Upgrade[] {
     return Object.values(this.playerUpgradesComponent.upgrades);
   }
-  getUpgrade<T extends Upgrade>(t: (new () => T) | string): T | null {
+  getUpgrade<T extends Upgrade>(t: keyof typeof upgrades): T | null {
     return this.playerUpgradesComponent.getUpgrade(t);
   }
 
@@ -426,7 +428,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
       this.playerUi.allDirty = true;
     }
   }
-  unlockResearch(research: string) {
+  unlockResearch(research: keyof typeof upgrades) {
     let upgrade = this.getUpgrade(research);
     if (upgrade != null) {
       upgrade.canResearch = true;

@@ -29,7 +29,7 @@ export class BetterDiceUpgrade extends Upgrade {
       return;
     }
     if (this.level >= 5) {
-      this.player.unlockResearch("WanderingKnightUpgrade");
+      this.player.unlockResearch("WanderingKnight");
     }
   }
 }

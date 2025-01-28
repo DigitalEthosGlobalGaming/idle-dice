@@ -1,6 +1,5 @@
 import { Building } from "@src/building";
 import { Dice } from "@src/buildings/dice";
-import { WanderingKnightUpgrade } from "@src/components/upgrades/wandering-knight.upgrade";
 import { GridSpace } from "@src/grid-system/grid-space";
 import { Resources } from "@src/resources";
 import { random } from "@src/utility/random";
@@ -63,7 +62,7 @@ export class WanderingKnight extends Building {
     for (let dice of diceToBonus) {
       if (dice.rolling != true) {
         let value =
-          (this.player.getUpgrade(WanderingKnightUpgrade)?.value ?? 1) / 10;
+          (this.player.getUpgrade("WanderingKnight")?.value ?? 1) / 10;
         value = Math.floor(value * 10) / 10;
         dice.multiplier += value;
       }

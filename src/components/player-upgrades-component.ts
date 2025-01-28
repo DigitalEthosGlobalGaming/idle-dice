@@ -6,6 +6,13 @@ import { PassiveEnergyComponent } from "./upgrades/passive-energy.upgrade";
 import { WanderingKnightUpgrade } from "@src/components/upgrades/wandering-knight.upgrade";
 import { BishopUpgrade } from "@src/components/upgrades/bishop.upgrade";
 
+export const upgrades = {
+  PassiveEnergy: PassiveEnergyComponent,
+  BetterDice: BetterDiceUpgrade,
+  WanderingKnight: WanderingKnightUpgrade,
+  Bishop: BishopUpgrade,
+};
+
 export class PlayerUpgradesComponent extends ex.Component {
   upgrades: { [key: string]: Upgrade } = {};
   get player(): Player {
@@ -14,17 +21,16 @@ export class PlayerUpgradesComponent extends ex.Component {
   hasAdded: boolean = false;
   onAdd(owner: ex.Entity): void {
     super.onAdd?.(owner);
-    this.addUpgrade(PassiveEnergyComponent);
-    this.addUpgrade(BetterDiceUpgrade);
-    this.addUpgrade(WanderingKnightUpgrade);
-    this.addUpgrade(BishopUpgrade);
+    for (const key in upgrades) {
+      this.addUpgrade(key as keyof typeof upgrades);
+    }
   }
 
-  addUpgrade<T extends Upgrade>(t: new () => T): T {
-    let upgrade = this.upgrades[t.name];
+  addUpgrade<T extends Upgrade>(t: keyof typeof upgrades): T {
+    let upgrade = this.upgrades[t];
     if (upgrade == null) {
-      upgrade = new t();
-      this.upgrades[t.name] = upgrade;
+      upgrade = new upgrades[t]();
+      this.upgrades[t] = upgrade;
     }
 
     if (upgrade.player == null) {
@@ -34,12 +40,8 @@ export class PlayerUpgradesComponent extends ex.Component {
     return upgrade as T;
   }
 
-  getUpgrade<T extends Upgrade>(t: (new () => T) | string): T | null {
-    if (typeof t == "string") {
-      return this.upgrades[t] as T;
-    }
-    let upgrade = this.upgrades[t.name];
-
+  getUpgrade<T extends Upgrade>(t: keyof typeof upgrades): T | null {
+    let upgrade = this.upgrades[t];
     if (upgrade == null) {
       return null;
     }
