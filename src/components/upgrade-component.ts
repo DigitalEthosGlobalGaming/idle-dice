@@ -113,6 +113,18 @@ export class Upgrade {
     return this._nextValue;
   }
 
+  _canResearch: boolean = true;
+  get canResearch() {
+    return this._canResearch;
+  }
+  set canResearch(value: boolean) {
+    if (this._canResearch == value) {
+      return;
+    }
+    this._canResearch = value;
+    this.calculate();
+  }
+
   get code() {
     return this.constructor.name;
   }

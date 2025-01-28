@@ -62,7 +62,7 @@ export const playerActions: PlayerAction[] = [
     image: Resources.ChessPawn,
     name: "Buy Pawn",
     type: PlayerActionTypes.BUILDABLE,
-    unlocked: true,
+    unlocked: false,
     building: {
       cost: () => 100,
       classRef: Roller,
@@ -85,7 +85,7 @@ export const playerActions: PlayerAction[] = [
     image: Resources.ChessBishop,
     name: "Buy Bishop",
     type: PlayerActionTypes.BUILDABLE,
-    unlocked: true,
+    unlocked: false,
     building: {
       cost: () => 10000,
       classRef: Bishop,

@@ -1,9 +1,5 @@
 import { GrowthType } from "@src/components/upgrades/../../utility/big-o-calculations";
 import { Upgrade } from "@src/components/upgrades/../upgrade-component";
-import {
-  PlayerActions,
-  playerActions,
-} from "@src/player-systems/player-actions";
 
 export class WanderingKnightUpgrade extends Upgrade {
   override name = "Wandering Knight";
@@ -28,6 +24,7 @@ export class WanderingKnightUpgrade extends Upgrade {
   override _baseValue: number = 1;
   override _costType = GrowthType.LOGARITHMIC;
   override _bonusType = GrowthType.LINEAR;
+  override _canResearch: boolean = false;
 
   calculate() {
     super.calculate();
@@ -38,11 +35,10 @@ export class WanderingKnightUpgrade extends Upgrade {
       return;
     }
     if (this.level >= 1) {
-      playerActions.find((a) => a.code == PlayerActions.NEWKNIGHT)!.unlocked =
-        true;
-      if (this.player.playerUi != null) {
-        this.player.playerUi.allDirty = true;
-      }
+      this.player.unlockAction("NEWKNIGHT");
+    }
+    if (this.level >= 5) {
+      this.player.unlockResearch("BishopUpgrade");
     }
   }
 }

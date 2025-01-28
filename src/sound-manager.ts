@@ -32,7 +32,7 @@ export class SoundManager {
         Sounds[soundKey as keyof typeof SoundPaths] = newSound;
       }
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
   play(sound: ex.Sound | keyof typeof Sounds) {
@@ -45,7 +45,13 @@ export class SoundManager {
       sound.play();
     }
   }
-  soundtracks: SoundKey[] = ["Soundtrack1", "Soundtrack2"];
+  soundtracks: SoundKey[] = [
+    "Soundtrack1",
+    "Soundtrack2",
+    "Soundtrack3",
+    "Soundtrack4",
+    "Soundtrack5",
+  ];
   lastPlayedMusic: ex.Sound | null = null;
   playBackgroundMusic() {
     if (this.lastPlayedMusic != null) {

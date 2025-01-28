@@ -68,6 +68,7 @@ class UpdatesUi extends Panel {
     for (const element of updates) {
       const updateItem = list.addPanel(`update-${element.id}`, UpdateItem);
       updateItem.gameUpdate = element;
+      updateItem.left = -this.size.x / 2;
     }
 
     const button = list.addPanel("back", Button);

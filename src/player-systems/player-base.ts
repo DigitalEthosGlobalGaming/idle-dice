@@ -350,7 +350,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   get upgrades(): Upgrade[] {
     return Object.values(this.playerUpgradesComponent.upgrades);
   }
-  getUpgrade<T extends Upgrade>(t: new () => T): T | null {
+  getUpgrade<T extends Upgrade>(t: (new () => T) | string): T | null {
     return this.playerUpgradesComponent.getUpgrade(t);
   }
 
@@ -402,6 +402,41 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         };
         this.showTooltip(tooltipObject);
       }
+    }
+  }
+
+  data: { [key: string]: any } = {};
+  setData(key: string, data: any) {
+    if (this.data == null) {
+      this.data = {};
+    }
+    this.data[key] = data;
+  }
+  getData(key: string) {
+    return this.data[key];
+  }
+
+  unlockAction(action: PlayerActions | string) {
+    let playerAction = playerActions.find((a) => a.code == action);
+    if (playerAction != null) {
+      playerAction.unlocked = true;
+    }
+    this.setData(`actions.${action}`, true);
+    if (this.playerUi != null) {
+      this.playerUi.allDirty = true;
+    }
+  }
+  unlockResearch(research: string) {
+    let upgrade = this.getUpgrade(research);
+    if (upgrade != null) {
+      upgrade.canResearch = true;
+    } else {
+      console.warn(`Could not find upgrade ${research}`);
+    }
+
+    this.setData(`research.${research}`, true);
+    if (this.playerUi != null) {
+      this.playerUi.allDirty = true;
     }
   }
 }

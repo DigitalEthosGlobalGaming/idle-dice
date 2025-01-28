@@ -53,7 +53,9 @@ export const SoundPaths = {
   ChipLay2: "./sounds/kenny/casino-audio/chip-lay-2.ogg",
   Soundtrack1: "./sounds/music/soundtrack_1.mp3",
   Soundtrack2: "./sounds/music/soundtrack_2.mp3",
-  // Soundtrack3: "./sounds/music/soundtrack_3.mp3",
+  Soundtrack3: "./sounds/music/soundtrack_3.mp3",
+  Soundtrack4: "./sounds/music/soundtrack_4.mp3",
+  Soundtrack5: "./sounds/music/soundtrack_5.mp3",
 };
 export const Sounds: Record<keyof typeof SoundPaths, ex.Sound> = {
   FlapSound: undefined,

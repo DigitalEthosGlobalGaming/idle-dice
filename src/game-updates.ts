@@ -69,18 +69,23 @@ addUpdate(
   "Features",
   "Knights now move to their new position instead of teleporting."
 );
-addUpdate(
-  "2025-01-24",
-  "Features",
-  "Escape now goes back to the main menu."
-);
+addUpdate("2025-01-24", "Features", "Escape now goes back to the main menu.");
 addUpdate(
   "2025-01-24",
   "Features",
   "Added in tooltips when hovering over buildings."
 );
 
-
+addUpdate(
+  "2025-01-28",
+  "Features",
+  "Added in a 'progression' like system that unlocks new buildings and upgrades as you research."
+);
+addUpdate(
+  "2025-01-28",
+  "Features",
+  "Added in a new Bishop piece that rolls diagonals."
+);
 
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());
