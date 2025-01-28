@@ -68,8 +68,16 @@ class UpgradeListItem extends Panel {
     if (this.upgrade.level == 0) {
       text = `Unlock ${this.upgrade.name}`;
     }
+
+    if (this.upgrade.isMaxLevel) {
+      text = `Maxed ${this.upgrade.name}`;
+      buyButton.visible = false;
+
+      label.pos = ex.vec(buyButton.left + label.halfWidth, 0);
+    } else {
+      label.pos = ex.vec(buyButton.right + label.halfWidth + 10, 0);
+    }
     label.text = text;
-    label.pos = ex.vec(buyButton.right + label.halfWidth + 10, 0);
   }
 }
 

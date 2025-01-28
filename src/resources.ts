@@ -22,6 +22,7 @@ export const Resources = {
   ChessKing: new ex.ImageSource("./images/board-game-icons/chess_king.png"),
   ChessRook: new ex.ImageSource("./images/board-game-icons/chess_rook.png"),
   ChessKnight: new ex.ImageSource("./images/board-game-icons/chess_knight.png"),
+  ChessBishop: new ex.ImageSource("./images/board-game-icons/chess_bishop.png"),
   ChessPawn: new ex.ImageSource("./images/board-game-icons/chess_pawn.png"),
   SuitDiamonds: new ex.ImageSource(
     "./images/board-game-icons/suit_diamonds.png"
@@ -39,15 +40,33 @@ export const Resources = {
     "./images/cursors/basic/double/resize_d_cross_diagonal.png"
   ),
 
-  // Sounds
-  FlapSound: new ex.Sound("./sounds/flap.wav"),
-  FailSound: new ex.Sound("./sounds/fail.wav"),
-  ScoreSound: new ex.Sound("./sounds/score.wav"),
-
   // UI Images
   UiButtonSquareFlat: new ex.ImageSource("./images/ui/button_square_flat.png"),
   UiFrame: new ex.ImageSource("./images/ui/button_square_flat.png"),
 } as const;
+
+export const SoundPaths = {
+  FlapSound: "./sounds/flap.wav",
+  FailSound: "./sounds/fail.wav",
+  ScoreSound: "./sounds/score.wav",
+  ChipLay1: "./sounds/kenny/casino-audio/chip-lay-1.ogg",
+  ChipLay2: "./sounds/kenny/casino-audio/chip-lay-2.ogg",
+  Soundtrack1: "./sounds/music/soundtrack_1.mp3",
+  Soundtrack2: "./sounds/music/soundtrack_2.mp3",
+  // Soundtrack3: "./sounds/music/soundtrack_3.mp3",
+};
+export const Sounds: Record<keyof typeof SoundPaths, ex.Sound> = {
+  FlapSound: undefined,
+  FailSound: undefined,
+  ScoreSound: undefined,
+  ChipLay1: undefined,
+  ChipLay2: undefined,
+  Soundtrack1: undefined,
+  Soundtrack2: undefined,
+  // Soundtrack3: undefined,
+} as any;
+
+export type SoundKey = keyof typeof SoundPaths;
 
 const UiNineSlices = {
   ButtonSquareFlat: {

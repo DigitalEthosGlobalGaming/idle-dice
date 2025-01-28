@@ -40,15 +40,6 @@ type CameraMovementData = {
   lastPos: ex.Vector;
 };
 
-const costs: { [key in PlayerActions]: number } = {
-  NONE: 0,
-  NEW_DICE: 10,
-  NEWROLLER: 100,
-  NEWKNIGHT: 1000,
-  REMOVE: 0,
-  UPGRADES: 0,
-};
-
 export class PlayerBase extends ex.Actor implements InputHandler {
   collides(_vec: ex.Vector): boolean {
     return false;
@@ -210,7 +201,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) { }
+  onPointerDown(_e: ExtendedPointerEvent) {}
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -288,7 +279,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     let existingBuilding = space.children.find((c) => c instanceof Building);
     if (existingBuilding == null) {
       const action = playerActions.find((a) => a.code == this.currentAction);
-      let cost = costs[this.currentAction];
+      let cost = 0;
       if (action?.type == PlayerActionTypes.BUILDABLE) {
         cost = action.building.cost();
 
@@ -374,7 +365,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return true;
   }
 
-
   onHighlightSpaceChange(
     oldSpace: GridSpace | null,
     newSpace: GridSpace | null
@@ -403,14 +393,13 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     this.hideTooltip("building-tooltip");
     this._highlightedSpace = newSpace;
     if (firstBuilding != null) {
-
       let tooltip = firstBuilding.tooltip;
       if (tooltip != null) {
         let tooltipObject = {
           code: "building-tooltip",
           title: firstBuilding.friendlyName,
           description: tooltip,
-        }
+        };
         this.showTooltip(tooltipObject);
       }
     }

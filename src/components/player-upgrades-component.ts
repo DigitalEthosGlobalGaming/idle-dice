@@ -34,11 +34,12 @@ export class PlayerUpgradesComponent extends ex.Component {
 
   getUpgrade<T extends Upgrade>(t: new () => T): T | null {
     let upgrade = this.upgrades[t.name];
-    if (upgrade.player == null) {
-      upgrade.player = this.player;
-    }
+
     if (upgrade == null) {
       return null;
+    }
+    if (upgrade.player == null) {
+      upgrade.player = this.player;
     }
     return upgrade as T;
   }

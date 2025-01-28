@@ -6,6 +6,7 @@ import { CreditScene } from "@src/scenes/credits.scene";
 import { HowToPlayScene } from "@src/scenes/how-to-play.scene";
 import { UpdatesScene } from "@src/scenes/updates.scene";
 import { TestUserInterfaceScene } from "@src/scenes/test/user-interface/user-interface.scene";
+import { SoundManager } from "@src/sound-manager";
 
 async function waitForFontLoad(font: string, timeout = 2000, interval = 100) {
   return new Promise((resolve, reject) => {
@@ -25,6 +26,7 @@ async function waitForFontLoad(font: string, timeout = 2000, interval = 100) {
   });
 }
 
+let soundsLoaded = false;
 // Load font before game start
 waitForFontLoad("24px DS-DIGI").then(() => {
   const game = new ex.Engine({
@@ -44,5 +46,13 @@ waitForFontLoad("24px DS-DIGI").then(() => {
   const loader = new GameLoader();
   game.start(loader).then(() => {
     game.goToScene("WelcomeScene");
+  });
+
+  document.addEventListener("click", () => {
+    if (!soundsLoaded) {
+      soundsLoaded = true;
+      SoundManager.initialise(game);
+      SoundManager.instance?.playBackgroundMusic();
+    }
   });
 });

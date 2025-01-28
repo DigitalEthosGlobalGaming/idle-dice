@@ -16,6 +16,24 @@ export class Upgrade {
     this.calculate();
   }
 
+  protected _maxLevel: number = -1;
+  get maxLevel() {
+    return this._maxLevel;
+  }
+  set maxLevel(value: number) {
+    if (this._maxLevel == value) {
+      return;
+    }
+    this._maxLevel = value;
+    this.calculate();
+  }
+
+  get isMaxLevel() {
+    if (this.maxLevel == -1) {
+      return false;
+    }
+    return this.level >= this.maxLevel;
+  }
   protected _baseValue: number = 0;
   get baseValue() {
     return this._baseValue;
@@ -120,15 +138,23 @@ export class Upgrade {
 
   onBuy() {}
   buy() {
+    if (this.isMaxLevel) {
+      return false;
+    }
     const didBuy = this.player.spendEnergy(this.nextCost);
     if (didBuy) {
       this._level++;
       this.calculate();
       this.onBuy();
+      return true;
     }
+    return false;
   }
 
   calculate() {
+    if (this.maxLevel != -1) {
+      this._level = Math.min(this._level, this.maxLevel);
+    }
     const costFunction = growthFunctions[this._costType];
     const bonusFunction = growthFunctions[this._bonusType];
     const cost = costFunction(this._level, this._baseCost);
