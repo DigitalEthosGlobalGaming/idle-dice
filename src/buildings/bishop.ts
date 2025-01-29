@@ -1,6 +1,5 @@
 import { Building } from "@src/building";
 import { Dice } from "@src/buildings/dice";
-import { BishopUpgrade } from "@src/components/upgrades/bishop.upgrade";
 import { GridSpace } from "@src/grid-system/grid-space";
 import { Resources } from "@src/resources";
 import { random } from "@src/utility/random";
@@ -19,7 +18,7 @@ export class Bishop extends Building {
     this.spriteImage = Resources.ChessBishop;
   }
 
-  onBuild(): void {}
+  onBuild(): void { }
 
   onInitialize(engine: ex.Engine): void {
     super.onInitialize(engine);
@@ -27,7 +26,7 @@ export class Bishop extends Building {
     this.tickRate = random.number(500, 1000);
   }
 
-  rollDice() {}
+  rollDice() { }
 
   onTick(_delta: number): void {
     super.onTick(_delta);
@@ -60,7 +59,7 @@ export class Bishop extends Building {
       bottomLeft.rollDice();
     }
     this.currentRange++;
-    let nextTickRate = this.player.getUpgrade(BishopUpgrade)?.value ?? 1000;
+    let nextTickRate = this.player.getUpgrade("Bishop")?.value ?? 1000;
     this.tickRate = nextTickRate;
   }
 }

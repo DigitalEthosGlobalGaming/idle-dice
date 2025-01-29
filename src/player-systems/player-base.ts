@@ -1,9 +1,12 @@
+import { Environment } from "@src/env";
 import { Building } from "@src/player-systems/../building";
-import { Dice } from "@src/player-systems/../buildings/dice";
-import { PlayerUpgradesComponent } from "@src/player-systems/../components/player-upgrades-component";
+import { Dice } from "@src/buildings/dice";
+import {
+  PlayerUpgradesComponent,
+  upgrades,
+} from "@src/player-systems/../components/player-upgrades-component";
 import { ScoreComponent } from "@src/player-systems/../components/score-component";
 import { Upgrade } from "@src/player-systems/../components/upgrade-component";
-import { PassiveEnergyComponent } from "@src/player-systems/../components/upgrades/passive-energy.upgrade";
 import { Ghost } from "@src/player-systems/../ghost";
 import { GridSpace } from "@src/player-systems/../grid-system/grid-space";
 import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
@@ -20,7 +23,6 @@ import {
   PlayerActionTypes,
 } from "./player-actions";
 import { Tooltip } from "./player-tooltip";
-import { Environment } from "@src/env";
 
 type MouseState = {
   button: number;
@@ -52,7 +54,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   ghost!: Ghost;
   draggingBuilding: Building | null = null;
   playerUi!: PlayerUi;
-  stats: { [key: string]: number } = {};
 
   _highlightedSpace: GridSpace | null = null;
   get highlightedSpace(): GridSpace | null {
@@ -70,7 +71,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = "UPGRADES";
+  _currentAction: PlayerActions = "NONE";
   get currentAction() {
     return this._currentAction;
   }
@@ -89,7 +90,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         description: relatedAction.tooltip,
       });
     }
-    this.getScene().save();
   }
 
   _score: number = 0;
@@ -162,7 +162,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     const timer = this.scene?.addTimer(
       new ex.Timer({
         fcn: () => {
-          const upgrade = this.getUpgrade(PassiveEnergyComponent);
+          const upgrade = this.getUpgrade("PassiveEnergy");
           let upgradeAmount = upgrade?.value ?? 1;
           this.scoreComponent.updateScore(upgradeAmount);
         },
@@ -214,13 +214,12 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         (a) => a.code == this.currentAction
       );
       if (currentAction?.type == PlayerActionTypes.BUILDABLE) {
-        if (this.currentAction == PlayerActions.REMOVE) {
+        if (this.currentAction == "REMOVE") {
           this.removeBuildable(space.globalPos);
         } else {
           this.placeBuildable(space.globalPos);
         }
       }
-      this.getScene().save();
     }
   }
 
@@ -285,7 +284,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         cost = action.building.cost();
 
         if (this.spendEnergy(cost)) {
-          if (this.currentAction == PlayerActions.NEWDICE) {
+          if (this.currentAction == "NEWDICE") {
             let newDice = new Dice();
             newDice.faces = 6;
             newDice.rollSpeed = 1;
@@ -351,7 +350,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   get upgrades(): Upgrade[] {
     return Object.values(this.playerUpgradesComponent.upgrades);
   }
-  getUpgrade<T extends Upgrade>(t: (new () => T) | string): T | null {
+  getUpgrade<T extends Upgrade>(t: keyof typeof upgrades): T | null {
     return this.playerUpgradesComponent.getUpgrade(t);
   }
 
@@ -363,17 +362,6 @@ export class PlayerBase extends ex.Actor implements InputHandler {
       return false;
     }
     this.scoreComponent.updateScore(-amount);
-    return true;
-  }
-
-  spendPrestigePoints(amount: number): boolean {
-    if (Environment.isDev) {
-      return true;
-    }
-    let prestigePoints = this.getData("prestige-points") ?? 0;
-    if (prestigePoints < amount) {
-      return false;
-    }
     return true;
   }
 
@@ -428,7 +416,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return this.data[key];
   }
 
-  unlockAction(action: PlayerActions | string) {
+  unlockAction(action: PlayerActions) {
     let playerAction = playerActions.find((a) => a.code == action);
     if (playerAction != null) {
       playerAction.unlocked = true;
@@ -438,7 +426,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
       this.playerUi.allDirty = true;
     }
   }
-  unlockResearch(research: string) {
+  unlockResearch(research: keyof typeof upgrades) {
     let upgrade = this.getUpgrade(research);
     if (upgrade != null) {
       upgrade.canResearch = true;
