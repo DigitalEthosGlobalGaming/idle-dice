@@ -1,10 +1,7 @@
 import { Environment } from "@src/env";
 import { Building } from "@src/player-systems/../building";
-import { Dice } from "@src/buildings/dice";
-import {
-  PlayerUpgradesComponent,
-  upgrades,
-} from "@src/player-systems/../components/player-upgrades-component";
+import { Dice } from "@src/player-systems/../buildings/dice";
+import { PlayerUpgradesComponent, upgrades } from "@src/player-systems/../components/player-upgrades-component";
 import { ScoreComponent } from "@src/player-systems/../components/score-component";
 import { Upgrade } from "@src/player-systems/../components/upgrade-component";
 import { Ghost } from "@src/player-systems/../ghost";
@@ -54,6 +51,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   ghost!: Ghost;
   draggingBuilding: Building | null = null;
   playerUi!: PlayerUi;
+  stats: { [key: string]: number } = {};
 
   _highlightedSpace: GridSpace | null = null;
   get highlightedSpace(): GridSpace | null {
@@ -71,7 +69,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = "NONE";
+  _currentAction: PlayerActions = "UPGRADES";
   get currentAction() {
     return this._currentAction;
   }
@@ -90,6 +88,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         description: relatedAction.tooltip,
       });
     }
+    this.getScene().save();
   }
 
   _score: number = 0;
@@ -220,6 +219,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
           this.placeBuildable(space.globalPos);
         }
       }
+      this.getScene().save();
     }
   }
 
@@ -365,6 +365,17 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return true;
   }
 
+  spendPrestigePoints(amount: number): boolean {
+    if (Environment.isDev) {
+      return true;
+    }
+    let prestigePoints = this.getData("prestige-points") ?? 0;
+    if (prestigePoints < amount) {
+      return false;
+    }
+    return true;
+  }
+
   onHighlightSpaceChange(
     oldSpace: GridSpace | null,
     newSpace: GridSpace | null
@@ -416,7 +427,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return this.data[key];
   }
 
-  unlockAction(action: PlayerActions) {
+  unlockAction(action: PlayerActions | string) {
     let playerAction = playerActions.find((a) => a.code == action);
     if (playerAction != null) {
       playerAction.unlocked = true;
