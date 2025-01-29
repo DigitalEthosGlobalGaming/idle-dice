@@ -79,7 +79,7 @@ export class GameScene extends Level implements Serializable {
           this.gridSystem = new DiceGameGridSystem();
           this.add(this.gridSystem);
         }
-        this.gridSystem.size = new ex.Vector(32, 32);
+        this.gridSystem.size = new ex.Vector(16, 16);
         this.gridSystem.spaceSize = new ex.Vector(32, 32);
 
         if (this.player == null) {
@@ -88,6 +88,8 @@ export class GameScene extends Level implements Serializable {
           this.add(this.player);
           const gridSize = this.gridSystem.getBounds().center;
           this.player.wishPosition = gridSize.clone();
+        } else {
+          this.resizeGrid();
         }
         this.inputSystem.paused = false;
       },
@@ -95,6 +97,15 @@ export class GameScene extends Level implements Serializable {
     });
     timer = this.addTimer(timer);
     timer.start();
+  }
+
+  resizeGrid() {
+    if (this.gridSystem == null) {
+      return;
+    }
+    const defaultSize = 16;
+    const gridSize = this.player?.getUpgrade("GridSize")?.value ?? 0;
+    this.gridSystem.size = new ex.Vector(gridSize + defaultSize, gridSize + defaultSize);
   }
 
   onKeyUp(evt: ExtendedKeyEvent) {
@@ -124,5 +135,24 @@ export class GameScene extends Level implements Serializable {
       this.gridColor
     );
     super.onPreDraw(ctx, elapsed);
+  }
+
+  prestige() {
+    let prestigePoints = Math.floor((this.player?.getData("current-prestige-score") ?? 0) / 1000000);
+    let currentPrestigePoints = this.player?.getData("prestige-points") ?? 0;
+    this.player?.setData("prestige-points", Math.floor(currentPrestigePoints + prestigePoints));
+
+    let totalPrestiges = this.player?.getData("total-prestiges") ?? 0;
+    this.player?.setData("total-prestiges", Math.floor(totalPrestiges) + 1);
+
+
+    this.gridSystem?.clearAll();
+    this.save();
+    this.gridSystem?.kill();
+    this.player?.kill();
+    this.player = undefined;
+    this.gridSystem = null;
+    this.previouslyLoaded = false;
+    this.engine.goToScene("PrestigeScene");
   }
 }

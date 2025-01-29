@@ -52,6 +52,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   ghost!: Ghost;
   draggingBuilding: Building | null = null;
   playerUi!: PlayerUi;
+  stats: { [key: string]: number } = {};
 
   _highlightedSpace: GridSpace | null = null;
   get highlightedSpace(): GridSpace | null {
@@ -69,7 +70,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = PlayerActions.NONE;
+  _currentAction: PlayerActions = "UPGRADES";
   get currentAction() {
     return this._currentAction;
   }
@@ -201,7 +202,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) {}
+  onPointerDown(_e: ExtendedPointerEvent) { }
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -362,6 +363,17 @@ export class PlayerBase extends ex.Actor implements InputHandler {
       return false;
     }
     this.scoreComponent.updateScore(-amount);
+    return true;
+  }
+
+  spendPrestigePoints(amount: number): boolean {
+    if (Environment.isDev) {
+      return true;
+    }
+    let prestigePoints = this.getData("prestige-points") ?? 0;
+    if (prestigePoints < amount) {
+      return false;
+    }
     return true;
   }
 

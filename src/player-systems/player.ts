@@ -62,4 +62,9 @@ export class Player extends PlayerBase implements Serializable {
     super.onAdd(engine);
     InputManager.register(this);
   }
+
+  onPostKill(scene: ex.Scene): void {
+    super.onPostKill(scene);
+    InputManager.unregister(this, scene);
+  }
 }

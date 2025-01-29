@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { Resources } from "../../resources";
+import { Resources } from "@src/resources";
 
 export class FloatingScore extends ex.Actor {
   static numberOfInstances = 0;

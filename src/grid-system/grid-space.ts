@@ -54,7 +54,7 @@ export class GridSpace extends ex.Actor implements Serializable {
     return this.grid.getNeighbors(this);
   }
 
-  handleClick: () => void = () => {};
+  handleClick: () => void = () => { };
 
   getBounds(): ex.BoundingBox {
     return new ex.BoundingBox(

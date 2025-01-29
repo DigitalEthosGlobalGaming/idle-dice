@@ -1,10 +1,21 @@
 import * as ex from "excalibur";
 import { Player } from "../player-systems/player";
 import { Upgrade } from "./upgrade-component";
-import { BetterDiceUpgrade } from "./upgrades/better-dice.upgrade";
-import { PassiveEnergyComponent } from "./upgrades/passive-energy.upgrade";
-import { WanderingKnightUpgrade } from "@src/components/upgrades/wandering-knight.upgrade";
-import { BishopUpgrade } from "@src/components/upgrades/bishop.upgrade";
+import { BetterDiceUpgrade } from "../upgrades/research/better-dice.upgrade";
+import { PassiveEnergyComponent } from "../upgrades/research/passive-energy.upgrade";
+import { WanderingKnightUpgrade } from "@src/upgrades/research/wandering-knight.upgrade";
+import { BishopUpgrade } from "@src/upgrades/research/bishop.upgrade";
+import { RookUpgrade } from "../upgrades/research/rook.upgrade";
+import { GridSizeUpgrade } from "@src/upgrades/prestige/grid-size.upgrade";
+
+export const upgrades = {
+  PassiveEnergy: PassiveEnergyComponent,
+  BetterDice: BetterDiceUpgrade,
+  WanderingKnight: WanderingKnightUpgrade,
+  Bishop: BishopUpgrade,
+  Rook: RookUpgrade,
+  GridSize: GridSizeUpgrade
+};
 
 export class PlayerUpgradesComponent extends ex.Component {
   upgrades: { [key: string]: Upgrade } = {};

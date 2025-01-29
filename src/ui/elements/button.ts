@@ -23,8 +23,16 @@ export class Button extends Panel {
   get tooltip(): Tooltip | undefined {
     return this._tooltip;
   }
-  set tooltip(value: Tooltip | undefined) {
+  set tooltip(value: Tooltip | undefined | string) {
     let oldTooltip = this._tooltip;
+    // Check if valiue is a string
+    if (typeof value == "string") {
+      value = {
+        code: `button-${this.id}`,
+        title: value,
+        description: '',
+      };
+    }
     if (value?.code == this.tooltip?.code) {
       return;
     }

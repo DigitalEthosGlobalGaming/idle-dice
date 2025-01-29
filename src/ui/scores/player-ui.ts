@@ -5,8 +5,8 @@ import {
 import { PlayerActionsUi } from "@src/player-systems/player-actions-ui";
 import { PlayerTooltip, Tooltip } from "@src/player-systems/player-tooltip";
 import { Panel } from "@src/ui/scores/../panel";
-import { UpgradesPanel } from "@src/ui/scores/../upgrades";
 import * as ex from "excalibur";
+import { UpgradesModal } from "../upgrades-modal";
 
 export class PlayerUi extends Panel {
   isMoving = false;
@@ -47,8 +47,8 @@ export class PlayerUi extends Panel {
         PlayerActionsUi
       );
     }
-    const upgradesPanel = this.addPanel("upgrades-modal", UpgradesPanel);
-    upgradesPanel.visible = this.currentAction == PlayerActions.UPGRADES;
+    const upgradesPanel = this.addPanel("upgrades-modal", UpgradesModal);
+    upgradesPanel.visible = this.currentAction == "UPGRADES";
     upgradesPanel.pos = ex.vec(bounds.width / 2, bounds.height / 2);
     if (this._tooltipElement == null) {
       this._tooltipElement = this.addPanel("player-tooltip", PlayerTooltip);

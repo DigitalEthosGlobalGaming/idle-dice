@@ -196,7 +196,12 @@ export class Panel extends ex.Actor implements InputHandler {
       return;
     }
     this._visible = value;
+    this.onVisibleChanged(value);
     this.allDirty = true;
+  }
+
+  onVisibleChanged(_visible: boolean) {
+
   }
 
   _padding = 0;
@@ -538,10 +543,10 @@ export class Panel extends ex.Actor implements InputHandler {
     this.isHovered = true;
     this.onHoverChanged(e);
   }
-  onPointerUp(_e: ex.PointerEvent): void {}
-  onPointerDown(_e: ex.PointerEvent): void {}
+  onPointerUp(_e: ex.PointerEvent): void { }
+  onPointerDown(_e: ex.PointerEvent): void { }
 
-  onHoverChanged(_e: ex.PointerEvent) {}
+  onHoverChanged(_e: ex.PointerEvent) { }
 
   getCurrentTick() {
     const engine = this.scene?.engine;
@@ -653,7 +658,7 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onRender() {}
+  onRender() { }
 
   getParent<T = Panel>(): T | null {
     let parent = this.parent;
@@ -687,5 +692,5 @@ export class Panel extends ex.Actor implements InputHandler {
     }
   }
 
-  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) {}
+  onResize(_oldSize: ex.Vector, _newSize: ex.Vector) { }
 }

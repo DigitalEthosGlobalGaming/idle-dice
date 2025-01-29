@@ -223,4 +223,15 @@ export class GridSystem extends ex.Actor implements Serializable {
       this.size = ex.vec(data.size._x, data.size._y);
     }
   }
+
+
+  clearAll() {
+    for (let entity of this.children) {
+      try {
+        entity.kill();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }
 }
