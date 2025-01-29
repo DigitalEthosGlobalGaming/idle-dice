@@ -5,12 +5,14 @@ import { BetterDiceUpgrade } from "./upgrades/better-dice.upgrade";
 import { PassiveEnergyComponent } from "./upgrades/passive-energy.upgrade";
 import { WanderingKnightUpgrade } from "@src/components/upgrades/wandering-knight.upgrade";
 import { BishopUpgrade } from "@src/components/upgrades/bishop.upgrade";
+import { RookUpgrade } from "./upgrades/rook.upgrade";
 
 export const upgrades = {
   PassiveEnergy: PassiveEnergyComponent,
   BetterDice: BetterDiceUpgrade,
   WanderingKnight: WanderingKnightUpgrade,
   Bishop: BishopUpgrade,
+  Rook: RookUpgrade
 };
 
 export class PlayerUpgradesComponent extends ex.Component {

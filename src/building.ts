@@ -44,6 +44,13 @@ export class Building extends ex.Actor implements Serializable {
       currentGraphics.tint = value;
     }
   }
+  get now() {
+    return new Date().getTime();
+  }
+
+  set nextTick(value: number) {
+    this.lastTick = this.now + value;
+  }
 
   _spriteImage?: ex.ImageSource;
 
@@ -83,7 +90,7 @@ export class Building extends ex.Actor implements Serializable {
   serialize(): any {
     return null;
   }
-  deserialize(_data: any): void {}
+  deserialize(_data: any): void { }
 
   getNeighbors() {
     return this.gridSpace.getNeighbors();
@@ -153,7 +160,14 @@ export class Building extends ex.Actor implements Serializable {
     this.updatePosition();
   }
 
-  moveTo(space: GridSpace) {
+  moveTo(space: GridSpace | ex.Vector) {
+    if (space instanceof ex.Vector) {
+      let newSpace = this.getSpace(space);
+      if (newSpace == null) {
+        return;
+      }
+      space = newSpace;
+    }
     this.wishScale = 1;
     let offset = this.globalPos.clone().sub(space.globalPos);
     this.gridSpace.removeChild(this);
@@ -161,12 +175,12 @@ export class Building extends ex.Actor implements Serializable {
     this.pos = offset;
   }
 
-  onTick(_delta: number) {}
+  onTick(_delta: number) { }
 
-  onBuild() {}
+  onBuild() { }
 
   trigger() {
     this.onTrigger();
   }
-  onTrigger() {}
+  onTrigger() { }
 }

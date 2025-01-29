@@ -1,6 +1,6 @@
 import { Environment } from "@src/env";
 import { Building } from "@src/player-systems/../building";
-import { Dice } from "@src/player-systems/../buildings/dice";
+import { Dice } from "@src/buildings/dice";
 import {
   PlayerUpgradesComponent,
   upgrades,
@@ -71,7 +71,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = PlayerActions.NONE;
+  _currentAction: PlayerActions = "NONE";
   get currentAction() {
     return this._currentAction;
   }
@@ -214,7 +214,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         (a) => a.code == this.currentAction
       );
       if (currentAction?.type == PlayerActionTypes.BUILDABLE) {
-        if (this.currentAction == PlayerActions.REMOVE) {
+        if (this.currentAction == "REMOVE") {
           this.removeBuildable(space.globalPos);
         } else {
           this.placeBuildable(space.globalPos);
@@ -284,7 +284,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         cost = action.building.cost();
 
         if (this.spendEnergy(cost)) {
-          if (this.currentAction == PlayerActions.NEWDICE) {
+          if (this.currentAction == "NEWDICE") {
             let newDice = new Dice();
             newDice.faces = 6;
             newDice.rollSpeed = 1;
@@ -416,7 +416,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return this.data[key];
   }
 
-  unlockAction(action: PlayerActions | string) {
+  unlockAction(action: PlayerActions) {
     let playerAction = playerActions.find((a) => a.code == action);
     if (playerAction != null) {
       playerAction.unlocked = true;

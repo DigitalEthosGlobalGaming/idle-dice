@@ -91,6 +91,11 @@ addUpdate(
   "Features",
   "Game now saves every 30 seconds."
 );
+addUpdate(
+  "2025-01-29",
+  "Features",
+  "Added in a new Rook piece that moves through dice."
+);
 
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());

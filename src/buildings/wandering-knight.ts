@@ -3,7 +3,7 @@ import { Dice } from "@src/buildings/dice";
 import { GridSpace } from "@src/grid-system/grid-space";
 import { Resources } from "@src/resources";
 import { random } from "@src/utility/random";
-// import { Player } from "@src/player-systems/player";
+
 
 export class WanderingKnight extends Building {
   static serializeName: string = "WanderingKnight";

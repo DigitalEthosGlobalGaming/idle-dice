@@ -3,7 +3,7 @@ import { Building } from "@src/building";
 import { Resources } from "@src/resources";
 import { Dice } from "./dice";
 import { Engine, Timer } from "excalibur";
-// import { Player } from "@src/player-systems/player";
+
 import { random } from "@src/utility/random";
 
 export class Roller extends Building {

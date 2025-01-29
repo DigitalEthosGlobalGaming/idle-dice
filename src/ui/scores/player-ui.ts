@@ -48,7 +48,7 @@ export class PlayerUi extends Panel {
       );
     }
     const upgradesPanel = this.addPanel("upgrades-modal", UpgradesPanel);
-    upgradesPanel.visible = this.currentAction == PlayerActions.UPGRADES;
+    upgradesPanel.visible = this.currentAction == "UPGRADES";
     upgradesPanel.pos = ex.vec(bounds.width / 2, bounds.height / 2);
     if (this._tooltipElement == null) {
       this._tooltipElement = this.addPanel("player-tooltip", PlayerTooltip);

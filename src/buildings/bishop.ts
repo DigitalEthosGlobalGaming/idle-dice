@@ -4,7 +4,7 @@ import { GridSpace } from "@src/grid-system/grid-space";
 import { Resources } from "@src/resources";
 import { random } from "@src/utility/random";
 import * as ex from "excalibur";
-// import { Player } from "@src/player-systems/player";
+
 
 export class Bishop extends Building {
   static serializeName: string = "Bishop";
@@ -18,7 +18,7 @@ export class Bishop extends Building {
     this.spriteImage = Resources.ChessBishop;
   }
 
-  onBuild(): void {}
+  onBuild(): void { }
 
   onInitialize(engine: ex.Engine): void {
     super.onInitialize(engine);
@@ -26,7 +26,7 @@ export class Bishop extends Building {
     this.tickRate = random.number(500, 1000);
   }
 
-  rollDice() {}
+  rollDice() { }
 
   onTick(_delta: number): void {
     super.onTick(_delta);
