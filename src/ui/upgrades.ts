@@ -7,8 +7,6 @@ import { UpgradeListItem } from "./upgrade-list-item";
 import { UpgradesModal } from "./upgrades-modal";
 import { Environment } from "@src/env";
 
-
-
 export class UpgradeUi extends Panel {
   onRender() {
     if (this.player == null) {
@@ -19,7 +17,9 @@ export class UpgradeUi extends Panel {
     title.text = "Research";
     title.fontSize = 40;
 
-    const upgrades = this.player.upgrades.filter((u) => u.canResearch && u.type == "RESEARCH");
+    const upgrades = this.player.upgrades.filter(
+      (u) => u.canResearch && u.type == "RESEARCH"
+    );
     if (upgrades.length == 0) {
       const info = this.addPanel("info", Label);
       info.fontSize = 24;
@@ -48,15 +48,17 @@ export class UpgradeUi extends Panel {
         let parent = this.parentPanel;
         if (parent != null) {
           const prestige = this.addPanel("prestige", Button);
+          prestige.visible = false;
           prestige.text = "PRESTIGE";
           prestige.fontSize = 20;
           prestige.pos = ex.vec(0, parent.height - this.halfHeight - 30);
-          prestige.tooltip = "Prestige to gain ⏣, earn 1 ⏣ for every 1 million energy earned.";
+          prestige.tooltip =
+            "Prestige to gain ⏣, earn 1 ⏣ for every 1 million energy earned.";
           prestige.onClick = () => {
             if (parent instanceof UpgradesModal) {
               parent.currentTab = "prestige-ui";
             }
-          }
+          };
         }
       }
     }

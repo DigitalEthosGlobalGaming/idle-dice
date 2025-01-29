@@ -58,7 +58,7 @@ addUpdate(
   "Features",
   "Added in wandering knights which move around and empower dice."
 );
-// 2025-01-24
+
 addUpdate(
   "2025-01-24",
   "Fixes",
@@ -86,11 +86,7 @@ addUpdate(
   "Features",
   "Added in a new Bishop piece that rolls diagonals."
 );
-addUpdate(
-  "2025-01-29",
-  "Features",
-  "Game now saves every 30 seconds."
-);
+addUpdate("2025-01-29", "Features", "Game now saves every 30 seconds.");
 addUpdate(
   "2025-01-29",
   "Features",
@@ -102,6 +98,19 @@ addUpdate(
   "Made it so we limit the number of score particles based on FPS."
 );
 
-export const gameUpdates = Object.values(updates).sort((a, b) => {
-  return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());
-});
+// 2025-01-30
+addUpdate(
+  "2025-01-30",
+  "Fixes",
+  "Fixed the sound system looping forever and crashing the game."
+);
+
+const showAfter = "2025-01-24";
+
+export const gameUpdates = Object.values(updates)
+  .filter((item) => item.date >= showAfter)
+  .sort((a, b) => {
+    return -a.date
+      .toLocaleLowerCase()
+      .localeCompare(b.date.toLocaleLowerCase());
+  });

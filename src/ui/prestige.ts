@@ -5,6 +5,7 @@ import { UpgradeUi } from "./upgrades";
 import { UpgradeListItem } from "./upgrade-list-item";
 import { Button } from "./elements/button";
 import { UpgradesModal } from "./upgrades-modal";
+import { Environment } from "@src/env";
 
 export class PrestigeUi extends UpgradeUi {
   onRender() {
@@ -25,11 +26,12 @@ export class PrestigeUi extends UpgradeUi {
     }
     title.fontSize = 40;
 
-
-    let prestigePoints = Math.floor((this.player.getData("current-prestige-score") ?? 0) / 1000000);
+    let prestigePoints = Math.floor(
+      (this.player.getData("current-prestige-score") ?? 0) / 1000000
+    );
 
     const prestige = this.addPanel("prestige", Button);
-    if (prestigePoints == 0) {
+    if (prestigePoints == 0 && !Environment.isDev) {
       prestige.disabled = true;
     }
     prestige.text = `PRESTIGE +${prestigePoints}⏣`;
@@ -49,14 +51,15 @@ export class PrestigeUi extends UpgradeUi {
       }
     };
 
-
     const info = this.addPanel("prestige-info", Label);
-    info.top = prestige.bottom + 10;
+    info.top = prestige.bottom + 20;
     info.left = -this.getParentBounds().width / 2 + 50;
-    info.text = "0 ⏣";
+    info.text = "Current: 0 ⏣";
     info.fontSize = 20;
 
-    const upgrades = this.player.upgrades.filter((u) => u.canResearch && u.type == "PRESTIGE");
+    const upgrades = this.player.upgrades.filter(
+      (u) => u.canResearch && u.type == "PRESTIGE"
+    );
     if (upgrades.length == 0) {
       const info = this.addPanel("info", Label);
       info.fontSize = 24;

@@ -1,7 +1,10 @@
 import { Environment } from "@src/env";
 import { Building } from "@src/player-systems/../building";
 import { Dice } from "@src/player-systems/../buildings/dice";
-import { PlayerUpgradesComponent, upgrades } from "@src/player-systems/../components/player-upgrades-component";
+import {
+  PlayerUpgradesComponent,
+  upgrades,
+} from "@src/player-systems/../components/player-upgrades-component";
 import { ScoreComponent } from "@src/player-systems/../components/score-component";
 import { Upgrade } from "@src/player-systems/../components/upgrade-component";
 import { Ghost } from "@src/player-systems/../ghost";
@@ -69,7 +72,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = "UPGRADES";
+  _currentAction: PlayerActions = "NONE";
   get currentAction() {
     return this._currentAction;
   }
@@ -201,7 +204,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) { }
+  onPointerDown(_e: ExtendedPointerEvent) {}
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;

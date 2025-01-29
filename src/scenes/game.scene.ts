@@ -4,6 +4,7 @@ import { DiceGameGridSystem } from "@src/scenes/../grid-system/grid-system-actor
 import { Level } from "@src/scenes/../level";
 import { Player } from "@src/scenes/../player-systems/player";
 import { Serializable } from "@src/scenes/../systems/save-system";
+import { NotificationSystem } from "@src/systems/notification.system";
 import * as ex from "excalibur";
 
 export class GameScene extends Level implements Serializable {
@@ -20,8 +21,17 @@ export class GameScene extends Level implements Serializable {
   gridSystem: DiceGameGridSystem | null = null;
   gridColor = new ex.Color(255 * 0, 255 * 0.1, 255 * 0.1, 1);
   saveSystem!: DiceSaveSystem;
+  notificationSystem!: NotificationSystem;
   autosaveTimer: ex.Timer | null = null;
   timer: ex.Timer | null = null;
+
+  override onInitialize(engine: ex.Engine): void {
+    super.onInitialize(engine);
+    if (this.notificationSystem == null) {
+      this.notificationSystem = new NotificationSystem();
+      this.world.add(this.notificationSystem);
+    }
+  }
 
   override onActivate(ctx: ex.SceneActivationContext): void {
     super.onActivate(ctx);
@@ -45,7 +55,6 @@ export class GameScene extends Level implements Serializable {
     }
   }
 
-
   save() {
     try {
       this.saveSystem?.save(this);
@@ -65,7 +74,7 @@ export class GameScene extends Level implements Serializable {
           }
         },
         interval: 1000 * 30,
-        repeats: true
+        repeats: true,
       });
       this.addTimer(this.autosaveTimer);
       this.autosaveTimer.start();
@@ -123,7 +132,10 @@ export class GameScene extends Level implements Serializable {
     }
     const defaultSize = 16;
     const gridSize = this.player?.getUpgrade("GridSize")?.value ?? 0;
-    this.gridSystem.size = new ex.Vector(gridSize + defaultSize, gridSize + defaultSize);
+    this.gridSystem.size = new ex.Vector(
+      gridSize + defaultSize,
+      gridSize + defaultSize
+    );
   }
 
   onKeyUp(evt: ExtendedKeyEvent) {
@@ -133,7 +145,7 @@ export class GameScene extends Level implements Serializable {
     }
   }
 
-  deserialize(_data: any): void { }
+  deserialize(_data: any): void {}
 
   onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {
     const gridBounds = this.gridSystem?.getBounds();
@@ -156,18 +168,27 @@ export class GameScene extends Level implements Serializable {
   }
 
   prestige() {
-    let prestigePoints = Math.floor((this.player?.getData("current-prestige-score") ?? 0) / 1000000);
-    let currentPrestigePoints = this.player?.getData("prestige-points") ?? 0;
-    this.player?.setData("prestige-points", Math.floor(currentPrestigePoints + prestigePoints));
+    let player = this.player;
+    if (player == null) {
+      throw new Error("Player is not defined");
+    }
+    let prestigePoints = Math.floor(
+      (player.getData("current-prestige-score") ?? 0) / 1000000
+    );
+    let currentPrestigePoints = player.getData("prestige-points") ?? 0;
+    player.setData(
+      "prestige-points",
+      Math.floor(currentPrestigePoints + prestigePoints)
+    );
 
-    let totalPrestiges = this.player?.getData("total-prestiges") ?? 0;
-    this.player?.setData("total-prestiges", Math.floor(totalPrestiges) + 1);
-
+    let totalPrestiges = player.getData("total-prestiges") ?? 0;
+    player.setData("total-prestiges", Math.floor(totalPrestiges) + 1);
+    player.score = 0;
 
     this.gridSystem?.clearAll();
     this.save();
     this.gridSystem?.kill();
-    this.player?.kill();
+    player.kill();
     this.player = undefined;
     this.gridSystem = null;
     this.previouslyLoaded = false;
