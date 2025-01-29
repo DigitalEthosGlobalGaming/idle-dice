@@ -49,8 +49,16 @@ export class ScoreComponent extends BaseComponent {
     if (this.owner == null) {
       throw new Error("Owner is null");
     }
+    const engine = this.owner.scene?.engine;
+    if (!engine) return;
 
-    if (FloatingScore.numberOfInstances >= 50) {
+    const fps = engine.stats.currFrame.fps ?? 60;
+    const maxInstances = Math.max(5, Math.floor(fps / 2));
+    const numberOfInstances = Math.min(50, maxInstances);
+
+
+
+    if (FloatingScore.numberOfInstances >= numberOfInstances) {
       this.updateScore(value);
       return;
     }
