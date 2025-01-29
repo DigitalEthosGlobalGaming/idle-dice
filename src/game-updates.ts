@@ -96,6 +96,11 @@ addUpdate(
   "Features",
   "Added in a new Rook piece that moves through dice."
 );
+addUpdate(
+  "2025-01-29",
+  "Technical",
+  "Made it so we limit the number of score particles based on FPS."
+);
 
 export const gameUpdates = Object.values(updates).sort((a, b) => {
   return -a.date.toLocaleLowerCase().localeCompare(b.date.toLocaleLowerCase());
