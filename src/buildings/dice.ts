@@ -1,5 +1,4 @@
 import { Building } from "@src/building";
-import { BetterDiceUpgrade } from "@src/components/upgrades/better-dice.upgrade";
 import { Config } from "@src/config";
 import { ease } from "@src/easing";
 import { Resources } from "@src/resources";
@@ -277,7 +276,7 @@ export class Dice extends Building implements Serializable {
 
   onRollFinish() {
     this.rolling = false;
-    let score = this.player.getUpgrade(BetterDiceUpgrade)?.value ?? 0;
+    let score = this.player.getUpgrade("BetterDice")?.value ?? 0;
     let totalScore = Math.floor(this.value * this.multiplier) + score;
     this.multiplier = 1;
     this.player.scoreComponent.createScore(this, totalScore);

@@ -4,7 +4,7 @@ import { GridSpace } from "@src/grid-system/grid-space";
 import { Resources } from "@src/resources";
 import { random } from "@src/utility/random";
 import * as ex from "excalibur";
-// import { Player } from "@src/player-systems/player";
+
 
 export class Bishop extends Building {
   static serializeName: string = "Bishop";

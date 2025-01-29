@@ -7,6 +7,7 @@ import { Player } from "./player-systems/player";
 import { SaveSystem } from "./systems/save-system";
 import { WanderingKnight } from "@src/buildings/wandering-knight";
 import { Bishop } from "@src/buildings/bishop";
+import { Rook } from "./buildings/rook";
 
 // This needs to be done because the classes themselves get minimized and the names are changed
 const classes = {
@@ -17,6 +18,7 @@ const classes = {
   DiceGameGridSystem: DiceGameGridSystem,
   GridSpace: GridSpace,
   Bishop: Bishop,
+  Rook: Rook,
 };
 
 export class DiceSaveSystem extends SaveSystem {

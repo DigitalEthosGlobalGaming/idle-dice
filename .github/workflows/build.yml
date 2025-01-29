@@ -25,15 +25,6 @@ jobs:
         with:
           submodules: recursive
 
-      # Cache node modules
-      - name: Cache node modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Set Build Version
         run: echo "BUILD_VERSION=$(date +'%Y%m%d%H%M%S')" >> $GITHUB_ENV
 

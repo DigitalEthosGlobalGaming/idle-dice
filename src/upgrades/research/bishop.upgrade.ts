@@ -1,9 +1,5 @@
 import { GrowthType } from "@src/utility/big-o-calculations";
 import { Upgrade } from "@src/components/upgrades/../upgrade-component";
-import {
-  PlayerActions,
-  playerActions,
-} from "@src/player-systems/player-actions";
 
 export class BishopUpgrade extends Upgrade {
   override name = "Bishop";
@@ -36,7 +32,7 @@ export class BishopUpgrade extends Upgrade {
   protected override _maxLevel: number = 20;
   override _baseCost: number = 100000;
   override _baseValue: number = 1;
-  override _costType = GrowthType.EXPONENTIAL;
+  override _costType = GrowthType.LINEAR;
   override _canResearch: boolean = false;
 
   calculate() {
@@ -48,11 +44,7 @@ export class BishopUpgrade extends Upgrade {
       return;
     }
     if (this.level >= 1) {
-      playerActions.find((a) => a.code == PlayerActions.BISHOP)!.unlocked =
-        true;
-      if (this.player.playerUi != null) {
-        this.player.playerUi.allDirty = true;
-      }
+      this.player.unlockAction("BISHOP");
     }
   }
 }

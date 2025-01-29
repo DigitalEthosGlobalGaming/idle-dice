@@ -12,10 +12,9 @@ export class WanderingKnightUpgrade extends Upgrade {
     }
 
     const parts = [
-      ` adds {${
-        Math.round(this.value) / 10
+      ` adds x${Math.round(this.value) / 10
       } to a dice's multiplier when moving into a neighboring tile.`,
-      `{nextCost} - Increase to {${Math.round(this._nextValue) / 10}}⚡︎`,
+      `{nextCost} - Increase to x${Math.round(this._nextValue) / 10}`,
     ];
 
     return parts.join("\n");
@@ -38,7 +37,8 @@ export class WanderingKnightUpgrade extends Upgrade {
       this.player.unlockAction("NEWKNIGHT");
     }
     if (this.level >= 5) {
-      this.player.unlockResearch("BishopUpgrade");
+      this.player.unlockResearch("Bishop");
+      this.player.unlockResearch("Rook");
     }
   }
 }
