@@ -53,9 +53,14 @@ export class SoundManager {
     "Soundtrack5",
   ];
   lastPlayedMusic: ex.Sound | null = null;
+
+  tick() {}
+
   playBackgroundMusic() {
     if (this.lastPlayedMusic != null) {
-      this.lastPlayedMusic.stop();
+      if (this.lastPlayedMusic.isStopped()) {
+        this.lastPlayedMusic.stop();
+      }
     }
     let sound: ex.Sound;
     do {
@@ -70,7 +75,7 @@ export class SoundManager {
       return;
     }
     this.lastPlayedMusic = sound;
-    sound.on("playbackend", () => {
+    sound.once("playbackend", () => {
       this.playBackgroundMusic();
     });
     sound.play();

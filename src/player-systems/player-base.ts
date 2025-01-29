@@ -1,6 +1,6 @@
 import { Environment } from "@src/env";
 import { Building } from "@src/player-systems/../building";
-import { Dice } from "@src/buildings/dice";
+import { Dice } from "@src/player-systems/../buildings/dice";
 import {
   PlayerUpgradesComponent,
   upgrades,
@@ -54,6 +54,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   ghost!: Ghost;
   draggingBuilding: Building | null = null;
   playerUi!: PlayerUi;
+  stats: { [key: string]: number } = {};
 
   _highlightedSpace: GridSpace | null = null;
   get highlightedSpace(): GridSpace | null {
@@ -90,6 +91,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         description: relatedAction.tooltip,
       });
     }
+    this.getScene().save();
   }
 
   _score: number = 0;
@@ -202,7 +204,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) { }
+  onPointerDown(_e: ExtendedPointerEvent) {}
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -220,6 +222,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
           this.placeBuildable(space.globalPos);
         }
       }
+      this.getScene().save();
     }
   }
 
@@ -365,6 +368,17 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return true;
   }
 
+  spendPrestigePoints(amount: number): boolean {
+    if (Environment.isDev) {
+      return true;
+    }
+    let prestigePoints = this.getData("prestige-points") ?? 0;
+    if (prestigePoints < amount) {
+      return false;
+    }
+    return true;
+  }
+
   onHighlightSpaceChange(
     oldSpace: GridSpace | null,
     newSpace: GridSpace | null
@@ -416,7 +430,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return this.data[key];
   }
 
-  unlockAction(action: PlayerActions) {
+  unlockAction(action: PlayerActions | string) {
     let playerAction = playerActions.find((a) => a.code == action);
     if (playerAction != null) {
       playerAction.unlocked = true;

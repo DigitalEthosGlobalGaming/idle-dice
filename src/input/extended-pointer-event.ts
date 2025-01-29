@@ -33,10 +33,12 @@ export class ExtendedPointerEvent extends ex.PointerEvent {
         let entities = Object.values(this.inputManager.entities ?? {});
 
         for (let entity of entities) {
-            if (entitiesGroupedByZIndex[entity.globalZ] == null) {
-                entitiesGroupedByZIndex[entity.globalZ] = [];
+            if (!entity.isKilled()) {
+                if (entitiesGroupedByZIndex[entity.globalZ] == null) {
+                    entitiesGroupedByZIndex[entity.globalZ] = [];
+                }
+                entitiesGroupedByZIndex[entity.globalZ].push(entity);
             }
-            entitiesGroupedByZIndex[entity.globalZ].push(entity);
         }
         let zIndices = Object.keys(entitiesGroupedByZIndex)
             .map((key) => parseInt(key))

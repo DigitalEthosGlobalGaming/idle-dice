@@ -13,11 +13,32 @@ import { ExtendedPointerEvent } from "@src/grid-system/../input/extended-pointer
 
 class GridSpaceGhost extends ex.Actor {
   spaceSize: ex.Vector = new ex.Vector(32, 32);
+  isGraphicsSetups = false;
+  protected _visible = false;
+  get visible() {
+    return this._visible;
+  }
+  set visible(value: boolean) {
+    if (this._visible == value) {
+      return;
+    }
+    this._visible = value;
+    this.setupGraphics();
+    if (value) {
+      this.graphics.use("hover");
+    } else {
+      this.graphics.use("hide");
+    }
+  }
   constructor(size: ex.Vector) {
     super();
     this.spaceSize = size;
   }
-  onInitialize(): void {
+
+  setupGraphics() {
+    if (this.isGraphicsSetups) {
+      return;
+    }
     this.graphics.add(
       "hide",
       new ex.Rectangle({
@@ -35,13 +56,6 @@ class GridSpaceGhost extends ex.Actor {
     this.graphics.add("hover", sprite);
     this.graphics.use("hide");
   }
-
-  show() {
-    this.graphics.use("hover");
-  }
-  hide() {
-    this.graphics.use("hide");
-  }
 }
 
 export class DiceGameGridSystem extends GridSystem implements InputHandler {
@@ -56,14 +70,14 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
     if (this._highlightedSpace != space) {
       this._highlightedSpace = space;
       if (!this.showGhost) {
-        this.ghost.hide();
+        this.ghost.visible = false;
         return;
       }
       if (space != null) {
-        this.ghost.show();
+        this.ghost.visible = true;
         this.ghost.pos = space.pos;
       } else {
-        this.ghost.hide();
+        this.ghost.visible = false;
       }
     }
     if (this.player != null) {
@@ -118,7 +132,7 @@ export class DiceGameGridSystem extends GridSystem implements InputHandler {
     if (this.ghost == null) {
       this.ghost = new GridSpaceGhost(this.spaceSize);
       this.addChild(this.ghost);
-      this.ghost.hide();
+      this.ghost.visible = false;
     }
     this.graphics.use(
       new Grid({

@@ -200,6 +200,9 @@ export class InputManager extends ex.Entity {
       delete previousHoveredEntities[entity.id];
     }
     for (let entity of Object.values(previousHoveredEntities)) {
+      if (entity.isKilled()) {
+        continue;
+      }
       if (entity.onPointerLeave != null) {
         entity.onPointerLeave(extendedEvent);
         entity.emit(InputManager.Events.pointerLeave, extendedEvent);
@@ -261,6 +264,17 @@ export class InputManager extends ex.Entity {
         entity.emit(InputManager.Events.keyPress, extendedEvent);
       }
     }
+  }
+
+  static unregister(entity: InputHandler, scene: ex.Scene): void {
+    if (entity.scene == null) {
+      throw new Error("Entity has no scene");
+    }
+    if (!(scene instanceof Level)) {
+      throw new Error("Scene is not a Level");
+    }
+    let inputManager = scene.inputSystem;
+    delete inputManager.entities[entity.id];
   }
 
   static register(entity: InputHandler): void {

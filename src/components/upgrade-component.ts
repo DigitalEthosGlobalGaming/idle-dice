@@ -3,7 +3,13 @@ import { Player } from "../player-systems/player";
 import { Resources } from "../resources";
 import { growthFunctions, GrowthType } from "../utility/big-o-calculations";
 
+export const UpgradeTypes = {
+  "RESEARCH": "RESEARCH",
+  "PRESTIGE": "PRESTIGE",
+}
+export type UpgradeType = keyof typeof UpgradeTypes;
 export class Upgrade {
+  type: UpgradeType = "RESEARCH";
   protected _baseCost: number = 0;
   get baseCost() {
     return this._baseCost;
@@ -148,12 +154,18 @@ export class Upgrade {
     this.calculate();
   }
 
-  onBuy() {}
+  onBuy() { }
   buy() {
     if (this.isMaxLevel) {
       return false;
     }
-    const didBuy = this.player.spendEnergy(this.nextCost);
+
+    let didBuy = false;
+    if (this.type == "RESEARCH") {
+      didBuy = this.player.spendEnergy(this.nextCost);
+    } else {
+      didBuy = this.player.spendPrestigePoints(this.nextCost);
+    }
     if (didBuy) {
       this._level++;
       this.calculate();

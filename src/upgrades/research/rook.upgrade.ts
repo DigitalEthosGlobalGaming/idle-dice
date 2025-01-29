@@ -1,4 +1,4 @@
-import { GrowthType } from "@src/components/upgrades/../../utility/big-o-calculations";
+import { GrowthType } from "@src/utility/big-o-calculations";
 import { Upgrade } from "@src/components/upgrades/../upgrade-component";
 
 export class RookUpgrade extends Upgrade {
