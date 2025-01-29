@@ -7,14 +7,15 @@ export class ScoreComponent extends BaseComponent {
   private _score: number;
   private _previousScore: number = -10;
   private _scorePerMinute: number = 0;
+  private lastScores: number[] = [];
   private scoreLabel: ex.Label | null = null;
 
   timer: ex.Timer | null = null;
-
+  lastTimerRan: number = 0;
 
   constructor() {
     super();
-    this._score = 10;
+    this._score = 0;
   }
 
   onAdd(owner: ex.Entity): void {
@@ -24,7 +25,7 @@ export class ScoreComponent extends BaseComponent {
       this.score = owner._score;
       if (this.timer == null) {
         this.timer = new ex.Timer({
-          fcn: () => {
+          action: () => {
             this.renderScore();
           },
           interval: 100,
@@ -52,6 +53,37 @@ export class ScoreComponent extends BaseComponent {
     if (this._previousScore == this._score) {
       return;
     }
+
+    let now = Date.now();
+    if (
+      this.lastTimerRan != 0 &&
+      this._previousScore > 0 &&
+      this._previousScore < this._score
+    ) {
+      let current = Math.floor(now / 1000 / 5) % 3;
+      let old = current - 1;
+      if (old < 0) {
+        old = 2;
+      }
+      this.lastScores[current] = this._score;
+      let scoreDiff = this._score - this._previousScore;
+      let newScorePerMinute = scoreDiff;
+      let scorePerMinuteDiff = newScorePerMinute - this._scorePerMinute;
+      if (this._scorePerMinute == 0) {
+        this._scorePerMinute = newScorePerMinute;
+      } else {
+        let percentageChange = Math.abs(
+          scorePerMinuteDiff / this._scorePerMinute
+        );
+        if (percentageChange > 0.1) {
+          scorePerMinuteDiff = scorePerMinuteDiff * 0.05;
+          this._scorePerMinute += scorePerMinuteDiff;
+        }
+        this._scorePerMinute += scorePerMinuteDiff;
+      }
+      this._scorePerMinute = Math.round(this._scorePerMinute);
+    }
+    this.lastTimerRan = now;
     if (this.scoreLabel == null) {
       this.scoreLabel = new ex.Label({
         text: `Energy: ${this._score}`,
@@ -70,6 +102,9 @@ export class ScoreComponent extends BaseComponent {
     this._previousScore = this._score;
     const prestigePoints = this.player?.getData("prestige-points") ?? 0;
     let text = `Energy: ${Math.floor(this._score)}⚡︎`;
+    // if (this._scorePerMinute > 0) {
+    //   text += `\n${this._scorePerMinute}⚡︎/min`;
+    // }
     if (prestigePoints > 0) {
       text += `\n${prestigePoints}⏣`;
     }
@@ -82,7 +117,10 @@ export class ScoreComponent extends BaseComponent {
     let scoreThisPrestige = this.player?.getData(key) ?? 0;
     this.player?.setData(key, scoreThisPrestige + points);
 
-    this.player?.setData('lifetime-energy', (this.player.getData('lifetime-energy') ?? 0) + points);
+    this.player?.setData(
+      "lifetime-energy",
+      (this.player.getData("lifetime-energy") ?? 0) + points
+    );
   }
 
   public createScore(creator: ex.Actor, value: number) {
@@ -96,7 +134,10 @@ export class ScoreComponent extends BaseComponent {
     const maxInstances = Math.max(5, Math.floor(fps / 2));
     const numberOfInstances = Math.min(50, maxInstances);
 
-    if (FloatingScore.numberOfInstances >= numberOfInstances || this.scoreLabel == null) {
+    if (
+      FloatingScore.numberOfInstances >= numberOfInstances ||
+      this.scoreLabel == null
+    ) {
       this.updateScore(value);
       return;
     }
