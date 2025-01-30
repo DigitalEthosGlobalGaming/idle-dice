@@ -16,7 +16,7 @@ export class PrestigeUi extends UpgradeUi {
     if (parent == null || !(parent instanceof UpgradesModal)) {
       return;
     }
-    let totalPrestiges = this.player.getData("total-prestiges") ?? 0;
+    let totalPrestiges = this.player.totalPrestiges ?? 0;
     const title = this.addPanel("title", Label);
     title.top = 10;
     if (totalPrestiges == 0) {
@@ -54,7 +54,7 @@ export class PrestigeUi extends UpgradeUi {
     const info = this.addPanel("prestige-info", Label);
     info.top = prestige.bottom + 20;
     info.left = -this.getParentBounds().width / 2 + 50;
-    info.text = "Current: 0 ⏣";
+    info.text = `Current: ${this.player.prestigePoints}⏣`;
     info.fontSize = 20;
 
     const upgrades = this.player.upgrades.filter(

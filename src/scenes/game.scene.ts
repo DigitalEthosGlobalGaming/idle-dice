@@ -111,7 +111,7 @@ export class GameScene extends Level implements Serializable {
 
         if (this.player == null) {
           this.player = new Player();
-          this.player.score = 10;
+          this.player.score = 1234;
           this.add(this.player);
           const gridSize = this.gridSystem.getBounds().center;
           this.player.wishPosition = gridSize.clone();
@@ -175,15 +175,26 @@ export class GameScene extends Level implements Serializable {
     let prestigePoints = Math.floor(
       (player.getData("current-prestige-score") ?? 0) / 1000000
     );
-    let currentPrestigePoints = player.getData("prestige-points") ?? 0;
-    player.setData(
-      "prestige-points",
-      Math.floor(currentPrestigePoints + prestigePoints)
-    );
+    player.prestigePoints =
+      Math.floor(player.prestigePoints + prestigePoints) + 1;
+    console.log(player.prestigePoints);
 
-    let totalPrestiges = player.getData("total-prestiges") ?? 0;
-    player.setData("total-prestiges", Math.floor(totalPrestiges) + 1);
-    player.score = 0;
+    player.totalPrestiges = Math.floor(player.totalPrestiges + 1);
+    player.score = player.totalPrestiges * 100 + 10;
+    for (const i in player.data) {
+      if (i.startsWith("actions.")) {
+        player.data[i] = false;
+      }
+      if (i.startsWith("research.")) {
+        player.data[i] = false;
+      }
+    }
+    for (const i in player.upgrades) {
+      const upgrade = player.upgrades[i];
+      if (upgrade.type == "RESEARCH") {
+        player.upgrades[i].level = 0;
+      }
+    }
 
     this.gridSystem?.clearAll();
     this.save();

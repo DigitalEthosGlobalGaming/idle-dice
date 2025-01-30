@@ -6,6 +6,7 @@ import { Player } from "@src/player-systems/player";
 export class ScoreComponent extends BaseComponent {
   private _score: number;
   private _previousScore: number = -10;
+  private _previousPrestigePoints: number = -10;
   private _scorePerMinute: number = 0;
   private lastScores: number[] = [];
   private scoreLabel: ex.Label | null = null;
@@ -50,7 +51,14 @@ export class ScoreComponent extends BaseComponent {
   }
 
   renderScore() {
-    if (this._previousScore == this._score) {
+    let player = this.player;
+    if (player == null) {
+      return;
+    }
+    if (
+      this._previousScore == this._score &&
+      player.prestigePoints == this._previousPrestigePoints
+    ) {
       return;
     }
 
@@ -96,11 +104,11 @@ export class ScoreComponent extends BaseComponent {
       });
     }
     if (this.scoreLabel.parent == null) {
-      const ui = this.getUi();
+      const ui = this.playerUi;
       ui.addChild(this.scoreLabel);
     }
     this._previousScore = this._score;
-    const prestigePoints = this.player?.getData("prestige-points") ?? 0;
+    const prestigePoints = player.prestigePoints;
     let text = `Energy: ${Math.floor(this._score)}⚡︎`;
     // if (this._scorePerMinute > 0) {
     //   text += `\n${this._scorePerMinute}⚡︎/min`;

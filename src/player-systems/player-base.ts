@@ -69,7 +69,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = "NONE";
+  _currentAction: PlayerActions = "UPGRADES";
   get currentAction() {
     return this._currentAction;
   }
@@ -89,6 +89,19 @@ export class PlayerBase extends ex.Actor implements InputHandler {
       });
     }
     this.getScene().save();
+  }
+
+  get totalPrestiges() {
+    return this.getData("total-prestiges") ?? 0;
+  }
+  set totalPrestiges(value: number) {
+    this.setData("total-prestiges", value);
+  }
+  get prestigePoints() {
+    return this.getData("prestige-points") ?? 0;
+  }
+  set prestigePoints(value: number) {
+    this.setData("prestige-points", value);
   }
 
   _score: number = 0;
@@ -369,10 +382,12 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     if (Environment.isDev) {
       return true;
     }
-    let prestigePoints = this.getData("prestige-points") ?? 0;
+    let prestigePoints = this.prestigePoints;
     if (prestigePoints < amount) {
       return false;
     }
+    this.prestigePoints = prestigePoints - amount;
+    this.scoreComponent.renderScore();
     return true;
   }
 

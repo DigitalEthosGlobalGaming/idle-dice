@@ -38,93 +38,133 @@ function getPossibleRolls(faces: number): number[][] {
     diceFaces.push(i + 1);
   }
 
-  for (let i = 0; i < totalPossibleRolls; i++) {
-    const roll = [];
-    const totalRolls = Math.floor(Math.random() * 5 + 10);
-    for (let i = 0; i < totalRolls; i++) {
-      const newNumber = getNewRoll(diceFaces, roll[roll.length - 1]);
-      roll.push(newNumber);
-    }
+  let rollsPerItem = Math.floor(totalPossibleRolls / faces);
+  for (let face = 1; face <= faces; face++) {
+    for (let i = 0; i < rollsPerItem; i++) {
+      const roll = [];
+      const totalRolls = Math.floor(Math.random() * 5 + 10);
+      for (let i = 0; i < totalRolls; i++) {
+        const newNumber = getNewRoll(diceFaces, random.integer(1, faces));
+        roll.push(newNumber);
+      }
+      roll[roll.length - 2] = getNewRoll(diceFaces, roll[roll.length - 1]);
+      roll[roll.length - 1] = face;
 
-    possibleRolls[faces].push(roll);
+      possibleRolls[faces].push(roll);
+    }
+  }
+  const rollsPerNumber: any = {};
+  const rolles = possibleRolls[faces];
+
+  for (let i = 0; i < rolles.length; i++) {
+    const roll = rolles[i];
+    const lastNumber = roll[roll.length - 1];
+    rollsPerNumber[lastNumber] = (rollsPerNumber[lastNumber] ?? 0) + 1;
   }
   return possibleRolls[faces];
 }
 
-function getRandomRoll(faces: number): number[] {
+function getRandomRoll(faces: number, face?: number): number[] {
   const diceFaces = getPossibleRolls(faces);
-  return diceFaces[Math.floor(Math.random() * diceFaces.length)];
+  if (face == undefined) {
+    return random.fromArray(diceFaces);
+  }
+  let rolles = diceFaces.filter((r) => r[r.length - 1] == face);
+  return random.fromArray(rolles);
 }
 
 const possibleRollAnimations: {
-  [key: string]: { animation: ex.Animation; numbers: number[] }[];
+  [key: string]: Record<
+    number,
+    { animation: ex.Animation; numbers: number[] }[]
+  >;
 } = {};
 
+const rollAnimationsPerFace = 10;
+
 function getPossibleRollAnimations(faces: number, speed: number) {
+  speed = speed ?? 1;
   const key = `${faces}-${speed}`;
   if (faces in possibleRollAnimations) {
     return possibleRollAnimations[key];
   }
-  possibleRollAnimations[key] = [];
+  possibleRollAnimations[key] = {};
 
-  const rollAnimationsPerFace = 10;
+  for (let face = 1; face <= faces; face++) {
+    for (
+      let rollAnimationIndex = 0;
+      rollAnimationIndex < rollAnimationsPerFace;
+      rollAnimationIndex++
+    ) {
+      const sprites = diceResources.map((r) => {
+        const sprite = ex.Sprite.from(r);
+        sprite.width = 16;
+        sprite.height = 16;
+        return sprite;
+      });
 
-  for (let i = 0; i < faces * rollAnimationsPerFace; i++) {
-    const sprites = diceResources.map((r) => {
-      const sprite = ex.Sprite.from(r);
-      sprite.width = 16;
-      sprite.height = 16;
-      return sprite;
-    });
+      const diceNumbers = getRandomRoll(faces, face);
+      const frameData: {
+        number: number;
+        duration: number;
+      }[] = [];
 
-    const diceNumbers = getRandomRoll(faces);
-    const frameData: {
-      number: number;
-      duration: number;
-    }[] = [];
+      const rollDuration = 100;
 
-    const rollDuration = 100;
+      for (const i in diceNumbers) {
+        const newNumber = diceNumbers[i];
+        const percentage = parseInt(i) / diceNumbers.length;
+        const duration =
+          ease("diceRollEasing", percentage, diceNumbers.length) * rollDuration;
 
-    for (const i in diceNumbers) {
-      const newNumber = diceNumbers[i];
-      const percentage = parseInt(i) / diceNumbers.length;
-      const duration =
-        ease("diceRollEasing", percentage, diceNumbers.length) * rollDuration;
+        frameData.push({
+          number: newNumber,
+          duration: duration,
+        });
+      }
 
-      frameData.push({
-        number: newNumber,
-        duration: duration,
+      const animation = new ex.Animation({
+        frames: frameData.map((item) => {
+          const graphic = sprites[item.number];
+          return {
+            graphic: graphic,
+            duration: item.duration,
+          };
+        }),
+        speed: 1,
+        strategy: ex.AnimationStrategy.Freeze,
+      });
+      if (possibleRollAnimations[key][face] == null) {
+        possibleRollAnimations[key][face] = [];
+      }
+      possibleRollAnimations[key][face].push({
+        animation: animation,
+        numbers: diceNumbers,
       });
     }
-
-    const animation = new ex.Animation({
-      frames: frameData.map((item) => {
-        const graphic = sprites[item.number];
-        return {
-          graphic: graphic,
-          duration: item.duration,
-        };
-      }),
-      speed: 1,
-      strategy: ex.AnimationStrategy.Freeze,
-    });
-    possibleRollAnimations[key].push({
-      animation: animation,
-      numbers: diceNumbers,
-    });
   }
   return possibleRollAnimations[key];
 }
 
 function getRandomRollAnimation(
   faces: number,
-  speed: number
+  speed: number,
+  weight: number
 ): {
   animation: ex.Animation;
   numbers: number[];
 } {
   const diceFaces = getPossibleRollAnimations(faces, speed);
-  return random.fromArray(diceFaces);
+  const numberCount: any = {};
+  let randomNumber = Math.min(random.integer(1, 6 + weight), 6);
+  const rolls = diceFaces[randomNumber];
+
+  for (const i in rolls) {
+    const numbers = rolls[i].numbers;
+    const lastNumber = numbers[numbers.length - 1];
+    numberCount[lastNumber] = (numberCount[lastNumber] ?? 0) + 1;
+  }
+  return random.fromArray(rolls);
 }
 
 export class Dice extends Building implements Serializable {
@@ -135,6 +175,10 @@ export class Dice extends Building implements Serializable {
   private _speed: number = 1;
   private _value: number = 0;
   private _multiplier: number = 1;
+
+  get weight(): number {
+    return 0;
+  }
 
   get tooltip() {
     let str = `Click to roll`;
@@ -208,7 +252,11 @@ export class Dice extends Building implements Serializable {
 
   postDeserialize(): void {
     try {
-      let rollAnimation = getRandomRollAnimation(this.faces, this.rollSpeed);
+      let rollAnimation = getRandomRollAnimation(
+        this.faces,
+        this.rollSpeed,
+        this.weight
+      );
       const lastFrame =
         rollAnimation.animation.frames[
           rollAnimation.animation.frames.length - 1
@@ -246,7 +294,7 @@ export class Dice extends Building implements Serializable {
     this.rolling = true;
     const speed = this.rollSpeed;
     const faces = this.faces;
-    const roll = getRandomRollAnimation(faces, speed);
+    const roll = getRandomRollAnimation(faces, speed, this.weight);
     const animation = roll.animation;
     this.value = roll.numbers[roll.numbers.length - 1];
 
