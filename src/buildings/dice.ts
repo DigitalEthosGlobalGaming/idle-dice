@@ -176,8 +176,12 @@ export class Dice extends Building implements Serializable {
   private _value: number = 0;
   private _multiplier: number = 1;
 
+  private _weight: number = -1;
   get weight(): number {
-    return 0;
+    return this._weight;
+  }
+  set weight(value: number) {
+    this._weight = value;
   }
 
   get tooltip() {
@@ -291,10 +295,14 @@ export class Dice extends Building implements Serializable {
     if (this.rollSpeed <= 0) {
       return;
     }
+    if (this.weight == -1) {
+      this.weight = this.player.getUpgrade("DiceWeight")?.value ?? 0;
+    }
     this.rolling = true;
     const speed = this.rollSpeed;
     const faces = this.faces;
     const roll = getRandomRollAnimation(faces, speed, this.weight);
+    console.log(this.weight);
     const animation = roll.animation;
     this.value = roll.numbers[roll.numbers.length - 1];
 

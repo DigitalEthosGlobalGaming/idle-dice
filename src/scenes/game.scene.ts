@@ -145,7 +145,7 @@ export class GameScene extends Level implements Serializable {
     }
   }
 
-  deserialize(_data: any): void {}
+  deserialize(_data: any): void { }
 
   onPreDraw(ctx: ex.ExcaliburGraphicsContext, elapsed: number): void {
     const gridBounds = this.gridSystem?.getBounds();
@@ -175,9 +175,9 @@ export class GameScene extends Level implements Serializable {
     let prestigePoints = Math.floor(
       (player.getData("current-prestige-score") ?? 0) / 1000000
     );
+    player.setData("current-prestige-score", 0);
     player.prestigePoints =
       Math.floor(player.prestigePoints + prestigePoints) + 1;
-    console.log(player.prestigePoints);
 
     player.totalPrestiges = Math.floor(player.totalPrestiges + 1);
     player.score = player.totalPrestiges * 100 + 10;

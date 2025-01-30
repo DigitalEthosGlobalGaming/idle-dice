@@ -47,7 +47,7 @@ waitForFontLoad("24px DS-DIGI").then(() => {
 
   const loader = new GameLoader();
   game.start(loader).then(() => {
-    game.goToScene("GameScene");
+    game.goToScene("WelcomeScene");
   });
 
   document.addEventListener("click", () => {

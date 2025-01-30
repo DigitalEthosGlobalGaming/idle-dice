@@ -104,6 +104,11 @@ addUpdate(
   "Fixes",
   "Fixed the sound system looping forever and crashing the game."
 );
+addUpdate(
+  "2025-01-31",
+  "Features",
+  "Added in the prestige system and 2 upgrades."
+);
 
 const showAfter = "2025-01-24";
 

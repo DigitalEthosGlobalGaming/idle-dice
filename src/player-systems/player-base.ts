@@ -69,7 +69,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  _currentAction: PlayerActions = "UPGRADES";
+  _currentAction: PlayerActions = "NONE";
   get currentAction() {
     return this._currentAction;
   }
@@ -176,7 +176,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         fcn: () => {
           const upgrade = this.getUpgrade("PassiveEnergy");
           let upgradeAmount = upgrade?.value ?? 1;
-          this.scoreComponent.updateScore(upgradeAmount);
+          this.scoreComponent.updateScore(upgradeAmount + 500000);
         },
         interval: 1000,
         repeats: true,
@@ -214,7 +214,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     }
   }
 
-  onPointerDown(_e: ExtendedPointerEvent) {}
+  onPointerDown(_e: ExtendedPointerEvent) { }
 
   onPointerUp(_e: ExtendedPointerEvent) {
     this.cameraMovementData = null;
@@ -364,7 +364,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     return Object.values(this.playerUpgradesComponent.upgrades);
   }
   getUpgrade<T extends Upgrade>(t: keyof typeof upgrades): T | null {
-    return this.playerUpgradesComponent.getUpgrade(t);
+    return this.playerUpgradesComponent?.getUpgrade(t);
   }
 
   spendEnergy(amount: number): boolean {

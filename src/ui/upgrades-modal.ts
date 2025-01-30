@@ -4,7 +4,7 @@ import { PrestigeUi } from "./prestige";
 import { UpgradeUi } from "./upgrades";
 
 export class UpgradesModal extends Modal {
-  protected _currentTab: string = "prestige-ui";
+  protected _currentTab: string = "upgrade-ui";
   get currentTab(): string {
     return this._currentTab;
   }
@@ -29,6 +29,6 @@ export class UpgradesModal extends Modal {
     });
   }
   onVisibleChanged(_visible: boolean): void {
-    this.currentTab = "prestige-ui";
+    this.currentTab = "upgrade-ui";
   }
 }
