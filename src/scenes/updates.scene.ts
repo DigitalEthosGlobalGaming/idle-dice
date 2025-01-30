@@ -1,9 +1,9 @@
-import { GameUpdate, gameUpdates } from "@src/scenes/../game-updates";
-import { Level } from "@src/scenes/../level";
-import { Button } from "@src/scenes/../ui/elements/button";
-import { Label } from "@src/scenes/../ui/elements/label";
-import { List } from "@src/scenes/../ui/elements/list";
-import { Panel } from "@src/scenes/../ui/panel";
+import { GameUpdate, gameUpdates } from "@src/game-updates";
+import { Level } from "@src/level";
+import { Button } from "@src/ui/elements/button";
+import { Label } from "@src/ui/elements/label";
+import { List } from "@src/ui/elements/list";
+import { Panel } from "@src/ui/panel";
 import { hashCheck } from "@src/utility/hash";
 import * as ex from "excalibur";
 

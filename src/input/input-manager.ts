@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { Level } from "@src/input/../level";
+import { Level } from "@src/level";
 import { ExtendedPointerEvent } from "./extended-pointer-event";
 import { ExtendedKeyEvent } from "./extended-key-event";
 
@@ -120,7 +120,6 @@ export class InputManager extends ex.Entity {
   get isInCurrentScene(): boolean {
     return this.scene?.isCurrentScene() ?? false;
   }
-
 
   onPointerDown(evt: ex.PointerEvent) {
     if (this.paused) {

@@ -1,5 +1,5 @@
 import { GrowthType } from "@src/utility/big-o-calculations";
-import { Upgrade } from "@src/components/upgrades/../upgrade-component";
+import { Upgrade } from "@src/components/upgrade-component";
 
 const parts = [
   `Generates {value}⚡︎ every second.`,

@@ -1,15 +1,12 @@
 import * as ex from "excalibur";
-import { Grid } from "@src/grid-system/../graphics/grid";
+import { Grid } from "@src/graphics/grid";
 import { GridSpace } from "./grid-space";
 import { GridSystem } from "./grid-system";
-import {
-  InputHandler,
-  InputManager,
-} from "@src/grid-system/../input/input-manager";
-import { Player } from "@src/grid-system/../player-systems/player";
-import { GameScene } from "@src/grid-system/../scenes/game.scene";
-import { Resources } from "@src/grid-system/../resources";
-import { ExtendedPointerEvent } from "@src/grid-system/../input/extended-pointer-event";
+import { InputHandler, InputManager } from "@src/input/input-manager";
+import { Player } from "@src/player-systems/player";
+import { GameScene } from "@src/scenes/game.scene";
+import { Resources } from "@src/resources";
+import { ExtendedPointerEvent } from "@src/input/extended-pointer-event";
 
 class GridSpaceGhost extends ex.Actor {
   spaceSize: ex.Vector = new ex.Vector(32, 32);

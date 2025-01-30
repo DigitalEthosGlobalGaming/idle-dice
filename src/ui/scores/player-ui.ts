@@ -4,7 +4,7 @@ import {
 } from "@src/player-systems/player-actions";
 import { PlayerActionsUi } from "@src/player-systems/player-actions-ui";
 import { PlayerTooltip, Tooltip } from "@src/player-systems/player-tooltip";
-import { Panel } from "@src/ui/scores/../panel";
+import { Panel } from "@src/ui/panel";
 import * as ex from "excalibur";
 import { UpgradesModal } from "../upgrades-modal";
 

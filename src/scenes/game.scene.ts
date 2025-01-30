@@ -1,9 +1,9 @@
 import { ExtendedKeyEvent } from "@src/input/extended-key-event";
-import { DiceSaveSystem } from "@src/scenes/../dice-save-system";
-import { DiceGameGridSystem } from "@src/scenes/../grid-system/grid-system-actor";
-import { Level } from "@src/scenes/../level";
-import { Player } from "@src/scenes/../player-systems/player";
-import { Serializable } from "@src/scenes/../systems/save-system";
+import { DiceSaveSystem } from "@src/dice-save-system";
+import { DiceGameGridSystem } from "@src/grid-system/grid-system-actor";
+import { Level } from "@src/level";
+import { Player } from "@src/player-systems/player";
+import { Serializable } from "@src/systems/save-system";
 import { NotificationSystem } from "@src/systems/notification.system";
 import * as ex from "excalibur";
 

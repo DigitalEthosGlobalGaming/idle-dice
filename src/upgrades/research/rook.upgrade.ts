@@ -1,5 +1,5 @@
 import { GrowthType } from "@src/utility/big-o-calculations";
-import { Upgrade } from "@src/components/upgrades/../upgrade-component";
+import { Upgrade } from "@src/components/upgrade-component";
 
 export class RookUpgrade extends Upgrade {
   override name = "Rook";
@@ -8,7 +8,7 @@ export class RookUpgrade extends Upgrade {
       return [
         `{nextCost}⚡︎ - Allows building of a Rook`,
         ` - Moves through dice to the next free space.`,
-        ' - Adding multipliers to all dice passed.',
+        " - Adding multipliers to all dice passed.",
       ].join("\n");
     }
 

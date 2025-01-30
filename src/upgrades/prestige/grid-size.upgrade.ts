@@ -1,12 +1,14 @@
 import { GrowthType } from "@src/utility/big-o-calculations";
-import { Upgrade, UpgradeType } from "@src/components/upgrades/../upgrade-component";
+import { Upgrade, UpgradeType } from "@src/components/upgrade-component";
 
 export class GridSizeUpgrade extends Upgrade {
   override name = "Grid Size";
   type: UpgradeType = "PRESTIGE";
   get description(): string {
     const parts = [
-      `{nextCost} - Increases playing space to {${this.nextValue + 16}} x {${this.nextValue + 16}}`,
+      `{nextCost} - Increases playing space to {${this.nextValue + 16}} x {${
+        this.nextValue + 16
+      }}`,
     ];
 
     return parts.join("\n");

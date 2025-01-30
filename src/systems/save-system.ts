@@ -1,6 +1,6 @@
 import { Component, Entity, Scene, System, SystemType } from "excalibur";
-import { isArray } from "@src/systems/../utility/is-array";
-import { isString } from "@src/systems/../utility/is-string";
+import { isArray } from "@src/utility/is-array";
+import { isString } from "@src/utility/is-string";
 
 export interface Serializable {
   serialize(): any;

@@ -1,7 +1,7 @@
-import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
-import { GameScene } from "@src/player-systems/../scenes/game.scene";
-import { Button } from "@src/player-systems/../ui/elements/button";
-import { Panel } from "@src/player-systems/../ui/panel";
+import { ExtendedPointerEvent } from "@src/input/extended-pointer-event";
+import { GameScene } from "@src/scenes/game.scene";
+import { Button } from "@src/ui/elements/button";
+import { Panel } from "@src/ui/panel";
 import * as ex from "excalibur";
 import { Player } from "./player";
 import { PlayerAction, playerActions } from "./player-actions";

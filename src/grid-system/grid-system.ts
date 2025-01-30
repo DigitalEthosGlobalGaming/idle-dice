@@ -1,6 +1,6 @@
 import * as ex from "excalibur";
 import { GridSpace } from "./grid-space";
-import { Serializable } from "@src/grid-system/../systems/save-system";
+import { Serializable } from "@src/systems/save-system";
 
 export class GridSystem extends ex.Actor implements Serializable {
   static serializeName: string = "GridSystem";
@@ -142,7 +142,12 @@ export class GridSystem extends ex.Actor implements Serializable {
   }
 
   getSpaceIndex(position: ex.Vector) {
-    if (position.x < 0 || position.y < 0 || position.x >= this.size.x || position.y >= this.size.y) {
+    if (
+      position.x < 0 ||
+      position.y < 0 ||
+      position.x >= this.size.x ||
+      position.y >= this.size.y
+    ) {
       return -1;
     }
     return position.y * this.size.x + position.x;
@@ -223,7 +228,6 @@ export class GridSystem extends ex.Actor implements Serializable {
       this.size = ex.vec(data.size._x, data.size._y);
     }
   }
-
 
   clearAll() {
     for (let entity of this.children) {

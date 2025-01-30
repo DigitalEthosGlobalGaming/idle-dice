@@ -1,22 +1,23 @@
-import { Level } from "@src/scenes/../level";
-import { Button } from "@src/scenes/../ui/elements/button";
-import { Label } from "@src/scenes/../ui/elements/label";
-import { List } from "@src/scenes/../ui/elements/list";
-import { Panel } from "@src/scenes/../ui/panel";
+import { Level } from "@src/level";
+import { Button } from "@src/ui/elements/button";
+import { Label } from "@src/ui/elements/label";
+import { List } from "@src/ui/elements/list";
+import { Panel } from "@src/ui/panel";
 import * as ex from "excalibur";
 
-const elements = [{
-  text: "CONGRATULATIONS",
-  size: 40
-},
-{
-  text: "Your efforts as rollmaster has been noticed",
-  size: 24
-},
-{
-  text: "Keep playing to unlock upgrades!",
-  size: 24
-}
+const elements = [
+  {
+    text: "CONGRATULATIONS",
+    size: 40,
+  },
+  {
+    text: "Your efforts as rollmaster has been noticed",
+    size: 24,
+  },
+  {
+    text: "Keep playing to unlock upgrades!",
+    size: 24,
+  },
 ];
 
 class Ui extends Panel {
@@ -50,7 +51,6 @@ export class PrestigeScene extends Level {
     super.onActivate(context);
     this.mainPanel = new Ui();
     this.add(this.mainPanel);
-
   }
 
   onDeactivate(context: ex.SceneActivationContext): void {

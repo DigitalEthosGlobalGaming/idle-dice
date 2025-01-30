@@ -1,5 +1,5 @@
 import { ImageSource } from "excalibur";
-import { Resources } from "@src/player-systems/../resources";
+import { Resources } from "@src/resources";
 import { Roller } from "@src/buildings/roller";
 import { WanderingKnight } from "@src/buildings/wandering-knight";
 import { Dice } from "@src/buildings/dice";
@@ -14,8 +14,8 @@ export const PlayerActionKey = {
   REMOVE: "REMOVE",
   UPGRADES: "UPGRADES",
   ROOK: "ROOK",
-  "NONE": "NONE",
-}
+  NONE: "NONE",
+};
 export type PlayerActions = keyof typeof PlayerActionKey;
 
 export enum PlayerActionTypes {
@@ -25,13 +25,13 @@ export enum PlayerActionTypes {
 
 export type PlayerAction =
   | {
-    name: string;
-    code: PlayerActions;
-    type: PlayerActionTypes.MENU;
-    image: ImageSource;
-    tooltip: string;
-    unlocked?: boolean;
-  }
+      name: string;
+      code: PlayerActions;
+      type: PlayerActionTypes.MENU;
+      image: ImageSource;
+      tooltip: string;
+      unlocked?: boolean;
+    }
   | PlayerActionBuildable;
 
 type PlayerActionBuildable = {
@@ -93,7 +93,8 @@ export const playerActions: PlayerAction[] = [
       cost: () => 125000,
       classRef: Rook,
     },
-    tooltip: "125000 - Moves to a random space through buildings. Adding multipliers to dice passed.",
+    tooltip:
+      "125000 - Moves to a random space through buildings. Adding multipliers to dice passed.",
   },
   {
     code: "BISHOP",

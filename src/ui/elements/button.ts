@@ -1,5 +1,5 @@
 import * as ex from "excalibur";
-import { Panel, PanelBackgrounds } from "@src/ui/elements/../panel";
+import { Panel, PanelBackgrounds } from "@src/ui/panel";
 import { Tooltip } from "@src/player-systems/player-tooltip";
 import { Label } from "@src/ui/elements/label";
 import { SoundManager } from "@src/sound-manager";
@@ -30,7 +30,7 @@ export class Button extends Panel {
       value = {
         code: `button-${this.id}`,
         title: value,
-        description: '',
+        description: "",
       };
     }
     if (value?.code == this.tooltip?.code) {

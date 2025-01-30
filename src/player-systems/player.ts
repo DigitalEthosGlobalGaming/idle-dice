@@ -1,9 +1,6 @@
 import * as ex from "excalibur";
-import { InputManager } from "@src/player-systems/../input/input-manager";
-import {
-  SerialisedObject,
-  Serializable,
-} from "@src/player-systems/../systems/save-system";
+import { InputManager } from "@src/input/input-manager";
+import { SerialisedObject, Serializable } from "@src/systems/save-system";
 import { PlayerBase } from "./player-base";
 
 export class Player extends PlayerBase implements Serializable {

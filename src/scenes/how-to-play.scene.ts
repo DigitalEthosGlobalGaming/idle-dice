@@ -1,9 +1,9 @@
 import * as ex from "excalibur";
-import { Level } from "@src/scenes/../level";
-import { Panel } from "@src/scenes/../ui/panel";
-import { Label } from "@src/scenes/../ui/elements/label";
-import { List } from "@src/scenes/../ui/elements/list";
-import { Button } from "@src/scenes/../ui/elements/button";
+import { Level } from "@src/level";
+import { Panel } from "@src/ui/panel";
+import { Label } from "@src/ui/elements/label";
+import { List } from "@src/ui/elements/list";
+import { Button } from "@src/ui/elements/button";
 
 const elements: any[] = [
   "HELP",

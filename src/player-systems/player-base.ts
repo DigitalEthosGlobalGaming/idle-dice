@@ -1,21 +1,18 @@
 import { Environment } from "@src/env";
-import { Building } from "@src/player-systems/../building";
-import { Dice } from "@src/player-systems/../buildings/dice";
+import { Building } from "@src/building";
+import { Dice } from "@src/buildings/dice";
 import {
   PlayerUpgradesComponent,
   upgrades,
-} from "@src/player-systems/../components/player-upgrades-component";
-import { ScoreComponent } from "@src/player-systems/../components/score-component";
-import { Upgrade } from "@src/player-systems/../components/upgrade-component";
-import { Ghost } from "@src/player-systems/../ghost";
-import { GridSpace } from "@src/player-systems/../grid-system/grid-space";
-import { ExtendedPointerEvent } from "@src/player-systems/../input/extended-pointer-event";
-import {
-  ButtonStates,
-  InputHandler,
-} from "@src/player-systems/../input/input-manager";
-import { GameScene } from "@src/player-systems/../scenes/game.scene";
-import { PlayerUi } from "@src/player-systems/../ui/scores/player-ui";
+} from "@src/components/player-upgrades-component";
+import { ScoreComponent } from "@src/components/score-component";
+import { Upgrade } from "@src/components/upgrade-component";
+import { Ghost } from "@src/ghost";
+import { GridSpace } from "@src/grid-system/grid-space";
+import { ExtendedPointerEvent } from "@src/input/extended-pointer-event";
+import { ButtonStates, InputHandler } from "@src/input/input-manager";
+import { GameScene } from "@src/scenes/game.scene";
+import { PlayerUi } from "@src/ui/scores/player-ui";
 import * as ex from "excalibur";
 import {
   playerActions,
