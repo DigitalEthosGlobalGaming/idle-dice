@@ -8,6 +8,7 @@ import { UpdatesScene } from "@src/scenes/updates.scene";
 import { TestUserInterfaceScene } from "@src/scenes/test/user-interface/user-interface.scene";
 import { SoundManager } from "@src/sound-manager";
 import { PrestigeScene } from "./scenes/prestige.scene";
+import { SettingsScene } from "./scenes/settings.scene";
 
 async function waitForFontLoad(font: string, timeout = 2000, interval = 100) {
   return new Promise((resolve, reject) => {
@@ -42,6 +43,7 @@ waitForFontLoad("24px DS-DIGI").then(() => {
       UpdatesScene,
       TestUserInterfaceScene,
       PrestigeScene,
+      SettingsScene
     },
   });
 

@@ -11,6 +11,7 @@ export const Scenes: Record<string, string> = {
   Updates: "UpdatesScene",
   Help: "HowToPlayScene",
   Credits: "CreditScene",
+  Settings: "SettingsScene",
 };
 class WelcomeUi extends Panel {
   onRender(): void {
@@ -43,9 +44,8 @@ class WelcomeUi extends Panel {
 
     let versionLabel1 = this.addPanel("version-label-2", Label);
     versionLabel1.fontSize = 30;
-    versionLabel1.text = `Version ${
-      import.meta.env.VITE_BUILD_VERSION || "dev"
-    }`;
+    versionLabel1.text = `Version ${import.meta.env.VITE_BUILD_VERSION || "dev"
+      }`;
     versionLabel1.bottomRight = ex.vec(
       screenSize.x / 2 - 10,
       screenSize.y / 2 - 10

@@ -109,6 +109,11 @@ addUpdate(
   "Features",
   "Added in the prestige system and 2 upgrades."
 );
+addUpdate(
+  "2025-01-31",
+  "Technical",
+  "Found some bugs in the dice rolling that was creating 100x more animations than needed to be created."
+);
 
 const showAfter = "2025-01-24";
 

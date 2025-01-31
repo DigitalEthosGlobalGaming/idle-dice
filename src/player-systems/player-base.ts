@@ -69,6 +69,10 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
+  get inputSystem() {
+    return this.getScene().inputSystem
+  }
+
   _currentAction: PlayerActions = "NONE";
   get currentAction() {
     return this._currentAction;
@@ -191,23 +195,32 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   }
 
   onPointerMove(e: ExtendedPointerEvent) {
+
     const isPrimary = e.isDown("MouseLeft") || e.pointerType == "Touch";
+
     if (isPrimary) {
-      if (this.cameraMovementData == null) {
-        this.cameraMovementData = {
-          isMoving: true,
-          pos: e.screenPos.clone(),
-          lastPos: e.screenPos.clone(),
-        };
+      if (this.inputSystem.isDown(ex.Keys.ShiftLeft)) {
+        let space = this.getScene().gridSystem?.getSpaceFromWorldPosition(e.worldPos);
+        if (space != null) {
+          this.onSpaceClicked(space);
+        }
       } else {
-        this.cameraMovementData.pos = e.screenPos.clone();
+        if (this.cameraMovementData == null) {
+          this.cameraMovementData = {
+            isMoving: true,
+            pos: e.screenPos.clone(),
+            lastPos: e.screenPos.clone(),
+          };
+        } else {
+          this.cameraMovementData.pos = e.screenPos.clone();
 
-        let diff = this.cameraMovementData.pos.sub(
-          this.cameraMovementData.lastPos
-        );
-        this.wishPosition = this.wishPosition.sub(diff);
+          let diff = this.cameraMovementData.pos.sub(
+            this.cameraMovementData.lastPos
+          );
+          this.wishPosition = this.wishPosition.sub(diff);
 
-        this.cameraMovementData.lastPos = e.screenPos.clone();
+          this.cameraMovementData.lastPos = e.screenPos.clone();
+        }
       }
     } else {
       this.cameraMovementData = null;
@@ -444,9 +457,13 @@ export class PlayerBase extends ex.Actor implements InputHandler {
 
   unlockAction(action: PlayerActions | string) {
     let playerAction = playerActions.find((a) => a.code == action);
-    if (playerAction != null) {
-      playerAction.unlocked = true;
+    if (playerAction == null) {
+      return;
     }
+    if (playerAction.unlocked == true) {
+      return;
+    }
+    playerAction.unlocked = true;
     this.setData(`actions.${action}`, true);
     if (this.playerUi != null) {
       this.playerUi.allDirty = true;

@@ -31,7 +31,7 @@ type RegisterForInput = {
 
 export type InputHandler = ex.Entity & RegisterForInput;
 
-export type ButtonStates = "MouseLeft" | "MouseRight";
+export type ButtonStates = "MouseLeft" | "MouseRight" | ex.Keys;
 
 export class InputManager extends ex.Entity {
   static InputManagers: InputManager[] = [];
@@ -53,6 +53,128 @@ export class InputManager extends ex.Entity {
   buttonStates: Record<ButtonStates, boolean> = {
     MouseLeft: false,
     MouseRight: false,
+    [ex.Keys.Backquote]: false,
+    [ex.Keys.Backslash]: false,
+    [ex.Keys.BracketLeft]: false,
+    [ex.Keys.BracketRight]: false,
+    [ex.Keys.Comma]: false,
+    [ex.Keys.Key0]: false,
+    [ex.Keys.Key1]: false,
+    [ex.Keys.Key2]: false,
+    [ex.Keys.Key3]: false,
+    [ex.Keys.Key4]: false,
+    [ex.Keys.Key5]: false,
+    [ex.Keys.Key6]: false,
+    [ex.Keys.Key7]: false,
+    [ex.Keys.Key8]: false,
+    [ex.Keys.Key9]: false,
+    [ex.Keys.Equal]: false,
+    [ex.Keys.IntlBackslash]: false,
+    [ex.Keys.IntlRo]: false,
+    [ex.Keys.IntlYen]: false,
+    [ex.Keys.A]: false,
+    [ex.Keys.B]: false,
+    [ex.Keys.C]: false,
+    [ex.Keys.D]: false,
+    [ex.Keys.E]: false,
+    [ex.Keys.F]: false,
+    [ex.Keys.G]: false,
+    [ex.Keys.H]: false,
+    [ex.Keys.I]: false,
+    [ex.Keys.J]: false,
+    [ex.Keys.K]: false,
+    [ex.Keys.L]: false,
+    [ex.Keys.M]: false,
+    [ex.Keys.N]: false,
+    [ex.Keys.O]: false,
+    [ex.Keys.P]: false,
+    [ex.Keys.Q]: false,
+    [ex.Keys.R]: false,
+    [ex.Keys.S]: false,
+    [ex.Keys.T]: false,
+    [ex.Keys.U]: false,
+    [ex.Keys.V]: false,
+    [ex.Keys.W]: false,
+    [ex.Keys.X]: false,
+    [ex.Keys.Y]: false,
+    [ex.Keys.Z]: false,
+    [ex.Keys.Minus]: false,
+    [ex.Keys.Period]: false,
+    [ex.Keys.Quote]: false,
+    [ex.Keys.Semicolon]: false,
+    [ex.Keys.Slash]: false,
+    [ex.Keys.AltLeft]: false,
+    [ex.Keys.AltRight]: false,
+    [ex.Keys.Alt]: false,
+    [ex.Keys.AltGraph]: false,
+    [ex.Keys.Backspace]: false,
+    [ex.Keys.CapsLock]: false,
+    [ex.Keys.ContextMenu]: false,
+    [ex.Keys.ControlLeft]: false,
+    [ex.Keys.ControlRight]: false,
+    [ex.Keys.Enter]: false,
+    [ex.Keys.MetaLeft]: false,
+    [ex.Keys.MetaRight]: false,
+    [ex.Keys.ShiftLeft]: false,
+    [ex.Keys.ShiftRight]: false,
+    [ex.Keys.Space]: false,
+    [ex.Keys.Tab]: false,
+    [ex.Keys.Convert]: false,
+    [ex.Keys.KanaMode]: false,
+    [ex.Keys.NonConvert]: false,
+    [ex.Keys.Delete]: false,
+    [ex.Keys.End]: false,
+    [ex.Keys.Help]: false,
+    [ex.Keys.Home]: false,
+    [ex.Keys.Insert]: false,
+    [ex.Keys.PageDown]: false,
+    [ex.Keys.PageUp]: false,
+    [ex.Keys.Up]: false,
+    [ex.Keys.Down]: false,
+    [ex.Keys.Left]: false,
+    [ex.Keys.Right]: false,
+    [ex.Keys.NumLock]: false,
+    [ex.Keys.Numpad0]: false,
+    [ex.Keys.Numpad1]: false,
+    [ex.Keys.Numpad2]: false,
+    [ex.Keys.Numpad3]: false,
+    [ex.Keys.Numpad4]: false,
+    [ex.Keys.Numpad5]: false,
+    [ex.Keys.Numpad6]: false,
+    [ex.Keys.Numpad7]: false,
+    [ex.Keys.Numpad8]: false,
+    [ex.Keys.Numpad9]: false,
+    [ex.Keys.NumAdd]: false,
+    [ex.Keys.NumDecimal]: false,
+    [ex.Keys.NumDivide]: false,
+    [ex.Keys.NumEnter]: false,
+    [ex.Keys.NumMultiply]: false,
+    [ex.Keys.NumSubtract]: false,
+    [ex.Keys.Esc]: false,
+    [ex.Keys.F1]: false,
+    [ex.Keys.F2]: false,
+    [ex.Keys.F3]: false,
+    [ex.Keys.F4]: false,
+    [ex.Keys.F5]: false,
+    [ex.Keys.F6]: false,
+    [ex.Keys.F7]: false,
+    [ex.Keys.F8]: false,
+    [ex.Keys.F9]: false,
+    [ex.Keys.F10]: false,
+    [ex.Keys.F11]: false,
+    [ex.Keys.F12]: false,
+    [ex.Keys.F13]: false,
+    [ex.Keys.F14]: false,
+    [ex.Keys.F15]: false,
+    [ex.Keys.F16]: false,
+    [ex.Keys.F17]: false,
+    [ex.Keys.F18]: false,
+    [ex.Keys.F19]: false,
+    [ex.Keys.F20]: false,
+    [ex.Keys.PrintScreen]: false,
+    [ex.Keys.ScrollLock]: false,
+    [ex.Keys.Pause]: false,
+    [ex.Keys.Unidentified]: false
   };
 
   get level(): Level {
@@ -215,6 +337,8 @@ export class InputManager extends ex.Entity {
     if (this.paused) {
       return;
     }
+
+    this.buttonStates[evt.key] = false;
     let extendedEvent = ExtendedKeyEvent.extend(evt, this);
     let entities = Object.values(this.entities);
     this.level.onKeyUp(extendedEvent);
@@ -240,6 +364,7 @@ export class InputManager extends ex.Entity {
     if (this.paused) {
       return;
     }
+    this.buttonStates[evt.key] = true
     let extendedEvent = ExtendedKeyEvent.extend(evt, this);
     this.level.onKeyDown(extendedEvent);
     let entities = Object.values(this.entities);
@@ -264,6 +389,11 @@ export class InputManager extends ex.Entity {
       }
     }
   }
+
+  isDown(button: ButtonStates): boolean {
+    return this.buttonStates[button];
+  }
+
 
   static unregister(entity: InputHandler, scene: ex.Scene): void {
     if (entity.scene == null) {

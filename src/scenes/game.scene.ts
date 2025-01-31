@@ -106,7 +106,7 @@ export class GameScene extends Level implements Serializable {
           this.gridSystem = new DiceGameGridSystem();
           this.add(this.gridSystem);
         }
-        this.gridSystem.size = new ex.Vector(16, 16);
+        this.gridSystem.size = new ex.Vector(32, 32);
         this.gridSystem.spaceSize = new ex.Vector(32, 32);
 
         if (this.player == null) {
@@ -115,9 +115,9 @@ export class GameScene extends Level implements Serializable {
           this.add(this.player);
           const gridSize = this.gridSystem.getBounds().center;
           this.player.wishPosition = gridSize.clone();
-        } else {
-          this.resizeGrid();
         }
+        this.resizeGrid();
+
         this.inputSystem.paused = false;
       },
       interval: 250,

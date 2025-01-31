@@ -9,7 +9,13 @@ export class Building extends ex.Actor implements Serializable {
   friendlyName: string = "Building";
   tickRate = -1;
   lastTick = -1;
-  wishScale = 1;
+  _wishScale = 1;
+  get wishScale() {
+    return this._wishScale;
+  }
+  set wishScale(value: number) {
+    this._wishScale = value;
+  }
   wishPos = ex.vec(0, 0);
   speed = 0.1;
 
