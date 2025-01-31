@@ -177,7 +177,7 @@ export class GameScene extends Level implements Serializable {
     );
     player.currentPrestigeScore = 0;
     player.prestigePoints =
-      Math.floor(player.prestigePoints + prestigePoints) + 1;
+      Math.floor(player.prestigePoints + prestigePoints);
 
     player.totalPrestiges = Math.floor(player.totalPrestiges + 1);
     player.score = player.totalPrestiges * 100 + 10;
@@ -197,8 +197,8 @@ export class GameScene extends Level implements Serializable {
     }
 
     this.gridSystem?.clearAll();
-    this.save();
     this.gridSystem?.kill();
+    this.save();
     player.kill();
     this.player = undefined;
     this.gridSystem = null;

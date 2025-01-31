@@ -56,10 +56,13 @@ function getChildren(obj: SerializableObject | Scene) {
     }
   }
   if (obj instanceof Scene) {
-    let entities = obj.entities.filter((e) => e.parent == null) as Entity[];
+    let entities = obj.entities.filter((e) => e.parent == null && !e.isKilled()) as Entity[];
     return entities;
   }
   if (obj instanceof Entity) {
+    if (obj.isKilled()) {
+      return [];
+    }
     return [...obj.getComponents(), ...obj.children];
   }
   if (obj instanceof Component) {

@@ -229,10 +229,13 @@ export class GridSystem extends ex.Actor implements Serializable {
     }
   }
 
+
   clearAll() {
     for (let entity of this.children) {
       try {
-        entity.kill();
+        if (entity instanceof GridSpace) {
+          entity.kill();
+        }
       } catch (e) {
         console.error(e);
       }

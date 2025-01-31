@@ -10,7 +10,7 @@ import { Upgrade } from "@src/components/upgrade-component";
 import { Ghost } from "@src/ghost";
 import { GridSpace } from "@src/grid-system/grid-space";
 import { ExtendedPointerEvent } from "@src/input/extended-pointer-event";
-import { ButtonStates, InputHandler } from "@src/input/input-manager";
+import { ButtonStates, InputHandler, InputManager } from "@src/input/input-manager";
 import { GameScene } from "@src/scenes/game.scene";
 import { PlayerUi } from "@src/ui/scores/player-ui";
 import * as ex from "excalibur";
@@ -69,8 +69,8 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   wishPosition = ex.vec(0, 0);
   isSetup = false;
 
-  get inputSystem() {
-    return this.getScene().inputSystem
+  get inputSystem(): InputManager | null {
+    return this.getScene()?.inputSystem ?? null
   }
 
   _currentAction: PlayerActions = "NONE";
@@ -129,6 +129,8 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     this.scoreComponent.score = value;
   }
 
+  subscriptions: ex.Subscription[] = [];
+
   getCamera(): ex.Camera {
     if (this.scene == null) {
       throw new Error("Scene is null");
@@ -174,15 +176,15 @@ export class PlayerBase extends ex.Actor implements InputHandler {
       this.addComponent(this.playerUpgradesComponent);
     }
 
-    this.scene?.on("im-pointer-down", (e) => {
+    this.subscriptions.push(this.scene?.on("im-pointer-down", (e) => {
       this.onPointerDown(e as ExtendedPointerEvent);
-    });
-    this.scene?.on("im-pointer-move", (e) => {
+    }));
+    this.subscriptions.push(this.scene?.on("im-pointer-move", (e) => {
       this.onPointerMove(e as ExtendedPointerEvent);
-    });
-    this.scene?.on("im-pointer-up", (e) => {
+    }));
+    this.subscriptions.push(this.scene?.on("im-pointer-up", (e) => {
       this.onPointerUp(e as ExtendedPointerEvent);
-    });
+    }));
     const timer = this.scene?.addTimer(
       new ex.Timer({
         fcn: () => {
@@ -203,11 +205,10 @@ export class PlayerBase extends ex.Actor implements InputHandler {
   }
 
   onPointerMove(e: ExtendedPointerEvent) {
-
     const isPrimary = e.isDown("MouseLeft") || e.pointerType == "Touch";
 
     if (isPrimary) {
-      if (this.inputSystem.isDown(ex.Keys.ShiftLeft)) {
+      if (this.inputSystem?.isDown(ex.Keys.ShiftLeft)) {
         let space = this.getScene().gridSystem?.getSpaceFromWorldPosition(e.worldPos);
         if (space != null) {
           this.onSpaceClicked(space);
@@ -489,5 +490,11 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     if (this.playerUi != null) {
       this.playerUi.allDirty = true;
     }
+  }
+
+  onPreKill(scene: ex.Scene): void {
+    super.onPreKill(scene);
+    this.subscriptions.forEach((s) => s.close());
+    this.subscriptions = [];
   }
 }
