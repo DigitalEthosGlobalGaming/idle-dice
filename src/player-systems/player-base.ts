@@ -108,6 +108,14 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     this.setData("prestige-points", value);
   }
 
+  get currentPrestigeScore() {
+    return this.getData("current-prestige-score") ?? 0;
+  }
+  set currentPrestigeScore(value: number) {
+    this.setData("current-prestige-score", value);
+  }
+
+
   _score: number = 0;
 
   get score() {

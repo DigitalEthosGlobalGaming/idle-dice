@@ -173,9 +173,9 @@ export class GameScene extends Level implements Serializable {
       throw new Error("Player is not defined");
     }
     let prestigePoints = Math.floor(
-      (player.getData("current-prestige-score") ?? 0) / 1000000
+      player.currentPrestigeScore / 1000000
     );
-    player.setData("current-prestige-score", 0);
+    player.currentPrestigeScore = 0;
     player.prestigePoints =
       Math.floor(player.prestigePoints + prestigePoints) + 1;
 

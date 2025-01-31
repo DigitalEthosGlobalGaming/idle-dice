@@ -44,7 +44,7 @@ export class UpgradeUi extends Panel {
         title.pos.y + title.height + list.halfHeight
       );
 
-      if (this.player.score > 1000000 || Environment.isDev) {
+      if (this.player.currentPrestigeScore > 1000000 || Environment.isDev) {
         let parent = this.parentPanel;
         if (parent != null) {
           const prestige = this.addPanel("prestige", Button);

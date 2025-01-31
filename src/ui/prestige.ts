@@ -26,9 +26,9 @@ export class PrestigeUi extends UpgradeUi {
     }
     title.fontSize = 40;
 
-    let prestigePoints = Math.floor(
-      (this.player.getData("current-prestige-score") ?? 0) / 1000000
-    );
+    let prestigePoints = Math.max(Math.floor(
+      (this.player.currentPrestigeScore) / 1000000
+    ), 0);
 
     const prestige = this.addPanel("prestige", Button);
     if (prestigePoints == 0 && !Environment.isDev) {
@@ -37,7 +37,6 @@ export class PrestigeUi extends UpgradeUi {
     prestige.text = `PRESTIGE +${prestigePoints}⏣`;
     prestige.fontSize = 20;
     prestige.top = title.height + 20;
-    // let prestigePoints = (this.player.getData("current-prestige-score") ?? 0)/ 1000000;
     prestige.tooltip = `Prestige to gain ${prestigePoints}⏣, 1 ⏣ for every 1 million energy earned.`;
     prestige.onPointerUp = () => {
       if (prestige.disabled) {
