@@ -302,7 +302,6 @@ export class Dice extends Building implements Serializable {
     const speed = this.rollSpeed;
     const faces = this.faces;
     const roll = getRandomRollAnimation(faces, speed, this.weight);
-    console.log(this.weight);
     const animation = roll.animation;
     this.value = roll.numbers[roll.numbers.length - 1];
 
