@@ -14,7 +14,7 @@ export class GridSizeUpgrade extends Upgrade {
     return parts.join("\n");
   }
   protected override _maxLevel: number = 16;
-  override _baseCost: number = 10;
+  override _baseCost: number = 1;
   override _baseValue: number = 1;
   override _costType = GrowthType.LINEAR;
   override _bonusType = GrowthType.LINEAR;
