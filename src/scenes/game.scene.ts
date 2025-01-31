@@ -111,7 +111,7 @@ export class GameScene extends Level implements Serializable {
 
         if (this.player == null) {
           this.player = new Player();
-          this.player.score = 1234;
+          this.player.score = 10;
           this.add(this.player);
           const gridSize = this.gridSystem.getBounds().center;
           this.player.wishPosition = gridSize.clone();
