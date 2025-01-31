@@ -176,7 +176,7 @@ export class PlayerBase extends ex.Actor implements InputHandler {
         fcn: () => {
           const upgrade = this.getUpgrade("PassiveEnergy");
           let upgradeAmount = upgrade?.value ?? 1;
-          this.scoreComponent.updateScore(upgradeAmount + 500000);
+          this.scoreComponent.updateScore(upgradeAmount);
         },
         interval: 1000,
         repeats: true,
