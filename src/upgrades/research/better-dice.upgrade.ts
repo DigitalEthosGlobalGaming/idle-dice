@@ -3,6 +3,7 @@ import { Upgrade } from "@src/components/upgrade-component";
 
 export class BetterDiceUpgrade extends Upgrade {
   override name = "Dice Boosters";
+  override code = "BETTER_DICE";
   get description(): string {
     if (this.level == 0) {
       return `{nextCost}⚡︎ - Dice generates {nextValue}⚡︎ extra when rolled.`;
@@ -33,3 +34,4 @@ export class BetterDiceUpgrade extends Upgrade {
     }
   }
 }
+

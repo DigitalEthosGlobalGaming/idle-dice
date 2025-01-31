@@ -3,6 +3,7 @@ import { Upgrade } from "@src/components/upgrade-component";
 
 export class WanderingKnightUpgrade extends Upgrade {
   override name = "Wandering Knight";
+  override code = "KNIGHT";
   get description(): string {
     if (this.level == 0) {
       return [
@@ -12,8 +13,7 @@ export class WanderingKnightUpgrade extends Upgrade {
     }
 
     const parts = [
-      ` adds x${
-        Math.round(this.value) / 10
+      ` adds x${Math.round(this.value) / 10
       } to a dice's multiplier when moving into a neighboring tile.`,
       `{nextCost} - Increase to x${Math.round(this._nextValue) / 10}`,
     ];

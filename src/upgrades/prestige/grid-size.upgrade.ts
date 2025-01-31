@@ -3,11 +3,11 @@ import { Upgrade, UpgradeType } from "@src/components/upgrade-component";
 
 export class GridSizeUpgrade extends Upgrade {
   override name = "Grid Size";
+  override code = "GRID_SIZE";
   type: UpgradeType = "PRESTIGE";
   get description(): string {
     const parts = [
-      `{nextCost}⏣ - Increases playing space to {${this.nextValue + 16}} x {${
-        this.nextValue + 16
+      `{nextCost}⏣ - Increases playing space to {${this.nextValue + 16}} x {${this.nextValue + 16
       }}`,
     ];
 

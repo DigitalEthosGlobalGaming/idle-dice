@@ -3,6 +3,7 @@ import { Upgrade } from "@src/components/upgrade-component";
 
 export class BishopUpgrade extends Upgrade {
   override name = "Bishop";
+  override code = "BISHOP";
   get description(): string {
     if (this.level == 0) {
       return [

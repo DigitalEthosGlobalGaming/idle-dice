@@ -64,6 +64,7 @@ function getWeightedDiePercentageImprovement(weight: number): number {
 
 export class DiceWeightUpgrade extends Upgrade {
   override name = "Dice Weight";
+  override code = "DICE_WEIGHT";
   type: UpgradeType = "PRESTIGE";
   get description(): string {
     const nextImprovement = Math.floor(getWeightedDiePercentageImprovement(this.nextValue));

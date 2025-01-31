@@ -7,6 +7,7 @@ const parts = [
 ];
 export class PassiveEnergyComponent extends Upgrade {
   override name = "Passive Energy";
+  override code = "PASSIVE_ENERGY";
   constructor() {
     super();
     this.level = 1;

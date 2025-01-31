@@ -3,6 +3,7 @@ import { Upgrade } from "@src/components/upgrade-component";
 
 export class RookUpgrade extends Upgrade {
   override name = "Rook";
+  override code = "ROOK";
   get description(): string {
     if (this.level == 0) {
       return [

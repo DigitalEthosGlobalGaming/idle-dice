@@ -131,10 +131,9 @@ export class Upgrade {
     this.calculate();
   }
 
-  get code() {
-    return this.constructor.name;
-  }
+
   name: string = "Upgrade";
+  code: string = "UPGRADE";
   get description(): string {
     return "";
   }
