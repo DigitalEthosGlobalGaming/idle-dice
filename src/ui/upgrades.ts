@@ -48,7 +48,6 @@ export class UpgradeUi extends Panel {
         let parent = this.parentPanel;
         if (parent != null) {
           const prestige = this.addPanel("prestige", Button);
-          prestige.visible = false;
           prestige.text = "PRESTIGE";
           prestige.fontSize = 20;
           prestige.pos = ex.vec(0, parent.height - this.halfHeight - 30);
