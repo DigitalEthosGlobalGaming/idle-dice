@@ -8,6 +8,7 @@ import { BishopUpgrade } from "@src/upgrades/research/bishop.upgrade";
 import { RookUpgrade } from "../upgrades/research/rook.upgrade";
 import { GridSizeUpgrade } from "@src/upgrades/prestige/grid-size.upgrade";
 import { DiceWeightUpgrade } from "@src/upgrades/prestige/dice-weight.upgrade";
+import { BetterPassiveEnergyUpgrade } from "@src/upgrades/prestige/passive-upgrade.upgrade";
 
 export const upgrades = {
   PassiveEnergy: PassiveEnergyComponent,
@@ -17,6 +18,7 @@ export const upgrades = {
   Rook: RookUpgrade,
   GridSize: GridSizeUpgrade,
   DiceWeight: DiceWeightUpgrade,
+  BetterPassiverEnergy: BetterPassiveEnergyUpgrade,
 };
 
 export class PlayerUpgradesComponent extends ex.Component {

@@ -52,25 +52,16 @@ On 2 you unlock the knight
 On 3 you unlock the ship
 On 4 you unlock the rook
 
-#### Grid Size
-
-Start off with a smaller space and upgrade using prestige points.
 
 #### Offline Processing
-
 Makes it so the passive energy will work while offline.
 
 #### Queen - Single Use
-
 Unlocks the queen which rolls all dice in an XxX area around them.
 
 #### King - Single Use
-
 Unlocks the king which gives multipliers to all dice around them.
 
-#### Weighted Dice
-
-Makes it more likely to roll a 6.
 
 #### ???? - "Final Unlock"
 

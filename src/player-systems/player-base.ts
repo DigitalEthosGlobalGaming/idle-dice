@@ -188,9 +188,9 @@ export class PlayerBase extends ex.Actor implements InputHandler {
     const timer = this.scene?.addTimer(
       new ex.Timer({
         fcn: () => {
-          const upgrade = this.getUpgrade("PassiveEnergy");
-          let upgradeAmount = upgrade?.value ?? 1;
-          this.scoreComponent.updateScore(upgradeAmount);
+          const upgradeAmount = this.getUpgrade("PassiveEnergy")?.value ?? 1;
+          const upgradeMultiplier = this.getUpgrade("BetterPassiverEnergy")?.value ?? 1;
+          this.scoreComponent.updateScore(upgradeAmount * (upgradeMultiplier / 100));
         },
         interval: 1000,
         repeats: true,
