@@ -15,12 +15,15 @@ import { ExtendedKeyEvent } from "./extended-key-event";
  * @property globalZ - The global z-index of the entity, used for rendering order.
  */
 type RegisterForInput = {
-  onClick?(evt: ExtendedPointerEvent): void;
+  onPointerPressed?(evt: ExtendedPointerEvent): void;
   onPointerDown?(evt: ExtendedPointerEvent): void;
   onPointerUp?(evt: ExtendedPointerEvent): void;
   onPointerMove?(evt: ExtendedPointerEvent): void;
   onPointerEnter?(evt: ExtendedPointerEvent): void;
   onPointerLeave?(evt: ExtendedPointerEvent): void;
+  onDragStart?(evt: ExtendedPointerEvent): void;
+  onDragEnd?(evt: ExtendedPointerEvent): void;
+  onDragMove?(evt: ExtendedPointerEvent): void;
   onKeyUp?(evt: ExtendedKeyEvent): void;
   onKeyDown?(evt: ExtendedKeyEvent): void;
   onKeyPress?(evt: ExtendedKeyEvent): void;
@@ -45,6 +48,7 @@ export class InputManager extends ex.Entity {
     hoverChange: "im-hover-change",
     pointerEnter: "im-pointer-enter",
     pointerLeave: "im-pointer-leave",
+    pointerPressed: "im-pointer-pressed",
   };
   showDebug = false;
   subscriptions: ex.Subscription[] = [];
@@ -243,6 +247,28 @@ export class InputManager extends ex.Entity {
     return this.scene?.isCurrentScene() ?? false;
   }
 
+  _draggingElements: InputHandler[] = [];
+  get draggingElements(): InputHandler[] {
+    return this._draggingElements;
+  }
+  set draggingElements(value: InputHandler[]) {
+    this._draggingElements = value;
+  }
+
+  private _isDragging: boolean = false;
+  get isDragging(): boolean {
+    return this._isDragging;
+  }
+  set isDragging(value: boolean) {
+    if (value == this._isDragging) {
+      return;
+    }
+
+    this._isDragging = value;
+  }
+
+  private _pressedEntities: InputHandler[] = [];
+
   onPointerDown(evt: ex.PointerEvent) {
     if (this.paused) {
       return;
@@ -255,6 +281,8 @@ export class InputManager extends ex.Entity {
     let extendedEvent = ExtendedPointerEvent.extend(evt, this);
 
     let entities = extendedEvent.entities;
+    this._draggingElements = entities;
+    this._pressedEntities = entities;
     for (let entity of entities) {
       if (entity.onPointerDown != null) {
         entity.onPointerDown(extendedEvent);
@@ -275,6 +303,7 @@ export class InputManager extends ex.Entity {
     }
     let extendedEvent = ExtendedPointerEvent.extend(evt, this);
     let entities = extendedEvent.entities;
+    this._draggingElements = entities;
     for (let entity of entities) {
       if (entity.onPointerUp != null) {
         entity.onPointerUp(extendedEvent);
@@ -282,6 +311,16 @@ export class InputManager extends ex.Entity {
 
       entity.emit(InputManager.Events.pointerUp, extendedEvent);
     }
+    for (let entity of this._pressedEntities) {
+      if (entity.isKilled()) {
+        continue;
+      }
+      if (entity.onPointerPressed != null) {
+        entity.onPointerPressed(extendedEvent);
+      }
+      entity.emit(InputManager.Events.pointerPressed, extendedEvent);
+    }
+    this._pressedEntities = [];
     this.scene?.emit("im-pointer-up", extendedEvent);
   }
 
@@ -290,6 +329,7 @@ export class InputManager extends ex.Entity {
       return;
     }
     let extendedEvent = ExtendedPointerEvent.extend(evt, this);
+    this._pressedEntities = [];
 
     if (this.showDebug) {
       this.level.drawDebug({
@@ -330,7 +370,56 @@ export class InputManager extends ex.Entity {
       }
     }
 
+    for (let entity of this.draggingElements) {
+      entity
+      if (entity.onPointerMove != null) {
+        entity.onPointerMove(extendedEvent);
+      }
+      entity.emit(InputManager.Events.pointerMove, extendedEvent);
+    }
+
+    const isButtonDown = this.isDown("MouseLeft");
+    if (isButtonDown && !this.isDragging) {
+      this.onDragStart(extendedEvent);
+    } else if (isButtonDown && this.isDragging) {
+      this.onDragMove(extendedEvent);
+    } else {
+      this.onDragEnd(extendedEvent);
+    }
+
     this.scene?.emit(InputManager.Events.pointerMove, extendedEvent);
+  }
+
+  onDragStart(evt: ExtendedPointerEvent) {
+    this.isDragging = true;
+    this.draggingElements = evt.entities;
+    for (let entity of this.draggingElements) {
+      if (entity.onDragStart != null) {
+        entity.onDragStart(evt);
+      }
+    }
+  }
+  onDragEnd(evt: ExtendedPointerEvent) {
+    const draggingElement = this.draggingElements;
+    this.isDragging = false;
+    for (let entity of draggingElement) {
+      if (entity.isKilled()) {
+        continue;
+      }
+      if (entity.onDragEnd != null) {
+        entity.onDragEnd(evt);
+      }
+    }
+  }
+  onDragMove(evt: ExtendedPointerEvent) {
+    for (let entity of this.draggingElements) {
+      if (entity.isKilled()) {
+        continue;
+      }
+      if (entity.onDragMove != null) {
+        entity.onDragMove(evt);
+      }
+    }
   }
 
   onKeyUp(evt: ex.KeyEvent) {

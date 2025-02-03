@@ -7,6 +7,7 @@ import { TestLabelPanel } from "./test-label";
 import { TestPanelContainer } from "./test-panel-container";
 import { TestListPanel } from "./test-list";
 import { TestButtonPanel } from "./test-button";
+import { TestSliderPanel } from "./test-slider";
 
 export const Scenes: Record<string, string> = {
   Play: "GameScene",
@@ -46,8 +47,9 @@ export class TestUserInterfaceScene extends Level {
     TestLabelPanel,
     TestListPanel,
     TestButtonPanel,
+    TestSliderPanel
   ];
-  _testId: number = 1;
+  _testId: number = 4;
   get testId(): number {
     return this._testId;
   }

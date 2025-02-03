@@ -215,7 +215,7 @@ export class Panel extends ex.Actor implements InputHandler {
 
   get screenSize(): ex.Vector {
     let screen = this.scene?.engine.screen;
-    return ex.vec(screen?.drawWidth ?? 0, screen?.drawHeight ?? 0);
+    return ex.vec(screen?.width ?? 0, screen?.drawHeight ?? 0);
   }
   get screenWidth(): number {
     let screen = this.scene?.engine.screen;
@@ -643,7 +643,7 @@ export class Panel extends ex.Actor implements InputHandler {
     const isParentPanel = this.parent instanceof Panel;
     if (!isParentPanel) {
       const subscription = this.scene?.engine.screen.events.on("resize", () => {
-        this.allDirty = true;
+        this.calculateSize();
       });
       if (subscription != null) {
         this.subscriptions.push(subscription);

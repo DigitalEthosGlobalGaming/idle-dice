@@ -4,6 +4,7 @@ import { Tooltip } from "@src/player-systems/player-tooltip";
 import { Label } from "@src/ui/elements/label";
 import { SoundManager } from "@src/sound-manager";
 import { SoundKey } from "@src/resources";
+import { ExtendedPointerEvent } from "@src/input/extended-pointer-event";
 
 export type ButtonIcon = {
   imageSource: ex.ImageSource;
@@ -13,7 +14,7 @@ export type ButtonIcon = {
 type ButtonOptions = {
   text?: string;
   icon?: ButtonIcon;
-  onClick?: (e: ex.PointerEvent) => void;
+  onClick?: (e: ExtendedPointerEvent) => void;
 };
 export class Button extends Panel {
   private label?: Label;
@@ -149,7 +150,7 @@ export class Button extends Panel {
     return ex.vec(this.width, this.height);
   }
 
-  set onClick(value: (e: ex.PointerEvent) => void) {
+  set onClick(value: (e: ExtendedPointerEvent) => void) {
     this.options.onClick = value;
   }
 
@@ -159,7 +160,7 @@ export class Button extends Panel {
     this.padding = 20;
   }
 
-  onHoverChanged(e: ex.PointerEvent): void {
+  onHoverChanged(e: ExtendedPointerEvent): void {
     super.onHoverChanged(e);
     if (this.hoverColor != null) {
       if (this.isHovered) {
@@ -181,7 +182,7 @@ export class Button extends Panel {
     }
   }
 
-  onPointerDown(_e: ex.PointerEvent): void {
+  onPointerDown(_e: ExtendedPointerEvent): void {
     super.onPointerDown(_e);
     if (this.disabled) {
       return;
